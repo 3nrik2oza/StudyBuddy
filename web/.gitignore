@@ -1,0 +1,9 @@
+# .NET build artifacts
+**/bin/
+**/obj/
+.vs/
+*.user
+*.suo
+
+# lokalne postavke
+appsettings.Development.json
