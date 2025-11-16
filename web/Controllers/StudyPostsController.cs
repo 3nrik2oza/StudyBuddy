@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using web.Data;
 using web.Models.Entities;
 using web.Models.ViewModels;
-using web.Services;
 
 namespace web.Controllers;
 
@@ -17,12 +18,31 @@ public class StudyPostListItemVM
 
 public class StudyPostsController : Controller
 {
+    private readonly StudyBuddyDbContext _context;
+
+    public StudyPostsController(StudyBuddyDbContext context)
+    {
+        _context = context;
+    }
+
     public IActionResult Index(int? subjectId, DateTime? from)
     {
-        var query = InMemoryData.StudyPosts.AsQueryable();
+        DateTime minDate;
 
-        var minDate = from ?? DateTime.Today;
-        query = query.Where(p => p.StartAt >= minDate);
+        if (from.HasValue)
+        {
+            minDate = DateTime.SpecifyKind(from.Value, DateTimeKind.Utc);
+        }
+        else
+        {
+            var nowUtc = DateTime.UtcNow;
+            minDate = new DateTime(nowUtc.Year, nowUtc.Month, nowUtc.Day, 0, 0, 0, DateTimeKind.Utc);
+        }
+
+        var query = _context.StudyPosts
+            .Include(p => p.Subject)
+            .Where(p => p.StartAt >= minDate);
+
 
         if (subjectId.HasValue)
         {
@@ -31,25 +51,18 @@ public class StudyPostsController : Controller
 
         var items = query
             .OrderBy(p => p.StartAt)
-            .AsEnumerable()
-            .Select(p =>
+            .Select(p => new StudyPostListItemVM
             {
-                var subject = InMemoryData.Subjects.FirstOrDefault(s => s.Id == p.SubjectId);
-                var subjectName = subject != null ? subject.Name : "Neznan predmet";
-
-                return new StudyPostListItemVM
-                {
-                    Id = p.Id,
-                    Title = p.Title,
-                    SubjectName = subjectName,
-                    StartAt = p.StartAt,
-                    Location = p.Location,
-                    IsOnline = p.IsOnline
-                };
+                Id          = p.Id,
+                Title       = p.Title,
+                SubjectName = p.Subject != null ? p.Subject.Name : "Neznan predmet",
+                StartAt     = p.StartAt,
+                Location    = p.Location,
+                IsOnline    = p.IsOnline
             })
             .ToList();
 
-        ViewBag.Subjects = InMemoryData.Subjects;
+        ViewBag.Subjects = _context.Subjects.ToList();
         ViewBag.From = minDate.ToString("yyyy-MM-dd");
 
         return View(items);
@@ -58,12 +71,13 @@ public class StudyPostsController : Controller
     [HttpGet]
     public IActionResult Create()
     {
-        ViewBag.Subjects = InMemoryData.Subjects;
-        // default: danas + 1h
+        ViewBag.Subjects = _context.Subjects.ToList();
+
         var vm = new StudyPostCreateVM
         {
-            StartAt = DateTime.Now.AddHours(1)
+            StartAt = DateTime.UtcNow.AddHours(1)
         };
+
         return View(vm);
     }
 
@@ -72,28 +86,32 @@ public class StudyPostsController : Controller
     {
         if (!ModelState.IsValid)
         {
-            ViewBag.Subjects = InMemoryData.Subjects;
+            ViewBag.Subjects = _context.Subjects.ToList();
             return View(vm);
         }
 
-        var newId = InMemoryData.StudyPosts.Any()
-            ? InMemoryData.StudyPosts.Max(p => p.Id) + 1
+        var newId = _context.StudyPosts.Any()
+            ? _context.StudyPosts.Max(p => p.Id) + 1
             : 1;
+
+        var startAtUtc = DateTime.SpecifyKind(vm.StartAt, DateTimeKind.Utc);
 
         var entity = new StudyPost
         {
-            Id = newId,
-            Title = vm.Title,
-            SubjectId = vm.SubjectId,
-            StartAt = vm.StartAt,
-            Location = vm.Location,
-            IsOnline = vm.IsOnline,
-            FacultyId = 1,         // za sada hard-code
-            AuthorUserId = "demo", // kasnije iz logiranog usera
-            CreatedAt = DateTime.UtcNow
+            Id           = newId,
+            Title        = vm.Title,
+            SubjectId    = vm.SubjectId,
+            StartAt      = startAtUtc,
+            Location     = vm.Location,
+            IsOnline     = vm.IsOnline,
+            FacultyId    = 1,
+            AuthorUserId = "demo",
+            CreatedAt    = DateTime.UtcNow
         };
 
-        InMemoryData.StudyPosts.Add(entity);
+        _context.StudyPosts.Add(entity);
+        _context.SaveChanges();
+
         TempData["ok"] = "Termin je uspješno kreiran.";
 
         return RedirectToAction(nameof(Index));

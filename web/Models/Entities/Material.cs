@@ -6,7 +6,7 @@ public class Material
     public string Title { get; set; } = "";
     public string? Description { get; set; }
 
-    public string Type { get; set; } = "link"; // "link" ili "file"
+    public string Type { get; set; } = "link"; 
     public string? Url { get; set; }
     public string? FilePath { get; set; }
 

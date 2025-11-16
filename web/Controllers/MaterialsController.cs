@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using web.Services;
+using Microsoft.EntityFrameworkCore;
+using web.Data;
 using web.Models.Entities;
 using web.Models.ViewModels;
 
@@ -17,9 +18,18 @@ public class MaterialListItemVM
 
 public class MaterialsController : Controller
 {
+    private readonly StudyBuddyDbContext _context;
+
+    public MaterialsController(StudyBuddyDbContext context)
+    {
+        _context = context;
+    }
+
     public IActionResult Index(int? subjectId, string? search)
     {
-        var query = InMemoryData.Materials.AsQueryable();
+        var query = _context.Materials
+            .Include(m => m.Subject)
+            .AsQueryable();
 
         if (subjectId.HasValue)
         {
@@ -28,43 +38,35 @@ public class MaterialsController : Controller
 
         if (!string.IsNullOrWhiteSpace(search))
         {
+            var searchLower = search.ToLower();
             query = query.Where(m =>
-                m.Title.Contains(search, StringComparison.OrdinalIgnoreCase));
+                m.Title.ToLower().Contains(searchLower));
         }
 
         var items = query
             .OrderByDescending(m => m.CreatedAt)
-            .AsEnumerable()   
-            .Select(m =>
+            .Select(m => new MaterialListItemVM
             {
-                var subject = InMemoryData.Subjects.FirstOrDefault(s => s.Id == m.SubjectId);
-                var subjectName = subject != null ? subject.Name : "Neznan predmet";
-
-                return new MaterialListItemVM
-                {
-                    Id = m.Id,
-                    Title = m.Title,
-                    Description = m.Description,
-                    SubjectName = subjectName,
-                    Type = m.Type,
-                    Url = m.Url
-                };
+                Id = m.Id,
+                Title = m.Title,
+                Description = m.Description,
+                SubjectName = m.Subject != null ? m.Subject.Name : "Neznan predmet",
+                Type = m.Type,
+                Url = m.Url
             })
             .ToList();
 
-
-       ViewBag.Subjects = InMemoryData.Subjects;
+        ViewBag.Subjects = _context.Subjects.ToList();
         ViewBag.SelectedSubjectId = subjectId;
         ViewBag.Search = search;
 
         return View(items);
-
     }
 
     [HttpGet]
     public IActionResult Create()
     {
-        ViewBag.Subjects = InMemoryData.Subjects;
+        ViewBag.Subjects = _context.Subjects.ToList();
         return View(new MaterialCreateVM());
     }
 
@@ -73,30 +75,32 @@ public class MaterialsController : Controller
     {
         if (!ModelState.IsValid)
         {
-            ViewBag.Subjects = InMemoryData.Subjects;
+            ViewBag.Subjects = _context.Subjects.ToList();
             return View(vm);
         }
 
-        var newId = InMemoryData.Materials.Any()
-            ? InMemoryData.Materials.Max(m => m.Id) + 1
+        var newId = _context.Materials.Any()
+            ? _context.Materials.Max(m => m.Id) + 1
             : 1;
 
         var entity = new Material
         {
-            Id = newId,
-            Title = vm.Title,
-            Description = vm.Description,
-            Type = vm.Type,
-            Url = vm.Type == "link" ? vm.Url : null,
-            SubjectId = vm.SubjectId,
-            FacultyId = 1,
-            AuthorUserId = "demo",
-            CreatedAt = DateTime.UtcNow
+            Id           = newId,          
+            Title        = vm.Title,
+            Description  = vm.Description,
+            Type         = vm.Type,
+            Url          = vm.Type == "link" ? vm.Url : null,
+            SubjectId    = vm.SubjectId,
+            FacultyId    = 1,          // za sada FRI
+            AuthorUserId = "demo",     // kasnije iz Identity-ja
+            CreatedAt    = DateTime.UtcNow
         };
 
-        InMemoryData.Materials.Add(entity);
-        TempData["ok"] = "Gradivo je uspješno dodano.";
+        _context.Materials.Add(entity);
+        _context.SaveChanges();
 
+        TempData["ok"] = "Gradivo je uspješno dodano.";
         return RedirectToAction(nameof(Index));
     }
+
 }

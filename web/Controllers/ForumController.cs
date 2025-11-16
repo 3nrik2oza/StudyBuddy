@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
-using web.Models.ViewModels;
-using web.Services;
+using Microsoft.EntityFrameworkCore;
+using web.Data;
+using web.Models.Entities;
 
 namespace web.Controllers;
 
@@ -19,9 +20,16 @@ public class ForumThreadListItemVM
 
 public class ForumController : Controller
 {
+    private readonly StudyBuddyDbContext _context;
+
+    public ForumController(StudyBuddyDbContext context)
+    {
+        _context = context;
+    }
+
     public IActionResult Index(int? subjectId, string? category, string? search)
     {
-        var threads = InMemoryData.ForumThreads.AsQueryable();
+        var threads = _context.ForumThreads.AsQueryable();
 
         if (subjectId.HasValue)
         {
@@ -31,15 +39,20 @@ public class ForumController : Controller
         if (!string.IsNullOrWhiteSpace(category))
         {
             threads = threads.Where(t =>
-                t.Category.Equals(category, StringComparison.OrdinalIgnoreCase));
+                t.Category.ToLower() == category.ToLower());
         }
 
         if (!string.IsNullOrWhiteSpace(search))
         {
+            var searchLower = search.ToLower();
+
             threads = threads.Where(t =>
-                t.Title.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                t.Content.Contains(search, StringComparison.OrdinalIgnoreCase));
+                t.Title.ToLower().Contains(searchLower) ||
+                t.Content.ToLower().Contains(searchLower));
         }
+
+        var subjectLookup = _context.Subjects
+            .ToDictionary(s => s.Id, s => s.Name);
 
         var items = threads
             .OrderByDescending(t => t.CreatedAt)
@@ -52,15 +65,14 @@ public class ForumController : Controller
                     ? t.Content.Substring(0, 140) + "..."
                     : t.Content,
                 Category = t.Category,
-                SubjectName = InMemoryData.Subjects
-                    .FirstOrDefault(s => s.Id == t.SubjectId)?.Name ?? "",
+                SubjectName = subjectLookup.TryGetValue(t.SubjectId, out var name) ? name : "",
                 AuthorName = t.AuthorName,
                 CreatedAt = t.CreatedAt,
                 RepliesCount = t.RepliesCount
             })
             .ToList();
 
-        ViewBag.Subjects = InMemoryData.Subjects;
+        ViewBag.Subjects = _context.Subjects.ToList();
         ViewBag.SelectedSubjectId = subjectId;
         ViewBag.SelectedCategory = category;
         ViewBag.Search = search;

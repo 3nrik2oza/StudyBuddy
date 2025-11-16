@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using web.Services;
+using web.Data;
 using web.Models.Entities;
 
 namespace web.Controllers;
@@ -15,20 +15,28 @@ public class TutorListItemVM
 
 public class TutorsController : Controller
 {
+    private readonly StudyBuddyDbContext _context;
+
+    public TutorsController(StudyBuddyDbContext context)
+    {
+        _context = context;
+    }
+
     public IActionResult Index(int? subjectId)
     {
-        var tutors = InMemoryData.Tutors
-            .Where(t => t.FacultyId == 1) // za sada FRI
-            .ToList();
+        var tutorsQuery = _context.Tutors
+            .Where(t => t.FacultyId == 1);
 
-        var tutorSubjectLookup = InMemoryData.TutorSubjects
+        var tutors = tutorsQuery.ToList();
+
+        var tutorSubjectLookup = _context.TutorSubjects
             .GroupBy(ts => ts.UserId)
             .ToDictionary(
                 g => g.Key,
                 g => g.Select(x => x.SubjectId).ToList()
             );
 
-        var faculty = InMemoryData.Faculties.FirstOrDefault(f => f.Id == 1);
+        var faculty = _context.Faculties.FirstOrDefault(f => f.Id == 1);
         var facultyName = faculty != null ? faculty.Name : "Unknown faculty";
 
         var items = new List<TutorListItemVM>();
@@ -45,7 +53,7 @@ public class TutorsController : Controller
                 continue;
             }
 
-            var subjectNames = InMemoryData.Subjects
+            var subjectNames = _context.Subjects
                 .Where(s => subjectIds.Contains(s.Id))
                 .Select(s => s.Name)
                 .ToList();
@@ -61,30 +69,29 @@ public class TutorsController : Controller
         }
 
         items = items
-                .OrderByDescending(t => t.HelpPoints)
-                .ToList();
+            .OrderByDescending(t => t.HelpPoints)
+            .ToList();
 
-            var topTutors = items.Take(3).ToList();
-            ViewBag.TopTutors = topTutors;
+        var topTutors = items.Take(3).ToList();
+        ViewBag.TopTutors = topTutors;
 
-            ViewBag.Subjects = InMemoryData.Subjects;
-            ViewBag.SelectedSubjectId = subjectId;
+        ViewBag.Subjects = _context.Subjects.ToList();
+        ViewBag.SelectedSubjectId = subjectId;
 
-            return View(items);
-
+        return View(items);
     }
 
     [HttpPost]
     public IActionResult GiveHelpPoint(string tutorId, int? subjectId)
     {
-        var tutor = InMemoryData.Tutors.FirstOrDefault(t => t.Id == tutorId);
+        var tutor = _context.Tutors.FirstOrDefault(t => t.Id == tutorId);
         if (tutor != null)
         {
             tutor.HelpPoints += 1;
+            _context.SaveChanges();   
             TempData["ok"] = "Help point has been added.";
         }
 
         return RedirectToAction(nameof(Index), new { subjectId = subjectId });
     }
-
 }

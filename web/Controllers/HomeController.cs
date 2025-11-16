@@ -1,8 +1,9 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using web.Data;
 using web.Models;
-using web.Services;
 using web.Models.Entities;
 
 namespace web.Controllers;
@@ -10,40 +11,43 @@ namespace web.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private readonly StudyBuddyDbContext _context;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ILogger<HomeController> logger, StudyBuddyDbContext context)
     {
         _logger = logger;
+        _context = context;
     }
 
     public IActionResult Index()
-{
-    var topTutors = InMemoryData.Tutors
-        .OrderByDescending(t => t.HelpPoints)
-        .Take(3)
-        .Select(t => new TutorListItemVM
+    {
+        var tutorsQuery = _context.Tutors
+            .Include(t => t.Faculty)
+            .Include(t => t.TutorSubjects)
+                .ThenInclude(ts => ts.Subject)
+            .Where(t => t.FacultyId == 1);
+
+        var topTutors = tutorsQuery
+            .OrderByDescending(t => t.HelpPoints)
+            .Take(3)
+            .ToList();
+
+        var topTutorItems = topTutors.Select(t => new TutorListItemVM
         {
+            Id = t.Id,
             Name = t.Name,
             HelpPoints = t.HelpPoints,
-            FacultyName = InMemoryData.Faculties
-                .FirstOrDefault(f => f.Id == t.FacultyId)?.Name ?? "",
-            Subjects = InMemoryData.TutorSubjects
-                .Where(ts => ts.UserId == t.Id)
-                .Join(
-                    InMemoryData.Subjects,
-                    ts => ts.SubjectId,
-                    s => s.Id,
-                    (ts, s) => s.Name
-                )
+            FacultyName = t.Faculty != null ? t.Faculty.Name : "",
+            Subjects = t.TutorSubjects
+                .Where(ts => ts.Subject != null)
+                .Select(ts => ts.Subject!.Name)
                 .ToList()
-        })
-        .ToList();
+        }).ToList();
 
-    ViewBag.TopTutors = topTutors;
+        ViewBag.TopTutors = topTutorItems;
 
-    return View();
-}
-
+        return View();
+    }
 
     public IActionResult Privacy()
     {
