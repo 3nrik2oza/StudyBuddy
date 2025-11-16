@@ -527,7 +527,7 @@
 
 .home-hero-image-wrapper {
     flex: 1;
-    min-width: 260px;
+    min-width: 500px;
 }
 
 .home-hero-image {
@@ -557,7 +557,7 @@
     padding: 1.6rem 1.8rem;
     border-radius: 1rem;
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
-    border: 1px solid #edf0f7;
+    border: 2px solid #edf0f7;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
