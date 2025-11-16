@@ -19,47 +19,47 @@ public static class InMemoryData
 
     public static List<Subject> Subjects { get; } = new()
     {
-        new Subject { Id = 1, Name = "Informacijski sistemi", Code = "IS",   FacultyId = 1 },
-        new Subject { Id = 2, Name = "APS1",                  Code = "APS1", FacultyId = 1 }
+        new Subject { Id = 1, Name = "Information Systems", Code = "IS",   FacultyId = 1 },
+        new Subject { Id = 2, Name = "APS1",                Code = "APS1", FacultyId = 1 }
     };
 
     public static List<Material> Materials { get; } = new()
     {
         new Material
         {
-            Id          = 1,
-            Title       = "IS – skripta za kolokvij",
-            Description = "Sažeti zapisci sa predavanja i vajbi za prvi kolokvij iz IS-a.",
-            Type        = "link",
-            Url         = "https://example.com/is-skripta",
-            SubjectId   = 1,      // Informacijski sistemi
-            FacultyId   = 1,      // FRI
-            AuthorUserId= "demo1",
-            CreatedAt   = DateTime.UtcNow.AddDays(-3)
+            Id           = 1,
+            Title        = "IS – midterm notes",
+            Description  = "Summarized notes from lectures and labs for the first IS midterm.",
+            Type         = "link",
+            Url          = "https://example.com/is-skripta",
+            SubjectId    = 1,      // Information Systems
+            FacultyId    = 1,      // FRI
+            AuthorUserId = "demo1",
+            CreatedAt    = DateTime.UtcNow.AddDays(-3)
         },
         new Material
         {
-            Id          = 2,
-            Title       = "APS1 – zadaci sa rješenjima",
-            Description = "Zbirka zadataka iz rekurzije i sortiranja.",
-            Type        = "link",
-            Url         = "https://example.com/aps1-zadaci",
-            SubjectId   = 2,      // APS1
-            FacultyId   = 1,
-            AuthorUserId= "demo2",
-            CreatedAt   = DateTime.UtcNow.AddDays(-1)
+            Id           = 2,
+            Title        = "APS1 – exercises with solutions",
+            Description  = "A collection of exercises on recursion and sorting.",
+            Type         = "link",
+            Url          = "https://example.com/aps1-zadaci",
+            SubjectId    = 2,      // APS1
+            FacultyId    = 1,
+            AuthorUserId = "demo2",
+            CreatedAt    = DateTime.UtcNow.AddDays(-1)
         },
         new Material
         {
-            Id          = 3,
-            Title       = "IS – UML dijagrami primjer",
-            Description = "Primjer UML dijagrama za seminarski projekat.",
-            Type        = "link",
-            Url         = "https://example.com/is-uml",
-            SubjectId   = 1,
-            FacultyId   = 1,
-            AuthorUserId= "demo3",
-            CreatedAt   = DateTime.UtcNow.AddHours(-5)
+            Id           = 3,
+            Title        = "IS – UML diagram example",
+            Description  = "Example UML diagram for a seminar project.",
+            Type         = "link",
+            Url          = "https://example.com/is-uml",
+            SubjectId    = 1,
+            FacultyId    = 1,
+            AuthorUserId = "demo3",
+            CreatedAt    = DateTime.UtcNow.AddHours(-5)
         }
     };
 
@@ -67,15 +67,15 @@ public static class InMemoryData
     {
         new StudyPost
         {
-            Id          = 1,
-            Title       = "IS – ponavljanje za kolokvij",
-            SubjectId   = 1,
-            StartAt     = DateTime.Today.AddDays(1).AddHours(17),
-            Location    = "FRI P22",
-            IsOnline    = false,
-            FacultyId   = 1,
-            AuthorUserId= "demo",
-            CreatedAt   = DateTime.UtcNow.AddDays(-1)
+            Id           = 1,
+            Title        = "IS – midterm revision",
+            SubjectId    = 1,
+            StartAt      = DateTime.Today.AddDays(1).AddHours(17),
+            Location     = "FRI P22",
+            IsOnline     = false,
+            FacultyId    = 1,
+            AuthorUserId = "demo",
+            CreatedAt    = DateTime.UtcNow.AddDays(-1)
         }
     };
 
@@ -112,51 +112,55 @@ public static class InMemoryData
         new TutorSubject { UserId = "tutor3", SubjectId = 1 }
     };
 
-    public static List<News> NewsItems { get; } = new()
+    public static List<ForumThread> ForumThreads { get; } = new()
     {
-        new News
+        new ForumThread
         {
-            Id        = 1,
-            Category  = "New material",
-            Title     = "New Math 1 notes uploaded",
-            Content   = "A new set of exercises and concise formula summaries for the Math 1 exam is now available.",
-            FacultyId = 1,
-            CreatedAt = DateTime.UtcNow.AddDays(-3),
-            LinkText  = "View material",
-            LinkUrl   = "/Materials"
+            Id           = 1,
+            Title        = "Looking for APS1 study group",
+            Content      = "Hi, I am looking for 2–3 people to study APS1 together before the midterm.",
+            Category     = "Study group",
+            SubjectId    = 2, // APS1
+            FacultyId    = 1,
+            AuthorName   = "Ana",
+            CreatedAt    = DateTime.UtcNow.AddDays(-2),
+            RepliesCount = 5
         },
-        new News
+        new ForumThread
         {
-            Id        = 2,
-            Category  = "Course update",
-            Title     = "New Python mini-projects",
-            Content   = "We added new practice projects: a to-do app, a calculator and a quiz application.",
-            FacultyId = 1,
-            CreatedAt = DateTime.UtcNow.AddDays(-2),
-            LinkText  = "See what’s new",
-            LinkUrl   = "/Materials"
+            Id           = 2,
+            Title        = "Sharing IS notes from last year",
+            Content      = "I uploaded my IS notes from last year. They cover all lectures and most of the lab exercises.",
+            Category     = "Materials",
+            SubjectId    = 1, // IS
+            FacultyId    = 1,
+            AuthorName   = "Marko",
+            CreatedAt    = DateTime.UtcNow.AddDays(-1),
+            RepliesCount = 10
         },
-        new News
+        new ForumThread
         {
-            Id        = 3,
-            Category  = "Announcement",
-            Title     = "Live Q&A with tutors",
-            Content   = "Every Sunday at 19:00 you can join an online Q&A session about programming and mathematics.",
-            FacultyId = 1,
-            CreatedAt = DateTime.UtcNow.AddDays(-1),
-            LinkText  = "Join the session",
-            LinkUrl   = "/StudySessions"
+            Id           = 3,
+            Title        = "Help with recursion in APS1",
+            Content      = "Can someone explain recursion with a simple example? I am stuck on the homework exercises.",
+            Category     = "Help",
+            SubjectId    = 2,
+            FacultyId    = 1,
+            AuthorName   = "Sara",
+            CreatedAt    = DateTime.UtcNow.AddHours(-8),
+            RepliesCount = 35
         },
-        new News
+        new ForumThread
         {
-            Id        = 4,
-            Category  = "Featured",
-            Title     = "Top 10 materials this month",
-            Content   = "Check which resources students are using and recommending the most for studying.",
-            FacultyId = 1,
-            CreatedAt = DateTime.UtcNow.AddHours(-6),
-            LinkText  = "Open list",
-            LinkUrl   = "/Materials"
+            Id           = 4,
+            Title        = "Project team for IS",
+            Content      = "I am looking for 2 more people to form a project team for StudyBuddy or a similar IS project.",
+            Category     = "Study group",
+            SubjectId    = 1,
+            FacultyId    = 1,
+            AuthorName   = "Lejla",
+            CreatedAt    = DateTime.UtcNow.AddHours(-3),
+            RepliesCount = 3
         }
     };
 }

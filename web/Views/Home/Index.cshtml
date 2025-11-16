@@ -1,16 +1,22 @@
 ﻿@using web.Controllers
 @{
-    ViewData[index: "Title"] = "Home";
-    List<web.Models.Entities.News>? latestNews = ViewBag.LatestNews as List<web.Models.Entities.News>; // više ne koristimo, ali može ostati
-    List<TutorListItemVM>? topTutors = ViewBag.TopTutors as List<TutorListItemVM>;
+    ViewData["Title"] = "Home";
 }
 
-<div class="home-hero rounded-4 p-4 p-md-5 mb-5 d-flex flex-column flex-md-row align-items-center">
-    <div class="flex-grow-1 mb-4 mb-md-0 me-md-4">
-        <h1 class="display-5 fw-bold mb-3">Study smarter, not harder.</h1>
-        <p class="lead mb-4">
-            Collect materials, join study sessions, find tutors and stay up to date with what is happening at your faculty.
+<section class="home-hero-new rounded-4 mb-5 d-flex flex-column flex-md-row align-items-center">
+    <div class="home-hero-text flex-grow-1 mb-4 mb-md-0 me-md-4">
+        <h1 class="home-hero-title mb-3">
+            Your platform for learning,<br />
+            clear support and real progress
+        </h1>
+        <p class="home-hero-subtitle mb-4">
+            Find notes, answers, tutors, and a community that truly helps.
+            Everything in one place — organized, intuitive, and modern.
         </p>
+
+        <a asp-controller="Materials" asp-action="Index" class="home-hero-btn">
+            Start now
+        </a>
     </div>
 
     <div class="home-hero-image-wrapper">
@@ -18,112 +24,52 @@
              alt="Students studying together"
              class="img-fluid rounded-4 shadow-sm home-hero-image" />
     </div>
+</section>
+
+<h2 class="home-section-title">Why StudyBuddy?</h2>
+<div class="home-info-grid mb-5">
+    <article class="home-info-card">
+        <h3 class="home-info-title">📘 Materials</h3>
+        <p class="home-info-text">
+            Well-structured notes, summaries, PDFs and exercises for all courses in one place.
+        </p>
+    </article>
+
+    <article class="home-info-card">
+        <h3 class="home-info-title">👩‍🏫 Tutors</h3>
+        <p class="home-info-text">
+            Find verified tutors for programming, mathematics and other subjects.
+        </p>
+    </article>
+
+    <article class="home-info-card">
+        <h3 class="home-info-title">💬 Forum</h3>
+        <p class="home-info-text">
+            Ask questions, share answers or read tips from other students — fast and helpful knowledge exchange.
+        </p>
+    </article>
 </div>
 
-<div class="row g-3 mb-5">
-    <div class="col-12 col-md-3">
-        <div class="home-card home-card-materials h-100 rounded-4 p-3">
-            <div class="home-card-icon mb-2">📚</div>
-            <h5 class="mb-2">Study materials</h5>
-            <p class="mb-3 text-muted small">
-                Find notes, summaries and links shared by other students.
-            </p>
-            <a asp-controller="Materials" asp-action="Index" class="stretched-link fw-semibold small">
-                Go to materials →
-            </a>
-        </div>
-    </div>
+<h2 class="home-section-title">How does it work?</h2>
+<div class="home-info-grid mb-5">
+    <article class="home-info-card">
+        <h3 class="home-info-title">1. Find materials</h3>
+        <p class="home-info-text">
+            Browse by subject, year, faculty or topic.
+        </p>
+    </article>
 
-    <div class="col-12 col-md-3">
-        <div class="home-card home-card-sessions h-100 rounded-4 p-3">
-            <div class="home-card-icon mb-2">🗓️</div>
-            <h5 class="mb-2">Study sessions</h5>
-            <p class="mb-3 text-muted small">
-                Join or create sessions to study together for your courses.
-            </p>
-            <a asp-controller="StudyPosts" asp-action="Index" class="stretched-link fw-semibold small">
-                View sessions →
-            </a>
-        </div>
-    </div>
+    <article class="home-info-card">
+        <h3 class="home-info-title">2. Study or get help</h3>
+        <p class="home-info-text">
+            Use notes or book a session with a tutor.
+        </p>
+    </article>
 
-    <div class="col-12 col-md-3">
-        <div class="home-card home-card-tutors h-100 rounded-4 p-3">
-            <div class="home-card-icon mb-2">🎓</div>
-            <h5 class="mb-2">Tutors</h5>
-            <p class="mb-3 text-muted small">
-                See which students offer help and how many help points they have.
-            </p>
-            <a asp-controller="Tutors" asp-action="Index" class="stretched-link fw-semibold small">
-                Find tutors →
-            </a>
-        </div>
-    </div>
-
-    <div class="col-12 col-md-3">
-        <div class="home-card home-card-news h-100 rounded-4 p-3">
-            <div class="home-card-icon mb-2">📰</div>
-            <h5 class="mb-2">News</h5>
-            <p class="mb-3 text-muted small">
-                Stay informed about deadlines, events and other announcements.
-            </p>
-            <a asp-controller="News" asp-action="Index" class="stretched-link fw-semibold small">
-                Read news →
-            </a>
-        </div>
-    </div>
+    <article class="home-info-card">
+        <h3 class="home-info-title">3. Join the community</h3>
+        <p class="home-info-text">
+            Ask questions, save notes, share your knowledge with others.
+        </p>
+    </article>
 </div>
-
-@if (topTutors != null && topTutors.Any())
-{
-    <section class="mb-5">
-        <h3 class="mb-3">Top tutors</h3>
-
-        @{
-            // boje za border i avatar – rotiraju se preko indeksa
-            string[]? borderColors = new[] { "#7aa8ff", "#ffd27a", "#8ed6aa" };
-            string[]? avatarColors = new[] { "#dce6f5", "#fae9c8", "#ddf5e8" };
-        }
-
-        <div class="row g-3">
-            @for (var i = 0; i < topTutors.Count && i < 3; i++)
-            {
-                TutorListItemVM? t = topTutors[i];
-                string? borderColor = borderColors[i % borderColors.Length];
-                string? avatarColor = avatarColors[i % avatarColors.Length];
-
-                <div class="col-12 col-md-4">
-                    <div class="card shadow-sm border-0 rounded-4 h-100" style="border-top: 6px solid @borderColor;">
-                        <div class="card-body d-flex flex-column">
-                            <div class="mb-3">
-                                <div class="rounded-circle mb-3"
-                                     style="width:60px; height:60px; background:@avatarColor;"></div>
-
-                                <h5 class="card-title mb-1">@t.Name</h5>
-                                @if (t.Subjects != null && t.Subjects.Any())
-                                {
-                                    <p class="small text-muted mb-0">
-                                        Subjects: @string.Join(separator: ", ", t.Subjects)
-                                    </p>
-                                }
-                            </div>
-
-                            <div class="mt-auto d-flex justify-content-between align-items-center">
-                                <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis">
-                                    @t.HelpPoints help points
-                                </span>
-                                <a asp-controller="Tutors" asp-action="Index" class="btn btn-outline-success btn-sm">
-                                    Tutor helped me
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-    </section>
-}
-else
-{
-    <p>No tutors yet.</p>
-}

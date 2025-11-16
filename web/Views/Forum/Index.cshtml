@@ -1,0 +1,71 @@
+@model List<web.Controllers.ForumThreadListItemVM>
+
+@{
+    ViewData["Title"] = "Forum";
+}
+
+<h2 class="mb-3">Forum</h2>
+
+<p class="text-muted mb-4">
+    Share questions, tips and study experiences with other students.
+</p>
+
+<div class="forum-list">
+
+    @foreach (var t in Model)
+    {
+        // odabir boje ruba prema kategoriji
+        var borderClass = t.Category switch
+        {
+            "Study group" => "forum-border-blue",
+            "Materials"   => "forum-border-green",
+            "Help"        => "forum-border-amber",
+            _             => "forum-border-red"
+        };
+
+        // ako nemaš RepliesCount, možeš ovdje staviti npr. 0 ili maknuti blok desno
+        var repliesText = t is { RepliesCount: > 0 }
+            ? $"{t.RepliesCount} replies"
+            : "";
+
+        <article class="forum-card @borderClass">
+            <div class="forum-card-top">
+                <h3>@t.Title</h3>
+
+                @if (!string.IsNullOrEmpty(repliesText))
+                {
+                    <span class="forum-replies">@repliesText</span>
+                }
+            </div>
+
+            <p>@t.ContentPreview</p>
+
+            <div class="forum-meta">
+                <span>📅 @t.CreatedAt.ToLocalTime().ToString("dd. MM. yyyy")</span>
+                <span>👤 @t.AuthorName</span>
+
+                @if (t.Category == "Study group")
+                {
+                    <span>🔥 Active</span>
+                }
+                else if (t.Category == "Materials")
+                {
+                    <span>📁 Materials</span>
+                }
+                else if (t.Category == "Help")
+                {
+                    <span>💬 Discussion</span>
+                }
+                else
+                {
+                    <span>🌟 Popular</span>
+                }
+            </div>
+        </article>
+    }
+
+    @if (!Model.Any())
+    {
+        <p>No forum threads yet.</p>
+    }
+</div>
