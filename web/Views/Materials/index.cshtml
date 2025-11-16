@@ -1,0 +1,143 @@
+@model List<web.Controllers.MaterialListItemVM>
+
+@{
+    ViewData["Title"] = "Study materials";
+    var subjects = ViewBag.Subjects as List<web.Models.Entities.Subject>;
+    var search = ViewBag.Search as string ?? "";
+}
+
+
+<h2 class="mb-1">Study materials</h2>
+<p class="text-muted mb-4">
+    Browse and share notes, summaries and useful links for your courses.
+</p>
+
+<form method="get" class="row g-2 mb-4 align-items-end">
+    <div class="col-sm-4">
+        <label class="form-label mb-1">Subject</label>
+        <select name="subjectId" class="form-select">
+            <option value="">All subjects</option>
+            @if (subjects != null)
+            {
+                foreach (var s in subjects)
+                {
+                    <option value="@s.Id">@s.Name</option>
+                }
+            }
+        </select>
+    </div>
+
+    <div class="col-sm-4">
+        <label class="form-label mb-1">Search</label>
+        <input type="text"
+               name="search"
+               value="@search"
+               placeholder="Search by title..."
+               class="form-control" />
+    </div>
+
+    <div class="col-sm-2 d-grid">
+        <button type="submit" class="btn btn-primary mt-2 mt-sm-0">
+            Filter
+        </button>
+    </div>
+
+    <div class="col-sm-2 d-grid">
+        <a asp-action="Create" class="btn btn-success mt-2 mt-sm-0">
+            Add material
+        </a>
+    </div>
+</form>
+
+@if (TempData["ok"] != null)
+{
+    <div class="alert alert-success">@TempData["ok"]</div>
+}
+
+@if (!Model.Any())
+{
+    <p>No materials found.</p>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var m in Model)
+        {
+            // choose color + icon based on subject
+            string cardColorClass;
+            string emoji;
+            var subject = m.SubjectName ?? "";
+
+            if (subject.Contains("APS", StringComparison.OrdinalIgnoreCase))
+            {
+                cardColorClass = "material-card-aps";
+                emoji = "💻";
+            }
+            else if (subject.Contains("baze", StringComparison.OrdinalIgnoreCase) ||
+                     subject.Contains("db", StringComparison.OrdinalIgnoreCase))
+            {
+                cardColorClass = "material-card-db";
+                emoji = "📊";
+            }
+            else if (subject.Contains("algoritm", StringComparison.OrdinalIgnoreCase))
+            {
+                cardColorClass = "material-card-algo";
+                emoji = "⚙️";
+            }
+            else
+            {
+                cardColorClass = "material-card-default";
+                emoji = "📘";
+            }
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="material-card @cardColorClass h-100">
+                    <div class="material-card-icon">
+                        @emoji
+                    </div>
+
+                    <div class="material-card-header text-muted small fw-semibold">
+                        @m.SubjectName
+                    </div>
+
+                    <h5 class="mt-3 mb-1">@m.Title</h5>
+
+                    <p class="text-muted small mb-3">
+                        @(string.IsNullOrWhiteSpace(m.Description)
+                            ? "No description provided."
+                            : m.Description)
+                    </p>
+
+                    <div class="d-flex justify-content-between align-items-center mt-auto">
+                        @if (!string.IsNullOrWhiteSpace(m.Type))
+                        {
+                            <span class="material-type-badge">
+                                @m.Type
+                            </span>
+                        }
+                        else
+                        {
+                            <span></span>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(m.Url))
+                        {
+                            <a href="@m.Url"
+                               target="_blank"
+                               rel="noopener"
+                               class="btn btn-outline-primary btn-sm">
+                                Open link
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted small">
+                                No link
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

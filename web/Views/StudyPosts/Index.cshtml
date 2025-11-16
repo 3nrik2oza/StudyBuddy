@@ -1,0 +1,122 @@
+@model List<web.Controllers.StudyPostListItemVM>
+
+@{
+    ViewData["Title"] = "Study sessions";
+    var subjects = ViewBag.Subjects as List<web.Models.Entities.Subject>;
+    var from = ViewBag.From as string;
+}
+
+<h2 class="mb-1">Study sessions</h2>
+<p class="text-muted mb-4">
+    Discover upcoming sessions and study together with other students.
+</p>
+
+<form method="get" class="row g-2 mb-4 align-items-end">
+    <div class="col-sm-4">
+        <label class="form-label mb-1">Subject</label>
+        <select name="subjectId" class="form-select">
+            <option value="">All subjects</option>
+            @if (subjects != null)
+            {
+                foreach (var s in subjects)
+                {
+                    <option value="@s.Id">@s.Name</option>
+                }
+            }
+        </select>
+    </div>
+
+    <div class="col-sm-3">
+        <label class="form-label mb-1">From date</label>
+        <input type="date" name="from" value="@from" class="form-control" />
+    </div>
+
+    <div class="col-sm-2 col-md-2 d-grid">
+        <button type="submit" class="btn btn-primary mt-2 mt-sm-0">
+            Filter
+        </button>
+    </div>
+
+    <div class="col-sm-3 col-md-3 d-grid">
+        <a asp-action="Create" class="btn btn-success mt-2 mt-sm-0">
+            New session
+        </a>
+    </div>
+</form>
+
+@if (TempData["ok"] != null)
+{
+    <div class="alert alert-success">@TempData["ok"]</div>
+}
+
+@if (!Model.Any())
+{
+    <p>No study sessions found.</p>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var t in Model)
+        {
+            // simple mapping subject -> image
+            string imageUrl;
+            var subjectName = t.SubjectName ?? "";
+
+            if (subjectName.Contains("APS", StringComparison.OrdinalIgnoreCase))
+            {
+                imageUrl = "https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg";
+            }
+            else if (subjectName.Contains("IS", StringComparison.OrdinalIgnoreCase))
+            {
+                imageUrl = "https://images.pexels.com/photos/3861964/pexels-photo-3861964.jpeg";
+            }
+            else
+            {
+                imageUrl = "https://images.pexels.com/photos/4145190/pexels-photo-4145190.jpeg";
+            }
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="session-card card h-100 border-0 shadow-sm">
+                    <div class="ratio ratio-16x9 session-card-cover">
+                        <img src="@imageUrl"
+                             class="card-img-top"
+                             alt="Study session image for @t.SubjectName" />
+                    </div>
+
+                    <div class="card-body d-flex flex-column">
+                        <span class="badge bg-light text-secondary mb-2">
+                            @t.SubjectName
+                        </span>
+
+                        <h5 class="card-title mb-1">@t.Title</h5>
+
+                        <p class="card-text text-muted small mb-3">
+                            @t.StartAt.ToString("dd.MM.yyyy HH:mm")
+                            ·
+                            @t.Location
+                        </p>
+
+                        <div class="mt-auto d-flex justify-content-between align-items-center">
+                            <span class="text-muted small">
+                                Study session
+                            </span>
+
+                            @if (t.IsOnline)
+                            {
+                                <span class="session-type-badge session-type-online">
+                                    Online
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="session-type-badge session-type-physical">
+                                    On campus
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

@@ -1,0 +1,62 @@
+@model web.Models.ViewModels.MaterialCreateVM
+@{
+    ViewData["Title"] = "Add material";
+    var subjects = ViewBag.Subjects as List<web.Models.Entities.Subject>;
+}
+
+<h2 class="mb-4">Add material</h2>
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Subject</label>
+        <select asp-for="SubjectId" class="form-select">
+            <option value="">-- All Subjects --</option>
+            @if (subjects != null)
+            {
+                foreach (var s in subjects)
+                {
+                    <option value="@s.Id">@s.Name</option>
+                }
+            }
+        </select>
+        <span asp-validation-for="SubjectId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Type</label>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" value="link" asp-for="Type" checked />
+            <label class="form-check-label">Link</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" value="file" asp-for="Type" />
+            <label class="form-check-label">File (kasnije)</label>
+        </div>
+        <span asp-validation-for="Type" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Url" class="form-label"></label>
+        <input asp-for="Url" class="form-control" />
+        <span asp-validation-for="Url" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

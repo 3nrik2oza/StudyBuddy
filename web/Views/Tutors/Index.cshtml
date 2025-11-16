@@ -1,0 +1,116 @@
+@model List<web.Controllers.TutorListItemVM>
+
+@{
+    ViewData["Title"] = "Tutors";
+    var subjects = ViewBag.Subjects as List<web.Models.Entities.Subject>;
+    int? selectedSubjectId = ViewBag.SelectedSubjectId as int?;
+}
+
+<h2 class="mb-1">Tutors</h2>
+<p class="text-muted mb-4">
+    See who is offering help and how many help points they have earned.
+</p>
+
+<form method="get" class="row g-2 mb-4">
+    <div class="col-sm-4 col-md-3">
+        <label class="form-label mb-1">Filter by subject</label>
+        <select name="subjectId" class="form-select" onchange="this.form.submit()">
+            <option value="">All subjects</option>
+            @if (subjects != null)
+            {
+                foreach (var s in subjects)
+                {
+                   @if (selectedSubjectId == s.Id)
+                    {
+                        <option value="@s.Id" selected>@s.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@s.Id">@s.Name</option>
+                    }
+
+                }
+            }
+        </select>
+    </div>
+</form>
+
+@if (TempData["ok"] != null)
+{
+    <div class="alert alert-success">@TempData["ok"]</div>
+}
+
+@if (!Model.Any())
+{
+    <p>No tutors found.</p>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var tutor in Model)
+        {
+            var primarySubject = tutor.Subjects.FirstOrDefault() ?? "";
+            string cardColorClass;
+
+            if (primarySubject.Contains("Mat", StringComparison.OrdinalIgnoreCase))
+            {
+                cardColorClass = "tutor-card-blue";
+            }
+            else if (primarySubject.Contains("Prog", StringComparison.OrdinalIgnoreCase) ||
+                     primarySubject.Contains("APS", StringComparison.OrdinalIgnoreCase))
+            {
+                cardColorClass = "tutor-card-yellow";
+            }
+            else if (primarySubject.Contains("Alg", StringComparison.OrdinalIgnoreCase))
+            {
+                cardColorClass = "tutor-card-red";
+            }
+            else if (primarySubject.Contains("baz", StringComparison.OrdinalIgnoreCase) ||
+                     primarySubject.Contains("SQL", StringComparison.OrdinalIgnoreCase))
+            {
+                cardColorClass = "tutor-card-green";
+            }
+            else
+            {
+                cardColorClass = "tutor-card-blue";
+            }
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="tutor-card @cardColorClass h-100">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="tutor-avatar"></div>
+                        <div class="ms-3">
+                            <h5 class="mb-1">@tutor.Name</h5>
+                            <p class="text-muted small mb-0">@tutor.FacultyName</p>
+                        </div>
+                    </div>
+
+                    <p class="text-muted small mb-3">
+                        <strong>Subjects:</strong>
+                        @if (tutor.Subjects.Any())
+                        {
+                            @string.Join(", ", tutor.Subjects)
+                        }
+                        else
+                        {
+                            <span>No subjects assigned.</span>
+                        }
+                    </p>
+
+                    <div class="mt-auto d-flex justify-content-between align-items-center">
+                        <span class="tutor-help-badge">
+                            ⭐ Help points: @tutor.HelpPoints
+                        </span>
+
+                        <form asp-action="GiveHelpPoint" method="post" class="m-0">
+                            <input type="hidden" name="tutorId" value="@tutor.Id" />
+                            <button type="submit" class="btn btn-outline-success btn-sm">
+                                Tutor helped me
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

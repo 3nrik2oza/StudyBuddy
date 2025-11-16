@@ -1,31 +1,404 @@
-html {
-  font-size: 14px;
+.home-hero {
+    background: linear-gradient(135deg, #f1f5f9, #e0f2fe);
+    border: 1px solid #e2e8f0;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+.home-hero-image-wrapper {
+    max-width: 260px;
+    flex-shrink: 0;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.home-hero-image {
+    object-fit: cover;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+/* Quick action cards */
+.home-card {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
 }
 
-body {
-  margin-bottom: 60px;
+.home-card:hover {
+    background-color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+.home-card-icon {
+    font-size: 1.6rem;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+/* Latest news styling */
+.home-news-item {
+    border-radius: 0.75rem;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 0.5rem;
+}
+/* Base card */
+.home-card {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.home-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+}
+
+/* Variant colors */
+.home-card-materials {
+    background-color: #dbeafe;      /* blue-100 */
+    border-color: #bfdbfe;
+}
+
+.home-card-materials:hover {
+    background-color: #bfdbfe;
+}
+
+.home-card-sessions {
+    background-color: #fef3c7;      /* amber-100 */
+    border-color: #fcd34d;
+}
+
+.home-card-sessions:hover {
+    background-color: #fde68a;
+}
+
+.home-card-tutors {
+    background-color: #ede9fe;      /* violet-100 */
+    border-color: #ddd6fe;
+}
+
+.home-card-tutors:hover {
+    background-color: #ddd6fe;
+}
+
+.home-card-news {
+    background-color: #dcfce7;      /* green-100 */
+    border-color: #bbf7d0;
+}
+
+.home-card-news:hover {
+    background-color: #bbf7d0;
+}
+.page-header {
+    border: 1px solid transparent;
+}
+
+/* match home card colors, but softer */
+.page-header-materials {
+    background-color: #eff6ff;   /* blue-50 */
+    border-color: #bfdbfe;
+}
+
+.page-header-sessions {
+    background-color: #fffbeb;   /* amber-50 */
+    border-color: #fcd34d;
+}
+
+.page-header-tutors {
+    background-color: #f5f3ff;   /* violet-50 */
+    border-color: #ddd6fe;
+}
+
+.page-header-news {
+    background-color: #ecfdf3;   /* green-50 */
+    border-color: #bbf7d0;
+}
+.tutor-pill {
+    background-color: #ede9fe;
+    border: 1px solid #ddd6fe;
+    font-size: 0.9rem;
+}
+
+.tutor-pill span.badge {
+    font-size: 0.8rem;
+}
+.session-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.session-card {
+    border-radius: 1rem;
+    overflow: hidden;
+    background-color: #ffffff;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+}
+
+.session-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+}
+
+.session-card-cover img {
+    object-fit: cover;
+}
+
+.session-card .card-body {
+    padding: 0.85rem 1rem 1rem;
+}
+
+.session-card .card-title {
+    font-weight: 600;
+}
+
+/* badge for type */
+.session-type-badge {
+    display: inline-block;
+    padding: 0.15rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.session-type-online {
+    background-color: #e0f2fe;
+    color: #1d4ed8;
+}
+
+.session-type-physical {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.material-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    border: 1px solid #eef0f4;
+    border-top-width: 6px;
+    border-top-style: solid;
+    border-top-color: #e5e7eb; /* default, ako ne nađemo subject */
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.material-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+}
+
+.material-card-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.material-card-header {
+    background: #f5f6f8;
+    border-radius: 999px;
+    padding: 4px 10px;
+    display: inline-block;
+}
+
+/* subject-specific colors (prilagodi kako želiš) */
+.material-card-default {
+    border-top-color: #6aa7ff; /* plava */
+}
+
+.material-card-aps {
+    border-top-color: #8ed081; /* zelena */
+}
+
+.material-card-db {
+    border-top-color: #f5b971; /* narandžasta */
+}
+
+.material-card-algo {
+    border-top-color: #ff7c7c; /* crvena */
+}
+
+/* badge for material type (PDF, notes, link...) */
+.material-type-badge {
+    display: inline-block;
+    padding: 0.15rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: #e0f2fe;
+    color: #1d4ed8;
+}
+/* Tutor cards – Top Tutors style */
+
+.tutor-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    border: 1px solid #eef0f4;
+    border-top-width: 6px;
+    border-top-style: solid;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tutor-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+}
+
+.tutor-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #dce6f5; /* default pastel plava */
+}
+
+/* boje vrha kartica prema predmetu */
+.tutor-card-blue {
+    border-top-color: #7aa8ff;
+}
+
+.tutor-card-yellow {
+    border-top-color: #ffd27a;
+}
+
+.tutor-card-red {
+    border-top-color: #ff8a8a;
+}
+
+.tutor-card-green {
+    border-top-color: #8ed6aa;
+}
+
+/* badge za help points */
+.tutor-help-badge {
+    background: #eef4ff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+.news-section {
+    padding: 0 40px 40px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.news-title {
+    font-size: 28px;
+    font-weight: 600;
+    margin: 40px 0 20px;
+}
+
+.news-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.news-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 18px 20px 16px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+    border: 1px solid #eef0f4;
+}
+
+/* unutrašnji layout */
+.news-card-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.news-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.news-tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.news-tag-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+}
+
+.news-tag-text {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6a7a99;
+    font-weight: 500;
+}
+
+.news-date {
+    color: #888;
+}
+
+.news-card h3 {
+    margin: 4px 0 2px;
+    font-size: 18px;
+}
+
+.news-card p {
+    margin: 0 0 4px;
+    font-size: 14px;
+    color: #444;
+}
+
+.news-link {
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.news-link:hover {
+    text-decoration: underline;
+}
+
+/* varijante boja po kategoriji */
+
+.news-blue {
+    border-left: 5px solid #6aa7ff;
+}
+.news-blue .news-tag-dot {
+    background: #6aa7ff;
+}
+.news-blue .news-link {
+    color: #3a6ea5;
+}
+
+.news-green {
+    border-left: 5px solid #8ed081;
+}
+.news-green .news-tag-dot {
+    background: #8ed081;
+}
+.news-green .news-link {
+    color: #3c8b4d;
+}
+
+.news-amber {
+    border-left: 5px solid #f5b971;
+}
+.news-amber .news-tag-dot {
+    background: #f5b971;
+}
+.news-amber .news-link {
+    color: #d07a22;
+}
+
+.news-red {
+    border-left: 5px solid #ff7c7c;
+}
+.news-red .news-tag-dot {
+    background: #ff7c7c;
+}
+.news-red .news-link {
+    color: #e45757;
 }
