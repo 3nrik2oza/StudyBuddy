@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using web.Data;
@@ -15,7 +16,7 @@ public class MaterialListItemVM
     public string Type { get; set; } = "";
     public string? Url { get; set; }
 }
-
+[Authorize]
 public class MaterialsController : Controller
 {
     private readonly StudyBuddyDbContext _context;

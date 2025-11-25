@@ -1,12 +1,23 @@
+using Microsoft.AspNetCore.Identity;
+using web.Data;
+using web.Models;
 using Microsoft.EntityFrameworkCore;
-using web.Data; 
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddDbContext<StudyBuddyDbContext>(options => options.UseNpgsql(
+    builder.Configuration.GetConnectionString("DefaultConnection")
+));
+
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDbContext<StudyBuddyDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+    options.SignIn.RequireConfirmedAccount = false)
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<StudyBuddyDbContext>();
+
+
+builder.Services.AddAuthentication();
 
 var app = builder.Build();
 
@@ -18,9 +29,13 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.MapRazorPages();
+
 app.UseHttpsRedirection();
 app.UseRouting();
 
+// 🔥 Important ordering
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();

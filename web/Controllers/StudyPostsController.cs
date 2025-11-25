@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using web.Data;
@@ -15,7 +16,7 @@ public class StudyPostListItemVM
     public string Location { get; set; } = "";
     public bool IsOnline { get; set; }
 }
-
+[Authorize]
 public class StudyPostsController : Controller
 {
     private readonly StudyBuddyDbContext _context;

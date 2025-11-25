@@ -1,9 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Data;
 using web.Models.Entities;
 
 namespace web.Controllers;
-
+[Authorize]
 public class TutorListItemVM
 {
     public string Id { get; set; } = "";
@@ -12,7 +13,7 @@ public class TutorListItemVM
     public string FacultyName { get; set; } = "";
     public List<string> Subjects { get; set; } = new();
 }
-
+[Authorize]
 public class TutorsController : Controller
 {
     private readonly StudyBuddyDbContext _context;

@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using web.Models;
 using web.Models.Entities; 
 
 namespace web.Data
 {
-    public class StudyBuddyDbContext : DbContext
+    public class StudyBuddyDbContext : IdentityDbContext<ApplicationUser>
     {
         public StudyBuddyDbContext(DbContextOptions<StudyBuddyDbContext> options)
             : base(options)

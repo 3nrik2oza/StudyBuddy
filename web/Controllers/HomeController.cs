@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using web.Data;
 using web.Models;
 using web.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace web.Controllers;
 

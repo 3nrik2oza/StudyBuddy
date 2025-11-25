@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using web.Data;
 using web.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace web.Controllers;
 
@@ -17,7 +18,7 @@ public class ForumThreadListItemVM
     public DateTime CreatedAt { get; set; }
     public int RepliesCount { get; set; }
 }
-
+[Authorize]
 public class ForumController : Controller
 {
     private readonly StudyBuddyDbContext _context;

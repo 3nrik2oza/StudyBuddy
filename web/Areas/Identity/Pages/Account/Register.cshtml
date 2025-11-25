@@ -1,0 +1,79 @@
+﻿@page
+@model web.Areas.Identity.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="login-wrapper">
+    <div class="login-card">
+
+        <h2 class="login-title register-title">Create an Account</h2>
+        <p class="login-subtitle register-subtitle">Join our platform in just a few steps</p>
+
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+            <!-- Full Name -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Name" class="form-control login-input" placeholder="Full Name" />
+                <label asp-for="Input.Name">Full Name</label>
+                <span asp-validation-for="Input.Name" class="text-danger"></span>
+            </div>
+
+            <!-- Description -->
+            <div class="form-floating mb-3">
+                <textarea asp-for="Input.Description" class="form-control login-input" placeholder="Description"></textarea>
+                <label asp-for="Input.Description">Description</label>
+                <span asp-validation-for="Input.Description" class="text-danger"></span>
+            </div>
+
+            <!-- Faculty Dropdown -->
+            <div class="form-floating mb-3">
+                <select asp-for="Input.FacultyId" class="form-control login-input" asp-items="Model.FacultyOptions">
+                    <option value="">-- Select Faculty --</option>
+                </select>
+                <label asp-for="Input.FacultyId">Faculty</label>
+                <span asp-validation-for="Input.FacultyId" class="text-danger"></span>
+            </div>
+
+            <!-- Is Tutor Checkbox -->
+            <div class="form-check mb-3">
+                <input asp-for="Input.IsTutor" class="form-check-input" />
+                <label asp-for="Input.IsTutor" class="form-check-label">Register as Tutor</label>
+                <span asp-validation-for="Input.IsTutor" class="text-danger"></span>
+            </div>
+
+            <!-- Email -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control login-input" autocomplete="username" placeholder="email@example.com" />
+                <label asp-for="Input.Email">Email</label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <!-- Password -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Password" class="form-control login-input" autocomplete="new-password" placeholder="Password" />
+                <label asp-for="Input.Password">Password</label>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.ConfirmPassword" class="form-control login-input" autocomplete="new-password" placeholder="Confirm Password" />
+                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <!-- Submit -->
+            <button id="registerSubmit" type="submit" class="btn login-btn w-100">Create Account</button>
+
+            <div class="login-links mt-3">
+                <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Already have an account? Log in</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
