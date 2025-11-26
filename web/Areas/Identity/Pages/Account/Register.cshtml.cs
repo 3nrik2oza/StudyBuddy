@@ -60,6 +60,7 @@ namespace web.Areas.Identity.Pages.Account
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
         public SelectList FacultyOptions { get; set; }
+        public SelectList SubjectOptions { get; set; }
 
         public class InputModel
         {
@@ -84,61 +85,102 @@ namespace web.Areas.Identity.Pages.Account
             public string Name { get; set; }
 
             [Display(Name = "Description")]
-            public string? Description { get; set; }
+            public string Description { get; set; }
 
             [Required]
             [Display(Name = "Faculty")]
             public int FacultyId { get; set; }
 
-            [Display(Name = "Is Tutor")]
+            [Display(Name = "Are you a Tutor?")]
             public bool IsTutor { get; set; }
+
+            [Display(Name = "Subjects you teach")]
+            public List<int> SubjectIds { get; set; } = new List<int>();
         }
 
         public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            // Load faculties + subjects for dropdowns
             FacultyOptions = new SelectList(await _context.Faculties.ToListAsync(), "Id", "Name");
+            SubjectOptions = new SelectList(await _context.Subjects.ToListAsync(), "Id", "Name");
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            // Reload dropdowns when form returns with error
             FacultyOptions = new SelectList(await _context.Faculties.ToListAsync(), "Id", "Name");
+            SubjectOptions = new SelectList(await _context.Subjects.ToListAsync(), "Id", "Name");
 
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
 
+                // Assign main user properties
                 user.Name = Input.Name;
                 user.Description = Input.Description;
                 user.FacultyId = Input.FacultyId;
-                user.IsTutor = Input.IsTutor;
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User created a new account with password.");
+                    _logger.LogInformation("User created a new account.");
 
+                    // ⭐ CREATE TUTOR ENTITY IF USER SELECTED "IS TUTOR"
+                    if (Input.IsTutor)
+                    {
+                        var tutor = new Tutor
+                        {
+                            Id = user.Id,
+                            Name = user.Name,
+                            FacultyId = user.FacultyId,
+                            HelpPoints = 0
+                        };
+
+                        _context.Tutors.Add(tutor);
+
+                        // Add TutorSubject relationships
+                        if (Input.SubjectIds != null && Input.SubjectIds.Count > 0)
+                        {
+                            foreach (var subjectId in Input.SubjectIds)
+                            {
+                                _context.TutorSubjects.Add(new TutorSubject
+                                {
+                                    UserId = user.Id,
+                                    SubjectId = subjectId
+                                });
+                            }
+                        }
+
+                        await _context.SaveChangesAsync();
+                    }
+
+                    // Email confirmation logic
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
                     var callbackUrl = Url.Page(
                         "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
+                        null,
+                        new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
+                        Request.Scheme);
 
                     await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email });
                     }
                     else
                     {
@@ -146,12 +188,15 @@ namespace web.Areas.Identity.Pages.Account
                         return LocalRedirect(returnUrl);
                     }
                 }
+
+                // Display errors
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
 
+            // If invalid, reload page
             return Page();
         }
 
@@ -163,8 +208,7 @@ namespace web.Areas.Identity.Pages.Account
             }
             catch
             {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
-                    $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. Make sure it has a parameterless constructor.");
             }
         }
 
@@ -172,8 +216,9 @@ namespace web.Areas.Identity.Pages.Account
         {
             if (!_userManager.SupportsUserEmail)
             {
-                throw new NotSupportedException("The default UI requires a user store with email support.");
+                throw new NotSupportedException("Identity user store does not support emails.");
             }
+
             return (IUserEmailStore<ApplicationUser>)_userStore;
         }
     }

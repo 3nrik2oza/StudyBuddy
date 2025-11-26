@@ -1,79 +1,216 @@
 ﻿@page
-@model web.Areas.Identity.Pages.Account.RegisterModel
+@model web.Areas.Identity.Pages.Account.ProfileModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "My Profile";
 }
 
-<div class="login-wrapper">
-    <div class="login-card">
-
-        <h2 class="login-title register-title">Create an Account</h2>
-        <p class="login-subtitle register-subtitle">Join our platform in just a few steps</p>
-
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
-
-            <!-- Full Name -->
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Name" class="form-control login-input" placeholder="Full Name" />
-                <label asp-for="Input.Name">Full Name</label>
-                <span asp-validation-for="Input.Name" class="text-danger"></span>
-            </div>
-
-            <!-- Description -->
-            <div class="form-floating mb-3">
-                <textarea asp-for="Input.Description" class="form-control login-input" placeholder="Description"></textarea>
-                <label asp-for="Input.Description">Description</label>
-                <span asp-validation-for="Input.Description" class="text-danger"></span>
-            </div>
-
-            <!-- Faculty Dropdown -->
-            <div class="form-floating mb-3">
-                <select asp-for="Input.FacultyId" class="form-control login-input" asp-items="Model.FacultyOptions">
-                    <option value="">-- Select Faculty --</option>
-                </select>
-                <label asp-for="Input.FacultyId">Faculty</label>
-                <span asp-validation-for="Input.FacultyId" class="text-danger"></span>
-            </div>
-
-            <!-- Is Tutor Checkbox -->
-            <div class="form-check mb-3">
-                <input asp-for="Input.IsTutor" class="form-check-input" />
-                <label asp-for="Input.IsTutor" class="form-check-label">Register as Tutor</label>
-                <span asp-validation-for="Input.IsTutor" class="text-danger"></span>
-            </div>
-
-            <!-- Email -->
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control login-input" autocomplete="username" placeholder="email@example.com" />
-                <label asp-for="Input.Email">Email</label>
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-
-            <!-- Password -->
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control login-input" autocomplete="new-password" placeholder="Password" />
-                <label asp-for="Input.Password">Password</label>
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
-
-            <!-- Confirm Password -->
-            <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" class="form-control login-input" autocomplete="new-password" placeholder="Confirm Password" />
-                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-
-            <!-- Submit -->
-            <button id="registerSubmit" type="submit" class="btn login-btn w-100">Create Account</button>
-
-            <div class="login-links mt-3">
-                <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Already have an account? Log in</a>
-            </div>
-        </form>
+<div class="home-hero-new mb-4" style="justify-content: flex-start;">
+    <div class="home-hero-text">
+        <h1 class="home-hero-title">Welcome, @Model.Input.Name!</h1>
+        <p class="home-hero-subtitle">Here you can view and edit your profile, change your password, or log out.</p>
     </div>
+</div>
+
+<div class="row g-4">
+
+    <!-- Profile Info Card -->
+    <div class="col-md-6">
+        <div class="home-info-card">
+            <h2 class="home-info-title">Profile Information</h2>
+
+            <form method="post" asp-page-handler="UpdateProfile">
+
+                <div class="mb-3">
+                    <label asp-for="Input.Name" class="form-label"></label>
+                    <input asp-for="Input.Name" class="form-control login-input" />
+                    <span asp-validation-for="Input.Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label>Email</label>
+                    <input class="form-control" value="@Model.Input.Email" disabled />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.Description" class="form-label"></label>
+                    <textarea asp-for="Input.Description" class="form-control login-input"></textarea>
+                    <span asp-validation-for="Input.Description" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.FacultyId" class="form-label">Faculty</label>
+                    <select asp-for="Input.FacultyId"
+                            asp-items="Model.FacultyOptions"
+                            class="form-control login-input">
+                        <option value="">-- Select Faculty --</option>
+                    </select>
+                    <span asp-validation-for="Input.FacultyId" class="text-danger"></span>
+                </div>
+
+                <!-- Tutor Checkbox -->
+                <div class="form-check mb-3">
+                    <input asp-for="Input.IsTutor" class="form-check-input" id="isTutorCheckbox" />
+                    <label asp-for="Input.IsTutor" class="form-check-label"></label>
+                </div>
+
+                <!-- Tutor subjects section (same UI as Register) -->
+                <div id="tutorSubjectsSection" style="display:@(Model.Input.IsTutor ? "block" : "none")">
+
+                    <label class="fw-bold">Subjects You Teach</label>
+
+                    <!-- subject selector row -->
+                    <div class="d-flex gap-2 align-items-center my-2">
+                        <select id="availableSubjects" class="form-control">
+                            <option value="">-- Select Subject --</option>
+
+                            @foreach (var s in Model.SubjectOptions)
+                            {
+                                <option value="@s.Value">@s.Text</option>
+                            }
+                        </select>
+
+                        <button type="button" id="addSubjectBtn" class="btn btn-secondary">
+                            Add
+                        </button>
+                    </div>
+
+                    <!-- selected subjects list -->
+                    <div id="selectedSubjectsContainer" class="mt-3">
+                        <!-- content added via JS -->
+                    </div>
+
+                    <!-- Hidden ASP.NET inputs (required for model binding) -->
+                    <div id="hiddenInputs"></div>
+
+                    <span asp-validation-for="Input.SubjectIds" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="login-btn w-100">Update Profile</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Change password & Logout -->
+    <div class="col-md-6">
+        <div class="home-info-card">
+            <h2 class="home-info-title">Change Password</h2>
+
+            <form method="post" asp-page-handler="ChangePassword">
+                <div class="mb-3">
+                    <label asp-for="Input.CurrentPassword" class="form-label"></label>
+                    <input asp-for="Input.CurrentPassword" type="password" class="form-control login-input" />
+                    <span asp-validation-for="Input.CurrentPassword" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.NewPassword" class="form-label"></label>
+                    <input asp-for="Input.NewPassword" type="password" class="form-control login-input" />
+                    <span asp-validation-for="Input.NewPassword" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.ConfirmPassword" class="form-label"></label>
+                    <input asp-for="Input.ConfirmPassword" type="password" class="form-control login-input" />
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="login-btn w-100">Change Password</button>
+            </form>
+        </div>
+
+        <div class="home-info-card mt-4 text-center">
+            <h2 class="home-info-title">Log Out</h2>
+            <form method="post" asp-page-handler="Logout">
+                <button type="submit" class="login-btn w-100 btn-danger">Logout</button>
+            </form>
+        </div>
+    </div>
+
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const isTutorCheckbox = document.getElementById("isTutorCheckbox");
+        const tutorSection = document.getElementById("tutorSubjectsSection");
+        const availableSubjects = document.getElementById("availableSubjects");
+        const addSubjectBtn = document.getElementById("addSubjectBtn");
+        const selectedContainer = document.getElementById("selectedSubjectsContainer");
+        const hiddenInputs = document.getElementById("hiddenInputs");
+
+        // Toggle visibility
+        function toggleTutorSection() {
+            tutorSection.style.display = isTutorCheckbox.checked ? "block" : "none";
+        }
+        toggleTutorSection();
+        isTutorCheckbox.addEventListener("change", toggleTutorSection);
+
+        // Add new subject
+        function addSubject() {
+            const subjectId = availableSubjects.value;
+            const subjectName = availableSubjects.options[availableSubjects.selectedIndex]?.text;
+
+            if (!subjectId) return;
+
+            // Remove selected option from available dropdown
+            availableSubjects.remove(availableSubjects.selectedIndex);
+
+            createSubjectRow(subjectId, subjectName);
+
+            availableSubjects.value = "";
+        }
+
+        // Create a selected subject row + hidden input
+        function createSubjectRow(id, name) {
+            const row = document.createElement("div");
+            row.className = "d-flex justify-content-between align-items-center border p-2 mb-2";
+            row.dataset.id = id;
+
+            row.innerHTML = `
+                <span>${name}</span>
+                <button type="button" class="btn btn-danger btn-sm">Remove</button>
+            `;
+
+            const hidden = document.createElement("input");
+            hidden.type = "hidden";
+            hidden.name = "Input.SubjectIds";
+            hidden.value = id;
+            hidden.dataset.id = id;
+
+            hiddenInputs.appendChild(hidden);
+
+            // remove event
+            row.querySelector("button").addEventListener("click", () => {
+                row.remove();
+                hidden.remove();
+
+                // add subject back to dropdown
+                const opt = document.createElement("option");
+                opt.value = id;
+                opt.text = name;
+                availableSubjects.appendChild(opt);
+            });
+
+            selectedContainer.appendChild(row);
+        }
+
+        addSubjectBtn.addEventListener("click", addSubject);
+
+        // PRELOAD existing subjects from model
+        @foreach (var subjectId in Model.Input.SubjectIds)
+        {
+            var subject = Model.SubjectOptions.FirstOrDefault(s => s.Value == subjectId.ToString());
+            if (subject != null)
+            {
+                <text>
+                    createSubjectRow("@subject.Value", "@subject.Text");
+
+                    // Remove from dropdown so it's not duplicated
+                    const optToRemove = availableSubjects.querySelector("option[value='@subject.Value']");
+                    if (optToRemove) optToRemove.remove();
+                </text>;
+            }
+        }
+    </script>
 }

@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using web.Data;
 using web.Models.Entities;
 using web.Models.ViewModels;
+using Microsoft.AspNetCore.Identity;
+using web.Models;
 
 namespace web.Controllers;
 
@@ -21,9 +23,12 @@ public class StudyPostsController : Controller
 {
     private readonly StudyBuddyDbContext _context;
 
-    public StudyPostsController(StudyBuddyDbContext context)
+        private readonly UserManager<ApplicationUser> _userManager;
+
+    public StudyPostsController(StudyBuddyDbContext context, UserManager<ApplicationUser> userManager)
     {
         _context = context;
+        _userManager = userManager;
     }
 
     public IActionResult Index(int? subjectId, DateTime? from)
@@ -97,6 +102,8 @@ public class StudyPostsController : Controller
 
         var startAtUtc = DateTime.SpecifyKind(vm.StartAt, DateTimeKind.Utc);
 
+        var userId = _userManager.GetUserId(User);
+
         var entity = new StudyPost
         {
             Id           = newId,
@@ -106,7 +113,7 @@ public class StudyPostsController : Controller
             Location     = vm.Location,
             IsOnline     = vm.IsOnline,
             FacultyId    = 1,
-            AuthorUserId = "demo",
+            AuthorUserId = userId,
             CreatedAt    = DateTime.UtcNow
         };
 

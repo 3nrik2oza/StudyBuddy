@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using web.Data;
 using web.Models.Entities;
 using web.Models.ViewModels;
+using Microsoft.AspNetCore.Identity;
+using web.Models;
 
 namespace web.Controllers;
 
@@ -20,10 +22,12 @@ public class MaterialListItemVM
 public class MaterialsController : Controller
 {
     private readonly StudyBuddyDbContext _context;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public MaterialsController(StudyBuddyDbContext context)
+    public MaterialsController(StudyBuddyDbContext context, UserManager<ApplicationUser> userManager)
     {
         _context = context;
+        _userManager = userManager;
     }
 
     public IActionResult Index(int? subjectId, string? search)
@@ -84,6 +88,8 @@ public class MaterialsController : Controller
             ? _context.Materials.Max(m => m.Id) + 1
             : 1;
 
+        var userId = _userManager.GetUserId(User);
+
         var entity = new Material
         {
             Id           = newId,          
@@ -93,14 +99,14 @@ public class MaterialsController : Controller
             Url          = vm.Type == "link" ? vm.Url : null,
             SubjectId    = vm.SubjectId,
             FacultyId    = 1,          // za sada FRI
-            AuthorUserId = "demo",     // kasnije iz Identity-ja
+            AuthorUserId = userId, 
             CreatedAt    = DateTime.UtcNow
         };
 
         _context.Materials.Add(entity);
         _context.SaveChanges();
 
-        TempData["ok"] = "Gradivo je uspješno dodano.";
+        TempData["ok"] = "Gradivo je uspješno dodano. ";
         return RedirectToAction(nameof(Index));
     }
 
