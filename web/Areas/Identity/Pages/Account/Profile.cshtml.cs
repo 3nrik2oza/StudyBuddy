@@ -35,7 +35,7 @@ namespace web.Areas.Identity.Pages.Account
         public SelectList FacultyOptions { get; set; }
         public SelectList SubjectOptions { get; set; }
 
-        // USER DATA
+
         public List<StudyPost> UserStudyPosts { get; set; } = new();
         public List<Material> UserMaterials { get; set; } = new();
 
@@ -62,14 +62,14 @@ namespace web.Areas.Identity.Pages.Account
             if (user == null)
                 return NotFound();
 
-            // Dropdowns
+
             FacultyOptions = new SelectList(await _context.Faculties.ToListAsync(), "Id", "Name");
             SubjectOptions = new SelectList(await _context.Subjects.ToListAsync(), "Id", "Name");
 
-            // Faculty name
+
             var faculty = await _context.Faculties.FindAsync(user.FacultyId);
 
-            // Tutor subjects
+
             var selectedSubjects = await _context.TutorSubjects
                 .Where(ts => ts.UserId == user.Id)
                 .Select(ts => ts.SubjectId)
@@ -265,14 +265,6 @@ namespace web.Areas.Identity.Pages.Account
                 return Forbid();
 
             _context.Materials.Remove(material);
-
-            // OPTIONAL: also delete file from disk if it exists
-            if (!string.IsNullOrEmpty(material.FilePath))
-            {
-                var filePath = Path.Combine("wwwroot", material.FilePath);
-                if (System.IO.File.Exists(filePath))
-                    System.IO.File.Delete(filePath);
-            }
 
             await _context.SaveChangesAsync();
 

@@ -38,7 +38,9 @@
             <button id="login-submit" type="submit" class="btn login-btn w-100">Log in</button>
 
             <div class="login-links">
-                <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Create a new account</a>
+                <a asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="@Model.ReturnUrl">
+                    Create a new account
+                </a>
             </div>
 
         </form>

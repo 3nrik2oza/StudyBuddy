@@ -18,44 +18,44 @@
         <h4>Account Information</h4>
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <!-- Name -->
+
         <div class="form-floating mb-3">
             <input asp-for="Input.Name" class="form-control" />
             <label asp-for="Input.Name"></label>
             <span asp-validation-for="Input.Name" class="text-danger"></span>
         </div>
 
-        <!-- Email (read only for now) -->
+
         <div class="form-floating mb-3">
             <input asp-for="Input.Email" class="form-control" readonly />
             <label asp-for="Input.Email"></label>
         </div>
+        
 
-        <!-- Description -->
         <div class="form-floating mb-3">
             <textarea asp-for="Input.Description" class="form-control" style="height:100px"></textarea>
             <label asp-for="Input.Description"></label>
             <span asp-validation-for="Input.Description" class="text-danger"></span>
         </div>
 
-        <!-- Faculty -->
+
         <div class="form-floating mb-3">
             <select asp-for="Input.FacultyId" asp-items="Model.FacultyOptions" class="form-control"></select>
             <label asp-for="Input.FacultyId">Faculty</label>
             <span asp-validation-for="Input.FacultyId" class="text-danger"></span>
         </div>
 
-        <!-- Tutor toggle -->
+
         <div class="form-check mb-3">
             <input asp-for="Input.IsTutor" class="form-check-input" id="isTutorCheckbox" />
             <label asp-for="Input.IsTutor" class="form-check-label">Registered as Tutor</label>
         </div>
 
-        <!-- Subjects for tutors -->
+
         <div id="tutorSubjectsSection" style="display:none;">
             <label class="fw-bold">Subjects You Teach</label>
 
-            <!-- Subject selector row -->
+
             <div class="d-flex gap-2 align-items-center my-2">
                 <select id="availableSubjects" class="form-control">
                     <option value="">-- Select Subject --</option>
@@ -71,7 +71,7 @@
                 <button type="button" id="addSubjectBtn" class="btn btn-secondary">Add</button>
             </div>
 
-            <!-- Selected subjects -->
+
             <div id="selectedSubjectsContainer">
                 @foreach (var subjectId in Model.Input.SubjectIds)
                 {
@@ -83,7 +83,7 @@
                             <span>@subject.Text</span>
                             <button type="button" class="btn btn-danger btn-sm remove-subject-btn">Remove</button>
 
-                            <!-- Hidden input -->
+
                             <input type="hidden" name="Input.SubjectIds" value="@subjectId" />
                         </div>
                     }
@@ -98,7 +98,7 @@
 
     <hr />
 
-    <!-- Change Password -->
+
     <h4>Change Password</h4>
     <form method="post" asp-page-handler="ChangePassword">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -123,7 +123,7 @@
 
     <hr />
 
-    <!-- User Study Sessions -->
+
     <h3>Your Study Sessions</h3>
 
     @if (Model.UserStudyPosts.Count == 0)
@@ -154,7 +154,7 @@
         </div>
     }
 
-    <!-- User Materials -->
+
     <h3>Your Materials</h3>
 
     @if (Model.UserMaterials.Count == 0)
