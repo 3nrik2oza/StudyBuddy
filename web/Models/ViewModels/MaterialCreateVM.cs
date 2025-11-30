@@ -15,7 +15,7 @@ public class MaterialCreateVM
 
     [Required]
     [Display(Name = "Type")]
-    public string Type { get; set; } = "link"; // "link" ili "file"
+    public string Type { get; set; } = "link"; 
 
     [Url]
     [Display(Name = "URL (if it is a link)")]
