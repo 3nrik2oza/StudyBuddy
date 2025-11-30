@@ -120,8 +120,9 @@ public class StudyPostsController : Controller
         _context.StudyPosts.Add(entity);
         _context.SaveChanges();
 
-        TempData["ok"] = "Termin je uspješno kreiran.";
-
+        TempData["ToastMessage"] = "Study session has been created successfully.";
+        
         return RedirectToAction(nameof(Index));
+
     }
 }
