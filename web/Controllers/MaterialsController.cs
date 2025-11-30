@@ -98,7 +98,7 @@ public class MaterialsController : Controller
             Type         = vm.Type,
             Url          = vm.Type == "link" ? vm.Url : null,
             SubjectId    = vm.SubjectId,
-            FacultyId    = 1,          // za sada FRI
+            FacultyId    = 1,         
             AuthorUserId = userId, 
             CreatedAt    = DateTime.UtcNow
         };
