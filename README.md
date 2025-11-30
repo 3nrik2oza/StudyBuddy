@@ -1,6 +1,6 @@
 # StudyBuddy
 
-StudyBuddy je ASP.NET MVC web aplikacija koja pomaže studentima da lakše organizuju učenje, pronađu materijale, tutore i study sessione, te komuniciraju preko foruma.
+StudyBuddy je spletna aplikacija ASP.NET MVC, ki študentom pomaga lažje organizirati učenje, najti študijske materiale, tutorje in študijske skupine ter komunicirati prek foruma.
 
 ## Kratek opis aplikacije
 
