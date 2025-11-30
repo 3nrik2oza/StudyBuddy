@@ -1,5 +1,9 @@
 # StudyBuddy
 
+## Avtorji
+Ajla Suljanović 63220443
+Enrik Roža 63240381
+
 StudyBuddy je spletna aplikacija ASP.NET MVC, ki študentom pomaga lažje organizirati učenje, najti študijske materiale, tutorje in študijske skupine ter komunicirati prek foruma.
 
 ## Kratek opis aplikacije
