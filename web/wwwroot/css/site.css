@@ -57,12 +57,12 @@
     background-color: #bfdbfe;
 }
 
-.home-card-sessions {
+.home-card-post {
     background-color: #fef3c7;      /* amber-100 */
     border-color: #fcd34d;
 }
 
-.home-card-sessions:hover {
+.home-card-post:hover {
     background-color: #fde68a;
 }
 
@@ -93,7 +93,7 @@
     border-color: #bfdbfe;
 }
 
-.page-header-sessions {
+.page-header-post {
     background-color: #fffbeb;   /* amber-50 */
     border-color: #fcd34d;
 }

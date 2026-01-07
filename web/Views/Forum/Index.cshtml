@@ -1,71 +1,93 @@
-@model List<web.Controllers.ForumThreadListItemVM>
+@model List<web.Models.ViewModels.ForumThreadListItemVM>
 
 @{
     ViewData["Title"] = "Forum";
 }
 
-<h2 class="mb-3">Forum</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-1">Forum</h2>
+        <p class="text-muted mb-0">
+            Share questions, tips and study experiences with other students.
+        </p>
+    </div>
 
-<p class="text-muted mb-4">
-    Share questions, tips and study experiences with other students.
-</p>
+    <a asp-action="Create" class="btn btn-success">
+        New thread
+    </a>
+</div>
+
+@if (TempData["ok"] != null)
+{
+    <div class="alert alert-success mb-4">
+        @TempData["ok"]
+    </div>
+}
 
 <div class="forum-list">
-
-    @foreach (var t in Model)
-    {
-        // odabir boje ruba prema kategoriji
-        var borderClass = t.Category switch
-        {
-            "Study group" => "forum-border-blue",
-            "Materials"   => "forum-border-green",
-            "Help"        => "forum-border-amber",
-            _             => "forum-border-red"
-        };
-
-        // ako nemaš RepliesCount, možeš ovdje staviti npr. 0 ili maknuti blok desno
-        var repliesText = t is { RepliesCount: > 0 }
-            ? $"{t.RepliesCount} replies"
-            : "";
-
-        <article class="forum-card @borderClass">
-            <div class="forum-card-top">
-                <h3>@t.Title</h3>
-
-                @if (!string.IsNullOrEmpty(repliesText))
-                {
-                    <span class="forum-replies">@repliesText</span>
-                }
-            </div>
-
-            <p>@t.ContentPreview</p>
-
-            <div class="forum-meta">
-                <span>📅 @t.CreatedAt.ToLocalTime().ToString("dd. MM. yyyy")</span>
-                <span>👤 @t.AuthorName</span>
-
-                @if (t.Category == "Study group")
-                {
-                    <span>🔥 Active</span>
-                }
-                else if (t.Category == "Materials")
-                {
-                    <span>📁 Materials</span>
-                }
-                else if (t.Category == "Help")
-                {
-                    <span>💬 Discussion</span>
-                }
-                else
-                {
-                    <span>🌟 Popular</span>
-                }
-            </div>
-        </article>
-    }
 
     @if (!Model.Any())
     {
         <p>No forum threads yet.</p>
+    }
+    else
+    {
+        foreach (var t in Model)
+        {
+            var borderClass = t.Category switch
+            {
+                "Study group" => "forum-border-blue",
+                "Materials"   => "forum-border-green",
+                "Help"        => "forum-border-amber",
+                _             => "forum-border-red"
+            };
+
+            var repliesText = t.RepliesCount > 0 ? $"{t.RepliesCount} replies" : "";
+
+            <article class="forum-card @borderClass">
+                <div class="forum-card-top">
+                    <h3 class="mb-0">
+                        <a asp-action="Details" asp-route-id="@t.Id" class="text-decoration-none text-dark">
+                            @t.Title
+                        </a>
+                    </h3>
+
+                    @if (!string.IsNullOrEmpty(repliesText))
+                    {
+                        <span class="forum-replies">@repliesText</span>
+                    }
+                </div>
+
+                <p>@t.ContentPreview</p>
+
+                <div class="forum-meta d-flex justify-content-between align-items-center">
+                    <div class="d-flex gap-3 flex-wrap">
+                        <span>📅 @t.CreatedAt.ToLocalTime().ToString("dd. MM. yyyy")</span>
+                        <span>👤 @t.AuthorName</span>
+
+                        @if (t.Category == "Study group")
+                        {
+                            <span>🔥 Active</span>
+                        }
+                        else if (t.Category == "Materials")
+                        {
+                            <span>📁 Materials</span>
+                        }
+                        else if (t.Category == "Help")
+                        {
+                            <span>💬 Discussion</span>
+                        }
+                        else
+                        {
+                            <span>🌟 Popular</span>
+                        }
+                    </div>
+
+                    <a asp-action="Details" asp-route-id="@t.Id" class="btn btn-outline-primary btn-sm">
+                        Open
+                    </a>
+                </div>
+            </article>
+        }
     }
 </div>

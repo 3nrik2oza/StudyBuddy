@@ -1,0 +1,98 @@
+@model web.Models.ViewModels.ForumDetailsVM
+
+@{
+    ViewData["Title"] = Model.Thread.Title;
+    var isThreadOwner = Model.CurrentUserId != null && Model.Thread.AuthorUserId == Model.CurrentUserId;
+}
+
+@if (TempData["ok"] != null)
+{
+    <div class="alert alert-success mb-3">@TempData["ok"]</div>
+}
+@if (TempData["err"] != null)
+{
+    <div class="alert alert-danger mb-3">@TempData["err"]</div>
+}
+
+<div class="d-flex justify-content-between align-items-start mb-2">
+    <div>
+        <h2 class="mb-1">@Model.Thread.Title</h2>
+        <p class="text-muted mb-0">
+            👤 @Model.Thread.AuthorName |
+            📅 @Model.Thread.CreatedAt.ToLocalTime().ToString("dd. MM. yyyy")
+        </p>
+    </div>
+
+    @if (isThreadOwner)
+    {
+        <form asp-action="DeleteThread" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Thread.Id" />
+            <button type="submit" class="btn btn-outline-danger btn-sm"
+                    onclick="return confirm('Delete this thread?');">
+                Delete thread
+            </button>
+        </form>
+    }
+</div>
+
+<p>@Model.Thread.Content</p>
+
+<hr />
+
+<h4 class="mb-3">Replies (@Model.Replies.Count)</h4>
+
+@if (Model.Replies.Any())
+{
+    foreach (var r in Model.Replies)
+    {
+        var isReplyOwner = Model.CurrentUserId != null && r.AuthorUserId == Model.CurrentUserId;
+
+        <div class="border rounded p-3 mb-2">
+            <p class="mb-2">@r.Content</p>
+            <small class="text-muted">
+                👤 @r.AuthorName |
+                📅 @r.CreatedAt.ToLocalTime().ToString("dd. MM. yyyy HH:mm")
+            </small>
+
+            @if (isReplyOwner)
+            {
+                <form asp-action="DeleteReply" method="post" class="mt-2">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@r.Id" />
+                    <input type="hidden" name="threadId" value="@Model.Thread.Id" />
+                    <button type="submit" class="btn btn-outline-danger btn-sm"
+                            onclick="return confirm('Delete this reply?');">
+                        Delete
+                    </button>
+                </form>
+            }
+        </div>
+    }
+}
+else
+{
+    <p>No replies yet.</p>
+}
+
+<hr />
+
+<h5 class="mb-2">Add reply</h5>
+
+<form asp-action="AddReply" method="post">
+    @Html.AntiForgeryToken()
+
+    <input asp-for="NewReply.ForumThreadId" type="hidden" />
+
+    <div class="mb-2">
+        <textarea asp-for="NewReply.Content" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="NewReply.Content" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Reply</button>
+    <a asp-action="Index" class="btn btn-outline-secondary ms-2">Back</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

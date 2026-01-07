@@ -1,14 +1,14 @@
 @model List<web.Controllers.StudyPostListItemVM>
 
 @{
-    ViewData["Title"] = "Study sessions";
+    ViewData["Title"] = "Study Post";
     var subjects = ViewBag.Subjects as List<web.Models.Entities.Subject>;
     var from = ViewBag.From as string;
 }
 
-<h2 class="mb-1">Study sessions</h2>
+<h2 class="mb-1">Study post</h2>
 <p class="text-muted mb-4">
-    Discover upcoming sessions and study together with other students.
+    Discover upcoming post and study together with other students.
 </p>
 
 <form method="get" class="row g-2 mb-4 align-items-end">
@@ -51,7 +51,7 @@
 
 @if (!Model.Any())
 {
-    <p>No study sessions found.</p>
+    <p>No study post found.</p>
 }
 else
 {

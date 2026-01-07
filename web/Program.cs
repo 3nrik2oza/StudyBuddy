@@ -16,9 +16,6 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<StudyBuddyDbContext>();
 
-
-builder.Services.AddAuthentication();
-
 var app = builder.Build();
 
 SeedData.Initialize(app.Services);

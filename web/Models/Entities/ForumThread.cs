@@ -8,8 +8,10 @@ namespace web.Models.Entities
         public string Category { get; set; } = ""; 
         public int SubjectId { get; set; }
         public int FacultyId { get; set; }
+        public string AuthorUserId { get; set; } = "";
         public string AuthorName { get; set; } = "";
         public DateTime CreatedAt { get; set; }
         public int RepliesCount { get; set; }
+        public List<ForumReply> Replies { get; set; } = new();
     }
 }

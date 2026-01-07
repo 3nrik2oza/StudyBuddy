@@ -1,0 +1,64 @@
+@model web.Models.ViewModels.ForumThreadCreateVM
+
+@{
+    ViewData["Title"] = "New thread";
+    var subjects = ViewBag.Subjects as List<web.Models.Entities.Subject>;
+    var categories = ViewBag.Categories as List<string>;
+}
+
+<h2 class="mb-3">New forum thread</h2>
+<p class="text-muted mb-4">Create a new topic and start the discussion.</p>
+
+<form asp-action="Create" method="post" class="row g-3">
+    @Html.AntiForgeryToken()
+
+    <div class="col-12">
+        <label class="form-label">Title</label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label">Category</label>
+        <select asp-for="Category" class="form-select">
+            @if (categories != null)
+            {
+                foreach (var c in categories)
+                {
+                    <option value="@c">@c</option>
+                }
+            }
+        </select>
+        <span asp-validation-for="Category" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <label class="form-label">Subject</label>
+        <select asp-for="SubjectId" class="form-select">
+            <option value="">Select subject</option>
+            @if (subjects != null)
+            {
+                foreach (var s in subjects)
+                {
+                    <option value="@s.Id">@s.Name</option>
+                }
+            }
+        </select>
+        <span asp-validation-for="SubjectId" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <label class="form-label">Content</label>
+        <textarea asp-for="Content" class="form-control" rows="6"></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+
+    <div class="col-12 d-flex gap-2">
+        <button type="submit" class="btn btn-success">Publish</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

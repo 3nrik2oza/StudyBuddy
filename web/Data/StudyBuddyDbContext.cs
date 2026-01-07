@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using web.Models;
-using web.Models.Entities; 
+using web.Models.Entities;
 
 namespace web.Data
 {
@@ -15,17 +15,19 @@ namespace web.Data
         public DbSet<Material> Materials { get; set; }
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<StudyPost> StudyPosts { get; set; }
-        public DbSet<Tutor> Tutors { get; set; } 
+        public DbSet<Tutor> Tutors { get; set; }
         public DbSet<TutorSubject> TutorSubjects { get; set; }
         public DbSet<Faculty> Faculties { get; set; }
         public DbSet<ForumThread> ForumThreads { get; set; }
+        public DbSet<ForumReply> ForumReplies { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-             modelBuilder.Entity<TutorSubject>()
-            .HasKey(ts => new { ts.UserId, ts.SubjectId });
+            modelBuilder.Entity<TutorSubject>()
+           .HasKey(ts => new { ts.UserId, ts.SubjectId });
 
             modelBuilder.Entity<TutorSubject>()
                 .HasOne(ts => ts.Tutor)
@@ -34,8 +36,15 @@ namespace web.Data
 
             modelBuilder.Entity<TutorSubject>()
                 .HasOne(ts => ts.Subject)
-                .WithMany() 
+                .WithMany()
                 .HasForeignKey(ts => ts.SubjectId);
+
+            modelBuilder.Entity<ForumReply>()
+                .HasOne(r => r.ForumThread)
+                .WithMany(t => t.Replies)
+                .HasForeignKey(r => r.ForumThreadId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
+
     }
 }
