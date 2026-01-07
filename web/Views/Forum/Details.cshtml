@@ -1,8 +1,17 @@
 @model web.Models.ViewModels.ForumDetailsVM
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<web.Models.ApplicationUser> UserManager
 
 @{
     ViewData["Title"] = Model.Thread.Title;
-    var isThreadOwner = Model.CurrentUserId != null && Model.Thread.AuthorUserId == Model.CurrentUserId;
+
+    var currentUserId = Model.CurrentUserId ?? "";
+    var currentUser = await UserManager.GetUserAsync(User);
+    var currentName = currentUser?.Name ?? "";
+
+    var isThreadOwner =
+        (!string.IsNullOrEmpty(currentUserId) && Model.Thread.AuthorUserId == currentUserId)
+        || (!string.IsNullOrEmpty(currentName) && Model.Thread.AuthorName == currentName);
 }
 
 @if (TempData["ok"] != null)
@@ -28,8 +37,7 @@
         <form asp-action="DeleteThread" method="post">
             @Html.AntiForgeryToken()
             <input type="hidden" name="id" value="@Model.Thread.Id" />
-            <button type="submit" class="btn btn-outline-danger btn-sm"
-                    onclick="return confirm('Delete this thread?');">
+            <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete this thread?');">
                 Delete thread
             </button>
         </form>
@@ -46,7 +54,7 @@
 {
     foreach (var r in Model.Replies)
     {
-        var isReplyOwner = Model.CurrentUserId != null && r.AuthorUserId == Model.CurrentUserId;
+        var isReplyOwner = !string.IsNullOrEmpty(currentUserId) && r.AuthorUserId == currentUserId;
 
         <div class="border rounded p-3 mb-2">
             <p class="mb-2">@r.Content</p>
@@ -61,8 +69,7 @@
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="id" value="@r.Id" />
                     <input type="hidden" name="threadId" value="@Model.Thread.Id" />
-                    <button type="submit" class="btn btn-outline-danger btn-sm"
-                            onclick="return confirm('Delete this reply?');">
+                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete this reply?');">
                         Delete
                     </button>
                 </form>
@@ -81,7 +88,6 @@ else
 
 <form asp-action="AddReply" method="post">
     @Html.AntiForgeryToken()
-
     <input asp-for="NewReply.ForumThreadId" type="hidden" />
 
     <div class="mb-2">

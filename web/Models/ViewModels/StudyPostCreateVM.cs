@@ -22,4 +22,7 @@ public class StudyPostCreateVM
 
     [Display(Name = "Online session")]
     public bool IsOnline { get; set; }
+
+    [Range(1, 100)]
+    public int MaxParticipants { get; set; } = 10;
 }

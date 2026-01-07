@@ -46,7 +46,15 @@
 
 @if (TempData["ok"] != null)
 {
-    <div class="alert alert-success">@TempData["ok"]</div>
+    <div class="alert alert-success mb-3">@TempData["ok"]</div>
+}
+@if (TempData["ToastMessage"] != null)
+{
+    <div class="alert alert-info mb-3">@TempData["ToastMessage"]</div>
+}
+@if (TempData["err"] != null)
+{
+    <div class="alert alert-danger mb-3">@TempData["err"]</div>
 }
 
 @if (!Model.Any())
@@ -58,22 +66,15 @@ else
     <div class="row g-3">
         @foreach (var t in Model)
         {
-            // simple mapping subject -> image
             string imageUrl;
             var subjectName = t.SubjectName ?? "";
 
             if (subjectName.Contains("APS", StringComparison.OrdinalIgnoreCase))
-            {
                 imageUrl = "https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg";
-            }
             else if (subjectName.Contains("IS", StringComparison.OrdinalIgnoreCase))
-            {
                 imageUrl = "https://images.pexels.com/photos/3861964/pexels-photo-3861964.jpeg";
-            }
             else
-            {
                 imageUrl = "https://images.pexels.com/photos/4145190/pexels-photo-4145190.jpeg";
-            }
 
             <div class="col-12 col-md-6 col-lg-4">
                 <div class="session-card card h-100 border-0 shadow-sm">
@@ -95,6 +96,54 @@ else
                             ·
                             @t.Location
                         </p>
+
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">
+                                👥 @t.ParticipantsCount / @t.MaxParticipants
+                                @if (t.IsFull)
+                                {
+                                    <span class="ms-2 badge bg-danger">Full</span>
+                                }
+                                else
+                                {
+                                    <span class="ms-2 badge bg-success">Open</span>
+                                }
+                            </small>
+
+                            <div class="d-flex gap-2">
+                                @if (t.IsOwner)
+                                {
+                                    <a asp-action="Participants"
+                                       asp-route-id="@t.Id"
+                                       class="btn btn-outline-secondary btn-sm">
+                                        Manage
+                                    </a>
+                                }
+
+                                @if (t.IsJoined)
+                                {
+                                    <form asp-action="Leave" method="post" class="m-0">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@t.Id" />
+                                        <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                            Leave
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="Join" method="post" class="m-0">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@t.Id" />
+                                        <button type="submit"
+                                                class="btn btn-primary btn-sm"
+                                                @(t.IsFull ? "disabled" : "")>
+                                            Join
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
 
                         <div class="mt-auto d-flex justify-content-between align-items-center">
                             <span class="text-muted small">

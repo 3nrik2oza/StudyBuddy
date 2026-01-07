@@ -1,0 +1,65 @@
+@model web.Models.ViewModels.StudyPostParticipantsVM
+
+@{
+    ViewData["Title"] = "Participants";
+}
+
+<h2 class="mb-1">Participants</h2>
+<p class="text-muted mb-4">
+    @Model.Title · @Model.Count / @Model.MaxParticipants joined
+</p>
+
+@if (TempData["ToastMessage"] != null)
+{
+    <div class="alert alert-success mb-3">@TempData["ToastMessage"]</div>
+}
+
+@if (!Model.Participants.Any())
+{
+    <p>No participants yet.</p>
+}
+else
+{
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Joined</th>
+                        <th style="width:140px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model.Participants)
+                    {
+                        <tr>
+                            <td>@p.Name</td>
+                            <td>@p.Email</td>
+                            <td>@p.JoinedAt.ToLocalTime().ToString("dd. MM. yyyy HH:mm")</td>
+                            <td class="text-end">
+                                @if (p.CanRemove)
+                                {
+                                    <form asp-action="RemoveParticipant" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="participantId" value="@p.ParticipantId" />
+                                        <input type="hidden" name="postId" value="@Model.StudyPostId" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm"
+                                                onclick="return confirm('Remove this participant?');">
+                                            Remove
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+</div>

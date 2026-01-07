@@ -20,7 +20,7 @@ namespace web.Data
         public DbSet<Faculty> Faculties { get; set; }
         public DbSet<ForumThread> ForumThreads { get; set; }
         public DbSet<ForumReply> ForumReplies { get; set; }
-
+        public DbSet<StudyPostParticipant> StudyPostParticipants { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -44,6 +44,22 @@ namespace web.Data
                 .WithMany(t => t.Replies)
                 .HasForeignKey(r => r.ForumThreadId)
                 .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<StudyPostParticipant>()
+                .HasIndex(x => new { x.StudyPostId, x.UserId })
+                .IsUnique();
+
+            modelBuilder.Entity<StudyPostParticipant>()
+                .HasOne(x => x.StudyPost)
+                .WithMany()
+                .HasForeignKey(x => x.StudyPostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<StudyPostParticipant>()
+                .HasOne(x => x.User)
+                .WithMany()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
         }
 
     }

@@ -19,4 +19,5 @@ public class StudyPost
     public Faculty? Faculty { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public int MaxParticipants { get; set; } = 10;
 }
