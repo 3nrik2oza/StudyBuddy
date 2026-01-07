@@ -153,7 +153,7 @@ public class StudyPostsController : Controller
             }
         }
 
-        TempData["ToastMessage"] = "Study session has been created successfully.";
+        TempData["ToastMessage"] = "Study post has been created successfully.";
         return RedirectToAction(nameof(Index));
     }
 

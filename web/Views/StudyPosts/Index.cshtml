@@ -1,7 +1,7 @@
 @model List<web.Controllers.StudyPostListItemVM>
 
 @{
-    ViewData["Title"] = "Study Post";
+    ViewData["Title"] = "Study post";
     var subjects = ViewBag.Subjects as List<web.Models.Entities.Subject>;
     var from = ViewBag.From as string;
 }
@@ -79,7 +79,7 @@ else
             <div class="col-12 col-md-6 col-lg-4">
                 <div class="session-card card h-100 border-0 shadow-sm">
                     <div class="ratio ratio-16x9 session-card-cover">
-                        <img src="@imageUrl" class="card-img-top" alt="Study session image for @t.SubjectName" />
+                        <img src="@imageUrl" class="card-img-top" alt="Study post image for @t.SubjectName" />
                     </div>
 
                     <div class="card-body d-flex flex-column">
@@ -145,7 +145,7 @@ else
 
                         <div class="mt-auto d-flex justify-content-between align-items-center">
                             <span class="text-muted small">
-                                Study session
+                                Study post
                             </span>
 
                             @if (t.IsOnline)

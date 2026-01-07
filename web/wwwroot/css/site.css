@@ -686,3 +686,109 @@
 .register-subtitle {
     margin-bottom: 1.4rem;
 }
+/* ===== Profile UI (sb-*) ===== */
+:root{
+    --sb-primary:#2563eb;
+    --sb-soft:#f3f6ff;
+    --sb-border:#e6e8ef;
+}
+
+.sb-page { background: #fafbff; }
+
+.sb-card{
+    border: 1px solid var(--sb-border);
+    border-radius: 18px;
+}
+.sb-card .card-header{
+    background: #fff;
+    border-bottom: 1px solid var(--sb-border);
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+}
+
+.sb-avatar{
+    width: 108px; height: 108px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #dbeafe, #eff6ff);
+    border: 2px solid #fff;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .08);
+    display:flex; align-items:center; justify-content:center;
+    margin: 0 auto;
+}
+.sb-avatar span{
+    font-size: 38px;
+    font-weight: 800;
+    color: #1d4ed8;
+}
+
+.sb-pill{
+    background: var(--sb-soft);
+    border: 1px solid var(--sb-border);
+    border-radius: 999px;
+    padding: .35rem .65rem;
+    font-size: .85rem;
+}
+
+.sb-chip{
+    font-size: .75rem;
+    border: 1px solid var(--sb-border);
+    padding: .2rem .5rem;
+    border-radius: 999px;
+    background: #fff;
+    color:#334155;
+}
+
+.sb-stat{
+    background: #fff;
+    border: 1px solid var(--sb-border);
+    border-radius: 18px;
+    padding: 18px;
+    height: 100%;
+}
+.sb-stat h3{ margin:0; font-weight: 800; }
+
+.sb-muted{ color:#64748b; }
+
+.btn-sb{
+    background: var(--sb-primary);
+    border-color: var(--sb-primary);
+}
+.btn-sb:hover{ filter: brightness(.95); }
+
+.sb-section-title{
+    font-weight: 800;
+    letter-spacing: .2px;
+}
+
+.sb-list-item{
+    border: 1px solid var(--sb-border);
+    border-radius: 14px;
+    padding: 14px 14px;
+    background: #fff;
+}
+
+.sb-subcard{
+    border: 1px solid var(--sb-border);
+    border-radius: 14px;
+    padding: 14px;
+    background: #fff;
+}
+
+.sb-subject-row{
+    border: 1px solid var(--sb-border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: #fff;
+    margin-bottom: 10px;
+}
+
+.sb-mini-row{
+    border: 1px solid var(--sb-border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}

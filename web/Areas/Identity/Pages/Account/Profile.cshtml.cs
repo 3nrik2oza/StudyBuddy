@@ -35,9 +35,11 @@ namespace web.Areas.Identity.Pages.Account
         public SelectList FacultyOptions { get; set; }
         public SelectList SubjectOptions { get; set; }
 
-
         public List<StudyPost> UserStudyPosts { get; set; } = new();
         public List<Material> UserMaterials { get; set; } = new();
+
+        public int StudyPostsCount { get; set; }
+        public int MaterialsCount { get; set; }
 
         public class InputModel
         {
@@ -55,26 +57,20 @@ namespace web.Areas.Identity.Pages.Account
             public string ConfirmPassword { get; set; }
         }
 
-
         public async Task<IActionResult> OnGetAsync()
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return NotFound();
-
+            if (user == null) return NotFound();
 
             FacultyOptions = new SelectList(await _context.Faculties.ToListAsync(), "Id", "Name");
             SubjectOptions = new SelectList(await _context.Subjects.ToListAsync(), "Id", "Name");
 
-
             var faculty = await _context.Faculties.FindAsync(user.FacultyId);
-
 
             var selectedSubjects = await _context.TutorSubjects
                 .Where(ts => ts.UserId == user.Id)
                 .Select(ts => ts.SubjectId)
                 .ToListAsync();
-
 
             UserStudyPosts = await _context.StudyPosts
                 .Include(s => s.Subject)
@@ -83,13 +79,16 @@ namespace web.Areas.Identity.Pages.Account
                 .OrderByDescending(s => s.CreatedAt)
                 .ToListAsync();
 
-
             UserMaterials = await _context.Materials
                 .Include(m => m.Subject)
                 .Include(m => m.Faculty)
                 .Where(m => m.AuthorUserId == user.Id)
                 .OrderByDescending(m => m.CreatedAt)
                 .ToListAsync();
+
+            // ✅ fill counts
+            StudyPostsCount = UserStudyPosts.Count;
+            MaterialsCount = UserMaterials.Count;
 
             Input = new InputModel
             {
@@ -104,13 +103,11 @@ namespace web.Areas.Identity.Pages.Account
 
             return Page();
         }
-        
+
         public async Task<IActionResult> OnPostUpdateProfileAsync()
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return NotFound();
-
+            if (user == null) return NotFound();
 
             FacultyOptions = new SelectList(await _context.Faculties.ToListAsync(), "Id", "Name");
             SubjectOptions = new SelectList(await _context.Subjects.ToListAsync(), "Id", "Name");
@@ -124,7 +121,6 @@ namespace web.Areas.Identity.Pages.Account
             user.IsTutor = Input.IsTutor;
 
             var result = await _userManager.UpdateAsync(user);
-
             if (!result.Succeeded)
             {
                 foreach (var error in result.Errors)
@@ -132,7 +128,6 @@ namespace web.Areas.Identity.Pages.Account
 
                 return Page();
             }
-
 
             if (user.IsTutor)
             {
@@ -148,11 +143,14 @@ namespace web.Areas.Identity.Pages.Account
                     };
                     _context.Tutors.Add(tutor);
                 }
-
+                else
+                {
+                    tutor.Name = user.Name;
+                    tutor.FacultyId = user.FacultyId;
+                }
 
                 var existing = _context.TutorSubjects.Where(ts => ts.UserId == user.Id);
                 _context.TutorSubjects.RemoveRange(existing);
-
 
                 if (Input.SubjectIds != null)
                 {
@@ -170,9 +168,7 @@ namespace web.Areas.Identity.Pages.Account
             }
             else
             {
-                
                 var tutor = await _context.Tutors.FindAsync(user.Id);
-
                 if (tutor != null)
                 {
                     _context.Tutors.Remove(tutor);
@@ -187,12 +183,11 @@ namespace web.Areas.Identity.Pages.Account
             TempData["StatusMessage"] = "Profile updated successfully!";
             return RedirectToPage();
         }
-        
+
         public async Task<IActionResult> OnPostChangePasswordAsync()
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return NotFound();
+            if (user == null) return NotFound();
 
             if (!ModelState.IsValid)
                 return Page();
@@ -221,51 +216,39 @@ namespace web.Areas.Identity.Pages.Account
             TempData["StatusMessage"] = "Password changed successfully!";
             return RedirectToPage();
         }
-        
+
         public async Task<IActionResult> OnPostLogoutAsync()
         {
             await _signInManager.SignOutAsync();
             return RedirectToPage("/Index");
         }
-        
+
         public async Task<IActionResult> OnPostDeleteStudyPostAsync(int id)
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return Unauthorized();
+            if (user == null) return Unauthorized();
 
             var post = await _context.StudyPosts.FirstOrDefaultAsync(p => p.Id == id);
-
-            if (post == null)
-                return NotFound();
-
-            if (post.AuthorUserId != user.Id)
-                return Forbid();
+            if (post == null) return NotFound();
+            if (post.AuthorUserId != user.Id) return Forbid();
 
             _context.StudyPosts.Remove(post);
             await _context.SaveChangesAsync();
 
-            TempData["StatusMessage"] = "Study session deleted.";
+            TempData["StatusMessage"] = "Study post deleted.";
             return RedirectToPage();
         }
-
 
         public async Task<IActionResult> OnPostDeleteMaterialAsync(int id)
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return Unauthorized();
+            if (user == null) return Unauthorized();
 
             var material = await _context.Materials.FirstOrDefaultAsync(m => m.Id == id);
-
-            if (material == null)
-                return NotFound();
-
-            if (material.AuthorUserId != user.Id)
-                return Forbid();
+            if (material == null) return NotFound();
+            if (material.AuthorUserId != user.Id) return Forbid();
 
             _context.Materials.Remove(material);
-
             await _context.SaveChangesAsync();
 
             TempData["StatusMessage"] = "Material deleted.";

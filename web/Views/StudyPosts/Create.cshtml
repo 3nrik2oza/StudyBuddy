@@ -1,10 +1,10 @@
 @model web.Models.ViewModels.StudyPostCreateVM
 @{
-    ViewData["Title"] = "New study session";
+    ViewData["Title"] = "New study post";
     var subjects = ViewBag.Subjects as List<web.Models.Entities.Subject>;
 }
 
-<h2 class="mb-4">New study session</h2>
+<h2 class="mb-4">New study post</h2>
 
 <form asp-action="Create" method="post">
     <div class="mb-3">

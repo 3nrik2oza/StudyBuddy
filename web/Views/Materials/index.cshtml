@@ -4,6 +4,7 @@
     ViewData["Title"] = "Study materials";
     var subjects = ViewBag.Subjects as List<web.Models.Entities.Subject>;
     var search = ViewBag.Search as string ?? "";
+    var selectedSubjectId = ViewBag.SelectedSubjectId as int?;
 }
 
 <h2 class="mb-1">Study materials</h2>
@@ -20,7 +21,9 @@
             {
                 foreach (var s in subjects)
                 {
-                    <option value="@s.Id">@s.Name</option>
+                    <option value="@s.Id" selected="@(selectedSubjectId == s.Id)">
+                        @s.Name
+                    </option>
                 }
             }
         </select>
@@ -57,7 +60,6 @@ else
     <div class="row g-3">
         @foreach (var m in Model)
         {
-            // choose color + icon based on subject
             string cardColorClass;
             string emoji;
             var subject = m.SubjectName ?? "";
