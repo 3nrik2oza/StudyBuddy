@@ -34,11 +34,6 @@
     </div>
 </form>
 
-@if (TempData[key: "ok"] != null)
-{
-    <div class="alert alert-success">@TempData["ok"]</div>
-}
-
 @if (!Model.Any())
 {
     <p>No tutors found.</p>

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using web.Data;
 using web.Models;
 using Microsoft.EntityFrameworkCore;
+using web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,8 @@ builder.Services.AddDbContext<StudyBuddyDbContext>(options => options.UseNpgsql(
 ));
 
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddHostedService<web.Services.StudyPostCleanupService>();
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     options.SignIn.RequireConfirmedAccount = false)

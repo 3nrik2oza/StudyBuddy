@@ -20,7 +20,6 @@
                 </button>
 
                 <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between" id="mainNav">
-
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
@@ -39,7 +38,7 @@
                         </li>
                     </ul>
 
-                        <partial name="_LoginPartial" />
+                    <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
@@ -47,17 +46,24 @@
 
     <div class="container">
         <main role="main" class="pb-3">
-            @RenderBody()
 
-            @* Toast poruke iz TempData *@
             @if (TempData["ok"] is string okMsg)
             {
-                <div class="alert alert-success mt-3">@okMsg</div>
+                <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                    @okMsg
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
             }
+
             @if (TempData["err"] is string errMsg)
             {
-                <div class="alert alert-danger mt-3">@errMsg</div>
+                <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                    @errMsg
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
             }
+
+            @RenderBody()
         </main>
     </div>
 

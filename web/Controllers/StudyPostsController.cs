@@ -22,6 +22,7 @@ public class StudyPostListItemVM
     public bool IsFull => ParticipantsCount >= MaxParticipants;
     public bool IsJoined { get; set; }
     public bool IsOwner { get; set; }
+    public string OrganizerName { get; set; } = "";
 }
 
 [Authorize]
@@ -38,21 +39,25 @@ public class StudyPostsController : Controller
 
     public IActionResult Index(int? subjectId, DateTime? from)
     {
-        DateTime minDate;
+        DateTime minDateUtc;
 
         if (from.HasValue)
-            minDate = DateTime.SpecifyKind(from.Value, DateTimeKind.Utc);
+        {
+            var localFrom = DateTime.SpecifyKind(from.Value.Date, DateTimeKind.Local);
+            minDateUtc = localFrom.ToUniversalTime();
+        }
         else
         {
-            var nowUtc = DateTime.UtcNow;
-            minDate = new DateTime(nowUtc.Year, nowUtc.Month, nowUtc.Day, 0, 0, 0, DateTimeKind.Utc);
+            var localNow = DateTime.Now;
+            var localStartOfDay = new DateTime(localNow.Year, localNow.Month, localNow.Day, 0, 0, 0, DateTimeKind.Local);
+            minDateUtc = localStartOfDay.ToUniversalTime();
         }
 
         var userId = _userManager.GetUserId(User) ?? "";
 
         var query = _context.StudyPosts
             .Include(p => p.Subject)
-            .Where(p => p.StartAt >= minDate);
+            .Where(p => p.StartAt >= minDateUtc);
 
         if (subjectId.HasValue)
             query = query.Where(p => p.SubjectId == subjectId.Value);
@@ -70,12 +75,16 @@ public class StudyPostsController : Controller
                 MaxParticipants = p.MaxParticipants,
                 ParticipantsCount = _context.StudyPostParticipants.Count(x => x.StudyPostId == p.Id),
                 IsJoined = userId != "" && _context.StudyPostParticipants.Any(x => x.StudyPostId == p.Id && x.UserId == userId),
-                IsOwner = userId != "" && p.AuthorUserId == userId
+                IsOwner = userId != "" && p.AuthorUserId == userId,
+                OrganizerName = _context.Users
+                    .Where(u => u.Id == p.AuthorUserId)
+                    .Select(u => (u.Name != null && u.Name != "") ? u.Name : (u.Email ?? "Unknown"))
+                    .FirstOrDefault() ?? "Unknown"
             })
             .ToList();
 
         ViewBag.Subjects = _context.Subjects.ToList();
-        ViewBag.From = minDate.ToString("yyyy-MM-dd");
+        ViewBag.From = from.HasValue ? from.Value.ToString("yyyy-MM-dd") : DateTime.Now.ToString("yyyy-MM-dd");
 
         return View(items);
     }
@@ -87,7 +96,7 @@ public class StudyPostsController : Controller
 
         var vm = new StudyPostCreateVM
         {
-            StartAt = DateTime.UtcNow.AddHours(1),
+            StartAt = DateTime.Now.AddHours(1),
             MaxParticipants = 10
         };
 
@@ -108,9 +117,9 @@ public class StudyPostsController : Controller
             ? _context.StudyPosts.Max(p => p.Id) + 1
             : 1;
 
-        var startAtUtc = DateTime.SpecifyKind(vm.StartAt, DateTimeKind.Utc);
+        var startAtUtc = DateTime.SpecifyKind(vm.StartAt, DateTimeKind.Local).ToUniversalTime();
 
-        var userId = _userManager.GetUserId(User);
+        var userId = _userManager.GetUserId(User) ?? "";
 
         var entity = new StudyPost
         {
@@ -121,13 +130,28 @@ public class StudyPostsController : Controller
             Location = vm.Location,
             IsOnline = vm.IsOnline,
             FacultyId = 1,
-            AuthorUserId = userId ?? "",
+            AuthorUserId = userId,
             CreatedAt = DateTime.UtcNow,
             MaxParticipants = vm.MaxParticipants
         };
 
         _context.StudyPosts.Add(entity);
         _context.SaveChanges();
+
+        if (userId != "")
+        {
+            var already = _context.StudyPostParticipants.Any(x => x.StudyPostId == entity.Id && x.UserId == userId);
+            if (!already)
+            {
+                _context.StudyPostParticipants.Add(new StudyPostParticipant
+                {
+                    StudyPostId = entity.Id,
+                    UserId = userId,
+                    JoinedAt = DateTime.UtcNow
+                });
+                _context.SaveChanges();
+            }
+        }
 
         TempData["ToastMessage"] = "Study session has been created successfully.";
         return RedirectToAction(nameof(Index));
@@ -231,7 +255,7 @@ public class StudyPostsController : Controller
                 {
                     ParticipantId = p.Id,
                     UserId = p.UserId,
-                    Name = u?.Name ?? "",
+                    Name = (u?.Name != null && u.Name != "") ? u.Name : "",
                     Email = u?.Email ?? "",
                     JoinedAt = p.JoinedAt,
                     CanRemove = p.UserId != userId

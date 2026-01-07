@@ -119,7 +119,7 @@ public class ForumController : Controller
         _context.ForumThreads.Add(entity);
         await _context.SaveChangesAsync();
 
-        TempData["ok"] = "Tema je uspješno dodana.";
+        TempData["ok"] = "The thread has been successfully added..";
         return RedirectToAction(nameof(Index));
     }
 
@@ -228,7 +228,7 @@ public class ForumController : Controller
         _context.ForumThreads.Remove(thread);
         await _context.SaveChangesAsync();
 
-        TempData["ok"] = "Tema je obrisana.";
+        TempData["ok"] = "The thread has been successfully deleted.";
         return RedirectToAction(nameof(Index));
     }
 

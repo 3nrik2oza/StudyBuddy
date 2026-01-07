@@ -106,7 +106,7 @@ public class MaterialsController : Controller
         _context.Materials.Add(entity);
         _context.SaveChanges();
 
-        TempData["ok"] = "Gradivo je uspješno dodano. ";
+        TempData["ok"] = "The material has been successfully added. ";
         return RedirectToAction(nameof(Index));
     }
 
