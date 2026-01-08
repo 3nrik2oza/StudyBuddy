@@ -24,6 +24,15 @@
         </div>
 
         <a asp-action="@backAction" class="btn btn-outline-secondary btn-sm">@backText</a>
+        <form asp-action="DeleteRequest" method="post" class="d-inline">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button type="submit" class="btn btn-outline-danger btn-sm"
+                onclick="return confirm('Delete this request and all messages?');">
+                Delete
+            </button>
+        </form>
+
     </div>
 
     <div class="card border-0 shadow-sm mb-3">
@@ -35,7 +44,7 @@
                     <div class="d-flex @(mine ? "justify-content-end" : "justify-content-start")">
                         <div class="p-3 rounded border bg-white" style="max-width: 760px; width: 100%;">
                             <div class="small text-muted mb-1">
-                                <b>@(m.SenderUser?.Name ?? "User")</b> • @m.SentAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+                                <b>@(m.SenderUser?.Name ?? "User")</b> • @m.SentAt.ToLocalTime().ToString("dd.MM.yyyy                      HH:mm")
                             </div>
                             <div style="white-space: pre-wrap;">@m.Body</div>
                         </div>
@@ -50,7 +59,8 @@
         <input type="hidden" name="id" value="@Model.Id" />
         <div class="card-body">
             <label class="form-label">New message</label>
-            <textarea name="body" class="form-control" rows="4" maxlength="2000" placeholder="Write a message..."></textarea>
+            <textarea name="body" class="form-control" rows="4" maxlength="2000"
+                placeholder="Write a message..."></textarea>
 
             <div class="d-flex gap-2 mt-2">
                 <button class="btn btn-primary">Send</button>

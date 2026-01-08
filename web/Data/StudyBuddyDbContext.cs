@@ -90,9 +90,7 @@ namespace web.Data
                 .HasOne(m => m.SenderUser)
                 .WithMany()
                 .HasForeignKey(m => m.SenderUserId)
-                .OnDelete(DeleteBehavior.Restrict);
-
+                .OnDelete(DeleteBehavior.Cascade);
         }
-
     }
 }

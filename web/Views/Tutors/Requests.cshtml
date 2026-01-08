@@ -12,8 +12,8 @@
             <h2 class="mb-1">@(isStudentView ? "My tutoring requests" : "Tutoring requests")</h2>
             <p class="text-muted mb-0">
                 @(isStudentView
-                    ? "Open a thread and continue the conversation with the tutor."
-                    : "Accept or decline requests. Student will get an email notification.")
+                                ? "Open a thread and continue the conversation with the tutor."
+                                : "Accept or decline requests. Student will get an email notification.")
             </p>
         </div>
         <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to tutors</a>
@@ -66,6 +66,14 @@
                                 <a asp-action="RequestDetails" asp-route-id="@r.Id" class="btn btn-outline-primary btn-sm">
                                     Open thread
                                 </a>
+                                <form asp-action="DeleteRequest" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@r.Id" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm"
+                                        onclick="return confirm('Delete this request and all messages?');">
+                                        Delete
+                                    </button>
+                                </form>
                             </div>
                         </div>
 
@@ -90,7 +98,7 @@
                                 <div style="min-width:280px; flex:1;">
                                     <label class="form-label small mb-1">Optional response message</label>
                                     <input name="responseMessage" class="form-control"
-                                           placeholder="e.g. Yes, Friday 16:00 works. Contact me on email…" />
+                                        placeholder="e.g. Yes, Friday 16:00 works. Contact me on email…" />
                                 </div>
 
                                 <button name="accept" value="true" class="btn btn-success">Accept</button>

@@ -406,4 +406,28 @@ public class TutorsController : Controller
         ViewBag.IsStudentView = true;
         return View("Requests", list);
     }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteRequest(int id)
+    {
+        var me = _userManager.GetUserId(User);
+        if (string.IsNullOrWhiteSpace(me)) return Forbid();
+
+        var req = await _context.TutorRequests
+            .FirstOrDefaultAsync(r => r.Id == id);
+
+        if (req == null) return NotFound();
+
+        if (req.StudentUserId != me && req.TutorUserId != me)
+            return Forbid();
+
+        _context.TutorRequests.Remove(req);
+        await _context.SaveChangesAsync();
+
+        TempData["ok"] = "Request deleted.";
+
+        var isTutor = req.TutorUserId == me;
+        return RedirectToAction(isTutor ? nameof(Requests) : nameof(MyRequests));
+    }
+
 }
