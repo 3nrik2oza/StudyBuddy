@@ -1,5 +1,5 @@
 namespace web.Models.ViewModels;
-
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 public class MaterialCreateVM
@@ -22,6 +22,8 @@ public class MaterialCreateVM
     public string? Url { get; set; }
 
     [Required]
-    [Display(Name = "Subejct")]
+    [Display(Name = "Subject")]
     public int SubjectId { get; set; }
+    public IFormFile? UploadFile { get; set; }
+
 }

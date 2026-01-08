@@ -14,6 +14,8 @@ public class StudyPostCreateVM
 
     [Required]
     [Display(Name = "Date and time")]
+    [DataType(DataType.DateTime)]
+    [DisplayFormat(DataFormatString = "{0:yyyy-MM-ddTHH:mm}", ApplyFormatInEditMode = true)]
     public DateTime StartAt { get; set; }
 
     [Required]

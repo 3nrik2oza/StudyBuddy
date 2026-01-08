@@ -1,63 +1,85 @@
 @model web.Models.ViewModels.ForumThreadCreateVM
-
 @{
     ViewData["Title"] = "New thread";
     var subjects = ViewBag.Subjects as List<web.Models.Entities.Subject>;
     var categories = ViewBag.Categories as List<string>;
 }
 
-<h2 class="mb-3">New forum thread</h2>
-<p class="text-muted mb-4">Create a new topic and start the discussion.</p>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8 col-xl-7">
 
-<form asp-action="Create" method="post" class="row g-3">
-    @Html.AntiForgeryToken()
+            <div class="d-flex align-items-start justify-content-between mb-3">
+                <div>
+                    <h1 class="h3 mb-1">New forum thread</h1>
+                    <div class="text-muted">Create a new topic and start the discussion.</div>
+                </div>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back</a>
+            </div>
 
-    <div class="col-12">
-        <label class="form-label">Title</label>
-        <input asp-for="Title" class="form-control" />
-        <span asp-validation-for="Title" class="text-danger"></span>
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4 p-md-5">
+
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Title</label>
+                            <input asp-for="Title" class="form-control form-control-lg" placeholder="e.g. APS1 recursion - help with proof" />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Category</label>
+                                <select asp-for="Category" class="form-select">
+                                    @if (categories != null)
+                                    {
+                                        foreach (var c in categories)
+                                        {
+                                            <option value="@c">@c</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="Category" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Subject</label>
+                                <select asp-for="SubjectId" class="form-select">
+                                    <option value="">-- Select subject --</option>
+                                    @if (subjects != null)
+                                    {
+                                        foreach (var s in subjects)
+                                        {
+                                            <option value="@s.Id">@s.Name</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="SubjectId" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 mt-3">
+                            <label class="form-label">Content</label>
+                            <textarea asp-for="Content" class="form-control" rows="8" placeholder="Write your question or topic..."></textarea>
+                            <span asp-validation-for="Content" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex gap-2 pt-2">
+                            <button type="submit" class="btn btn-success btn-lg px-4">Publish</button>
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg">Cancel</a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
     </div>
-
-    <div class="col-12 col-md-6">
-        <label class="form-label">Category</label>
-        <select asp-for="Category" class="form-select">
-            @if (categories != null)
-            {
-                foreach (var c in categories)
-                {
-                    <option value="@c">@c</option>
-                }
-            }
-        </select>
-        <span asp-validation-for="Category" class="text-danger"></span>
-    </div>
-
-    <div class="col-12 col-md-6">
-        <label class="form-label">Subject</label>
-        <select asp-for="SubjectId" class="form-select">
-            <option value="">Select subject</option>
-            @if (subjects != null)
-            {
-                foreach (var s in subjects)
-                {
-                    <option value="@s.Id">@s.Name</option>
-                }
-            }
-        </select>
-        <span asp-validation-for="SubjectId" class="text-danger"></span>
-    </div>
-
-    <div class="col-12">
-        <label class="form-label">Content</label>
-        <textarea asp-for="Content" class="form-control" rows="6"></textarea>
-        <span asp-validation-for="Content" class="text-danger"></span>
-    </div>
-
-    <div class="col-12 d-flex gap-2">
-        <button type="submit" class="btn btn-success">Publish</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
-    </div>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
