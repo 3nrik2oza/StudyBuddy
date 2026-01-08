@@ -113,6 +113,17 @@ else
                             </small>
 
                             <div class="d-flex gap-2">
+                                <form asp-controller="Bookmarks" asp-action="Toggle" method="post" class="m-0">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="type" value="2" />
+                                    <input type="hidden" name="entityId" value="@t.Id" />
+                                    <input type="hidden" name="returnUrl"
+                                        value="@Context.Request.Path@Context.Request.QueryString" />
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                        Save
+                                    </button>
+                                </form>
+
                                 @if (t.IsOwner)
                                 {
                                     <a asp-action="Participants" asp-route-id="@t.Id" class="btn btn-outline-secondary btn-sm">

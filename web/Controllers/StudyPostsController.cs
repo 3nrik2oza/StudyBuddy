@@ -288,4 +288,17 @@ public class StudyPostsController : Controller
         TempData["ToastMessage"] = "Participant removed.";
         return RedirectToAction(nameof(Participants), new { id = postId });
     }
+
+    [HttpGet]
+    public async Task<IActionResult> Details(int id)
+    {
+        var post = await _context.StudyPosts
+            .Include(p => p.Subject)
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+        if (post == null) return NotFound();
+
+        return View(post);
+    }
+
 }

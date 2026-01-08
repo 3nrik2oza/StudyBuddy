@@ -18,7 +18,7 @@ namespace web.Data
         public DbSet<Tutor> Tutors { get; set; }
         public DbSet<TutorSubject> TutorSubjects { get; set; }
         public DbSet<TutorRequestMessage> TutorRequestMessages { get; set; }
-
+        public DbSet<Bookmark> Bookmarks { get; set; }
         public DbSet<Faculty> Faculties { get; set; }
         public DbSet<ForumThread> ForumThreads { get; set; }
         public DbSet<ForumReply> ForumReplies { get; set; }
@@ -91,6 +91,17 @@ namespace web.Data
                 .WithMany()
                 .HasForeignKey(m => m.SenderUserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Bookmark>()
+                .HasIndex(x => new { x.UserId, x.Type, x.EntityId })
+                .IsUnique();
+
+            modelBuilder.Entity<Bookmark>()
+                .HasOne(x => x.User)
+                .WithMany()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }
