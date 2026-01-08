@@ -19,6 +19,9 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<StudyBuddyDbContext>();
 
+builder.Services.Configure<web.Services.SmtpOptions>(builder.Configuration.GetSection("Smtp"));
+builder.Services.AddScoped<web.Services.IEmailSender, web.Services.SmtpEmailSender>();
+
 var app = builder.Build();
 
 SeedData.Initialize(app.Services);

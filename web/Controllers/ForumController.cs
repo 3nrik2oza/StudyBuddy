@@ -203,7 +203,6 @@ public class ForumController : Controller
 
         await _context.SaveChangesAsync();
 
-        TempData["ok"] = "Odgovor je dodan.";
         return RedirectToAction(nameof(Details), new { id = vm.ForumThreadId });
     }
 
@@ -252,7 +251,6 @@ public class ForumController : Controller
 
         await _context.SaveChangesAsync();
 
-        TempData["ok"] = "Odgovor je obrisan.";
         return RedirectToAction(nameof(Details), new { id = threadId });
     }
 }

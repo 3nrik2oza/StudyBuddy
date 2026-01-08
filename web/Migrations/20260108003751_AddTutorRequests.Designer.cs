@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using web.Data;
@@ -11,9 +12,11 @@ using web.Data;
 namespace web.Migrations
 {
     [DbContext(typeof(StudyBuddyDbContext))]
-    partial class StudyBuddyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260108003751_AddTutorRequests")]
+    partial class AddTutorRequests
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -561,38 +564,6 @@ namespace web.Migrations
                     b.ToTable("TutorRequests");
                 });
 
-            modelBuilder.Entity("web.Models.Entities.TutorRequestMessage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Body")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<string>("SenderUserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("SentAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("TutorRequestId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SenderUserId");
-
-                    b.HasIndex("TutorRequestId");
-
-                    b.ToTable("TutorRequestMessages");
-                });
-
             modelBuilder.Entity("web.Models.Entities.TutorSubject", b =>
                 {
                     b.Property<string>("UserId")
@@ -776,25 +747,6 @@ namespace web.Migrations
                     b.Navigation("TutorUser");
                 });
 
-            modelBuilder.Entity("web.Models.Entities.TutorRequestMessage", b =>
-                {
-                    b.HasOne("web.Models.ApplicationUser", "SenderUser")
-                        .WithMany()
-                        .HasForeignKey("SenderUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("web.Models.Entities.TutorRequest", "TutorRequest")
-                        .WithMany("Messages")
-                        .HasForeignKey("TutorRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SenderUser");
-
-                    b.Navigation("TutorRequest");
-                });
-
             modelBuilder.Entity("web.Models.Entities.TutorSubject", b =>
                 {
                     b.HasOne("web.Models.Entities.Subject", "Subject")
@@ -822,11 +774,6 @@ namespace web.Migrations
             modelBuilder.Entity("web.Models.Entities.Tutor", b =>
                 {
                     b.Navigation("TutorSubjects");
-                });
-
-            modelBuilder.Entity("web.Models.Entities.TutorRequest", b =>
-                {
-                    b.Navigation("Messages");
                 });
 #pragma warning restore 612, 618
         }

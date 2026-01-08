@@ -17,11 +17,13 @@ namespace web.Data
         public DbSet<StudyPost> StudyPosts { get; set; }
         public DbSet<Tutor> Tutors { get; set; }
         public DbSet<TutorSubject> TutorSubjects { get; set; }
+        public DbSet<TutorRequestMessage> TutorRequestMessages { get; set; }
+
         public DbSet<Faculty> Faculties { get; set; }
         public DbSet<ForumThread> ForumThreads { get; set; }
         public DbSet<ForumReply> ForumReplies { get; set; }
         public DbSet<StudyPostParticipant> StudyPostParticipants { get; set; }
-
+        public DbSet<TutorRequest> TutorRequests { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -59,6 +61,36 @@ namespace web.Data
                 .WithMany()
                 .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<TutorRequest>()
+                .HasOne(x => x.StudentUser)
+                .WithMany()
+                .HasForeignKey(x => x.StudentUserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<TutorRequest>()
+                .HasOne(x => x.TutorUser)
+                .WithMany()
+                .HasForeignKey(x => x.TutorUserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<TutorRequest>()
+                .HasOne(x => x.Subject)
+                .WithMany()
+                .HasForeignKey(x => x.SubjectId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TutorRequestMessage>()
+                .HasOne(m => m.TutorRequest)
+                .WithMany(r => r.Messages)
+                .HasForeignKey(m => m.TutorRequestId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<TutorRequestMessage>()
+                .HasOne(m => m.SenderUser)
+                .WithMany()
+                .HasForeignKey(m => m.SenderUserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
         }
 

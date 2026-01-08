@@ -7,6 +7,9 @@
     var initial = !string.IsNullOrWhiteSpace(displayName) ? displayName.Trim()[0].ToString().ToUpper() : "U";
 
     var isTutor = Model.Input?.IsTutor ?? false;
+
+    var hasPic = !string.IsNullOrWhiteSpace(Model.Input?.ProfilePicturePath);
+    var picUrl = hasPic ? Model.Input.ProfilePicturePath : "";
 }
 
 <div class="sb-page">
@@ -27,10 +30,6 @@
             </div>
 
             <div class="d-flex gap-2">
-                <a class="btn btn-outline-primary btn-sm" asp-controller="Home" asp-action="Index">
-                    Preview Public Profile
-                </a>
-
                 <button class="btn btn-sb btn-sm text-white" type="submit" form="profileForm">
                     Save All
                 </button>
@@ -45,7 +44,18 @@
                 <!-- Profile card -->
                 <div class="card sb-card shadow-sm">
                     <div class="card-body text-center p-4">
-                        <div class="sb-avatar mb-3"><span>@initial</span></div>
+
+                        @* Avatar: show uploaded picture only if user is tutor AND has picture *@
+                        @if (isTutor && hasPic)
+                        {
+                            <div class="sb-avatar-img mb-3">
+                                <img src="@picUrl" alt="Profile picture" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="sb-avatar mb-3"><span>@initial</span></div>
+                        }
 
                         <h5 class="mb-1">@displayName</h5>
                         <div class="sb-muted mb-3">
@@ -53,17 +63,42 @@
                         </div>
 
                         <div class="d-flex justify-content-center flex-wrap gap-2 mb-3">
-                            <span class="badge text-bg-primary">Student</span>
+                            <span class="sb-chip text-bg-primary">Student</span>
                             @if (isTutor)
                             {
-                                <span class="badge text-bg-success">Tutor</span>
+                                <span class="sb-chip text-bg-success">Tutor</span>
                             }
                             <span class="sb-chip">StudyBuddy</span>
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="button" class="btn btn-outline-primary" disabled>Edit Avatar</button>
-                            <button type="button" class="btn btn-outline-secondary" disabled>Message Settings</button>
+
+                            @* Upload button: only visible if tutor *@
+                            @if (isTutor)
+                            {
+                                <form method="post" asp-page-handler="UploadAvatar" enctype="multipart/form-data" id="avatarForm">
+                                    <input type="file"
+                                           name="AvatarFile"
+                                           id="avatarFile"
+                                           accept=".jpg,.jpeg,.png,.webp,image/*"
+                                           class="d-none" />
+
+                                    <button type="button" class="btn btn-outline-primary" id="avatarBtn">
+                                        Add profile picture
+                                    </button>
+
+                                    <div class="sb-muted small mt-2">
+                                        JPG/PNG/WEBP • max 3MB
+                                    </div>
+                                </form>
+                            }
+                            else
+                            {
+                                <div class="sb-muted small">
+                                    Tip: enable “Registered as Tutor” to add a profile picture.
+                                </div>
+                            }
+
                         </div>
                     </div>
                 </div>
@@ -115,14 +150,13 @@
 
                                 <div class="col-md-6">
                                     <label class="form-label" asp-for="Input.Email"></label>
-                                    <input asp-for="Input.Email" class="form-control" readonly />
+                                    <input asp-for="Input.Email" class="form-control" readonly disabled />
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label">Role</label>
                                     <input class="form-control" value="@(isTutor ? "Student + Tutor" : "Student")" readonly />
                                 </div>
-
 
                                 <div class="col-12 d-flex align-items-center justify-content-between flex-wrap gap-2 mt-1">
                                     <div class="form-check">
@@ -349,6 +383,7 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
+        // tutor subjects toggle
         const isTutorCheckbox = document.getElementById("isTutorCheckbox");
         const tutorSection = document.getElementById("tutorSubjectsSection");
         const availableSubjects = document.getElementById("availableSubjects");
@@ -365,7 +400,6 @@
         function addSubject() {
             const subjectId = availableSubjects.value;
             const subjectName = availableSubjects.options[availableSubjects.selectedIndex].text;
-
             if (!subjectId) return;
 
             availableSubjects.remove(availableSubjects.selectedIndex);
@@ -394,7 +428,6 @@
 
         addSubjectBtn.addEventListener("click", addSubject);
 
-        // remove existing
         document.querySelectorAll(".remove-subject-btn").forEach(btn => {
             btn.addEventListener("click", function () {
                 const row = this.closest("[data-id]");
@@ -409,5 +442,19 @@
                 availableSubjects.appendChild(opt);
             });
         });
+
+        // avatar upload UX
+        const avatarBtn = document.getElementById("avatarBtn");
+        const avatarFile = document.getElementById("avatarFile");
+        const avatarForm = document.getElementById("avatarForm");
+
+        if (avatarBtn && avatarFile && avatarForm) {
+            avatarBtn.addEventListener("click", () => avatarFile.click());
+            avatarFile.addEventListener("change", () => {
+                if (avatarFile.files && avatarFile.files.length > 0) {
+                    avatarForm.submit();
+                }
+            });
+        }
     </script>
 }

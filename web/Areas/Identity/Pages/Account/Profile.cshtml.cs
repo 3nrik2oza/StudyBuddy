@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 using web.Data;
 using web.Models.Entities;
 using web.Models;
@@ -18,15 +19,18 @@ namespace web.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly StudyBuddyDbContext _context;
+        private readonly IWebHostEnvironment _env;
 
         public ProfileModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            StudyBuddyDbContext context)
+            StudyBuddyDbContext context,
+            IWebHostEnvironment env)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
+            _env = env;
         }
 
         [BindProperty]
@@ -40,6 +44,10 @@ namespace web.Areas.Identity.Pages.Account
 
         public int StudyPostsCount { get; set; }
         public int MaterialsCount { get; set; }
+
+        // Upload field
+        [BindProperty]
+        public IFormFile AvatarFile { get; set; }
 
         public class InputModel
         {
@@ -55,6 +63,9 @@ namespace web.Areas.Identity.Pages.Account
             public string CurrentPassword { get; set; }
             public string NewPassword { get; set; }
             public string ConfirmPassword { get; set; }
+
+            // NEW
+            public string ProfilePicturePath { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -86,7 +97,6 @@ namespace web.Areas.Identity.Pages.Account
                 .OrderByDescending(m => m.CreatedAt)
                 .ToListAsync();
 
-            // ✅ fill counts
             StudyPostsCount = UserStudyPosts.Count;
             MaterialsCount = UserMaterials.Count;
 
@@ -98,7 +108,8 @@ namespace web.Areas.Identity.Pages.Account
                 FacultyId = user.FacultyId,
                 FacultyName = faculty?.Name ?? "",
                 IsTutor = user.IsTutor,
-                SubjectIds = selectedSubjects
+                SubjectIds = selectedSubjects,
+                ProfilePicturePath = user.ProfilePicturePath
             };
 
             return Page();
@@ -181,6 +192,64 @@ namespace web.Areas.Identity.Pages.Account
             }
 
             TempData["StatusMessage"] = "Profile updated successfully!";
+            return RedirectToPage();
+        }
+
+        // NEW: upload / change profile picture
+        public async Task<IActionResult> OnPostUploadAvatarAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return NotFound();
+
+            if (AvatarFile == null || AvatarFile.Length == 0)
+            {
+                TempData["StatusMessage"] = "Please select an image file.";
+                return RedirectToPage();
+            }
+
+            const long maxSize = 3 * 1024 * 1024; // 3MB
+            if (AvatarFile.Length > maxSize)
+            {
+                TempData["StatusMessage"] = "Image is too large (max 3MB).";
+                return RedirectToPage();
+            }
+
+            var ext = Path.GetExtension(AvatarFile.FileName).ToLowerInvariant();
+            var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            if (!allowed.Contains(ext))
+            {
+                TempData["StatusMessage"] = "Only JPG, PNG or WEBP images are allowed.";
+                return RedirectToPage();
+            }
+
+            var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "avatars");
+            Directory.CreateDirectory(uploadsDir);
+
+            var safeUserId = user.Id.Replace(":", "_");
+            var random = Convert.ToHexString(RandomNumberGenerator.GetBytes(8)).ToLowerInvariant();
+            var fileName = $"{safeUserId}_{random}{ext}";
+            var fullPath = Path.Combine(uploadsDir, fileName);
+
+            await using (var stream = System.IO.File.Create(fullPath))
+            {
+                await AvatarFile.CopyToAsync(stream);
+            }
+
+            // delete old file (optional)
+            if (!string.IsNullOrWhiteSpace(user.ProfilePicturePath))
+            {
+                var oldRel = user.ProfilePicturePath.TrimStart('/').Replace("/", Path.DirectorySeparatorChar.ToString());
+                var oldFull = Path.Combine(_env.WebRootPath, oldRel);
+                if (System.IO.File.Exists(oldFull))
+                {
+                    try { System.IO.File.Delete(oldFull); } catch { }
+                }
+            }
+
+            user.ProfilePicturePath = $"/uploads/avatars/{fileName}";
+            await _userManager.UpdateAsync(user);
+
+            TempData["StatusMessage"] = "Profile picture updated!";
             return RedirectToPage();
         }
 
