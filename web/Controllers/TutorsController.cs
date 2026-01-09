@@ -36,28 +36,49 @@ public class TutorsController : Controller
         _email = email;
     }
 
-    public IActionResult Index(int? subjectId, string? search)
+    // ✅ AUTO faculty filter (from profile)
+    public async Task<IActionResult> Index(int? subjectId, string? search)
     {
-        var tutors = _context.Tutors
-            .Where(t => t.FacultyId == 1)
-            .ToList();
+        var me = await _userManager.GetUserAsync(User);
+        var myFacultyId = me?.FacultyId ?? 0;
 
-        var tutorSubjectLookup = _context.TutorSubjects
-            .GroupBy(ts => ts.UserId)
-            .ToDictionary(
-                g => g.Key,
-                g => g.Select(x => x.SubjectId).ToList()
-            );
+        // tutors scoped to my faculty
+        var tutorsQuery = _context.Tutors.AsQueryable();
+        if (myFacultyId != 0)
+            tutorsQuery = tutorsQuery.Where(t => t.FacultyId == myFacultyId);
 
-        var faculty = _context.Faculties.FirstOrDefault(f => f.Id == 1);
-        var facultyName = faculty != null ? faculty.Name : "Unknown faculty";
+        var tutors = await tutorsQuery.ToListAsync();
 
+        // subjects scoped to my faculty (for filter dropdown)
+        var subjectsForFaculty = myFacultyId != 0
+            ? await _context.Subjects.Where(s => s.FacultyId == myFacultyId).OrderBy(s => s.Name).ToListAsync()
+            : await _context.Subjects.OrderBy(s => s.Name).ToListAsync();
+
+        ViewBag.Subjects = subjectsForFaculty;
+        ViewBag.SelectedSubjectId = subjectId;
+        ViewBag.Search = search ?? "";
+
+        // faculty name for badge text
+        var facultyName = "Unknown faculty";
+        if (myFacultyId != 0)
+            facultyName = await _context.Faculties.Where(f => f.Id == myFacultyId).Select(f => f.Name).FirstOrDefaultAsync() ?? "Unknown faculty";
+
+        // tutor -> subjectIds lookup (only for relevant tutors)
         var tutorIds = tutors.Select(t => t.Id).ToList();
 
-        var userLookup = _context.Users
+        var tutorSubjectLookup = await _context.TutorSubjects
+            .Where(ts => tutorIds.Contains(ts.UserId))
+            .GroupBy(ts => ts.UserId)
+            .ToDictionaryAsync(g => g.Key, g => g.Select(x => x.SubjectId).ToList());
+
+        // user lookup for email + avatar
+        var userLookup = await _context.Users
             .Where(u => tutorIds.Contains(u.Id))
             .Select(u => new { u.Id, u.Email, u.ProfilePicturePath })
-            .ToDictionary(x => x.Id, x => new { x.Email, x.ProfilePicturePath });
+            .ToDictionaryAsync(x => x.Id, x => new { x.Email, x.ProfilePicturePath });
+
+        // subject names lookup (only for this faculty’s subjects)
+        var subjectNameById = subjectsForFaculty.ToDictionary(s => s.Id, s => s.Name);
 
         var items = new List<TutorListItemVM>();
 
@@ -69,9 +90,9 @@ public class TutorsController : Controller
             if (subjectId.HasValue && !subjectIds.Contains(subjectId.Value))
                 continue;
 
-            var subjectNames = _context.Subjects
-                .Where(s => subjectIds.Contains(s.Id))
-                .Select(s => s.Name)
+            var subjectNames = subjectIds
+                .Where(id => subjectNameById.ContainsKey(id))
+                .Select(id => subjectNameById[id])
                 .ToList();
 
             userLookup.TryGetValue(tutor.Id, out var u);
@@ -90,7 +111,7 @@ public class TutorsController : Controller
 
         if (!string.IsNullOrWhiteSpace(search))
         {
-            var s = search.Trim().ToLower();
+            var s = search.Trim().ToLowerInvariant();
             items = items.Where(x =>
                     (!string.IsNullOrWhiteSpace(x.Name) && x.Name.ToLower().Contains(s)) ||
                     (!string.IsNullOrWhiteSpace(x.Email) && x.Email.ToLower().Contains(s))
@@ -103,26 +124,22 @@ public class TutorsController : Controller
             .ToList();
 
         ViewBag.TopTutors = items.Take(3).ToList();
-        ViewBag.Subjects = _context.Subjects.ToList();
-        ViewBag.SelectedSubjectId = subjectId;
-        ViewBag.Search = search ?? "";
 
-        // ✅ DODANO: da Index zna da li je user tutor (za dugme)
         var meId = _userManager.GetUserId(User);
-        ViewBag.IsCurrentUserTutor = !string.IsNullOrWhiteSpace(meId) && _context.Tutors.Any(t => t.Id == meId);
+        ViewBag.IsCurrentUserTutor = !string.IsNullOrWhiteSpace(meId) && await _context.Tutors.AnyAsync(t => t.Id == meId);
 
         return View(items);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult GiveHelpPoint(string tutorId, int? subjectId, string? search)
+    public async Task<IActionResult> GiveHelpPoint(string tutorId, int? subjectId, string? search)
     {
-        var tutor = _context.Tutors.FirstOrDefault(t => t.Id == tutorId);
+        var tutor = await _context.Tutors.FirstOrDefaultAsync(t => t.Id == tutorId);
         if (tutor != null)
         {
             tutor.HelpPoints += 1;
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             TempData["ToastMessage"] = "Help point has been added.";
         }
 
@@ -132,11 +149,27 @@ public class TutorsController : Controller
     [HttpGet]
     public async Task<IActionResult> Request(string tutorId)
     {
+        var me = await _userManager.GetUserAsync(User);
+        var myFacultyId = me?.FacultyId ?? 0;
+
+        // ensure tutor exists
         var tutorUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == tutorId);
         if (tutorUser == null) return NotFound();
 
+        // optional: block requesting tutors from other faculties
+        if (myFacultyId != 0)
+        {
+            var tutorFacultyId = await _context.Tutors.Where(t => t.Id == tutorId).Select(t => (int?)t.FacultyId).FirstOrDefaultAsync();
+            if (tutorFacultyId.HasValue && tutorFacultyId.Value != myFacultyId)
+                return Forbid();
+        }
+
         ViewBag.TutorName = tutorUser.Name;
-        ViewBag.Subjects = await _context.Subjects.ToListAsync();
+
+        // subjects only from my faculty
+        ViewBag.Subjects = myFacultyId != 0
+            ? await _context.Subjects.Where(s => s.FacultyId == myFacultyId).OrderBy(s => s.Name).ToListAsync()
+            : await _context.Subjects.OrderBy(s => s.Name).ToListAsync();
 
         return View(new TutorRequestCreateVM
         {
@@ -152,13 +185,35 @@ public class TutorsController : Controller
         var studentId = _userManager.GetUserId(User);
         if (string.IsNullOrWhiteSpace(studentId)) return Forbid();
 
+        var me = await _userManager.GetUserAsync(User);
+        var myFacultyId = me?.FacultyId ?? 0;
+
         var tutorUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == vm.TutorUserId);
         if (tutorUser == null) return NotFound();
 
         ViewBag.TutorName = tutorUser.Name;
-        ViewBag.Subjects = await _context.Subjects.ToListAsync();
+
+        ViewBag.Subjects = myFacultyId != 0
+            ? await _context.Subjects.Where(s => s.FacultyId == myFacultyId).OrderBy(s => s.Name).ToListAsync()
+            : await _context.Subjects.OrderBy(s => s.Name).ToListAsync();
 
         if (!ModelState.IsValid) return View(vm);
+
+        // ✅ safety: subject must belong to my faculty
+        if (myFacultyId != 0)
+        {
+            var okSubject = await _context.Subjects.AnyAsync(s => s.Id == vm.SubjectId && s.FacultyId == myFacultyId);
+            if (!okSubject)
+            {
+                ModelState.AddModelError(nameof(vm.SubjectId), "Invalid subject for your faculty.");
+                return View(vm);
+            }
+
+            // also block requesting tutor from other faculty (if tutor exists as Tutor record)
+            var tutorFacultyId = await _context.Tutors.Where(t => t.Id == vm.TutorUserId).Select(t => (int?)t.FacultyId).FirstOrDefaultAsync();
+            if (tutorFacultyId.HasValue && tutorFacultyId.Value != myFacultyId)
+                return Forbid();
+        }
 
         var req = new TutorRequest
         {
@@ -211,7 +266,6 @@ public class TutorsController : Controller
         return RedirectToAction(nameof(RequestDetails), new { id = req.Id });
     }
 
-    // ✅ POPRAVLJENO: Include StudentUser da nema 2 query-a po requestu
     [HttpGet]
     public async Task<IActionResult> Requests()
     {
@@ -293,7 +347,6 @@ public class TutorsController : Controller
             await _context.SaveChangesAsync();
         }
 
-        // ✅ standardizuj na globalni toast iz _Layout
         TempData["ok"] = accept ? "Request accepted." : "Request declined.";
         return RedirectToAction(nameof(Requests));
     }
@@ -301,8 +354,8 @@ public class TutorsController : Controller
     [HttpGet]
     public async Task<IActionResult> RequestDetails(int id)
     {
-        var me = _userManager.GetUserId(User);
-        if (string.IsNullOrWhiteSpace(me)) return Forbid();
+        var meId = _userManager.GetUserId(User);
+        if (string.IsNullOrWhiteSpace(meId)) return Forbid();
 
         var req = await _context.TutorRequests
             .Include(r => r.Subject)
@@ -314,11 +367,10 @@ public class TutorsController : Controller
 
         if (req == null) return NotFound();
 
-        if (req.StudentUserId != me && req.TutorUserId != me)
+        if (req.StudentUserId != meId && req.TutorUserId != meId)
             return Forbid();
 
         req.Messages = req.Messages.OrderBy(m => m.SentAt).ToList();
-
         return View(req);
     }
 
@@ -326,8 +378,8 @@ public class TutorsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SendRequestMessage(int id, string body)
     {
-        var me = _userManager.GetUserId(User);
-        if (string.IsNullOrWhiteSpace(me)) return Forbid();
+        var meId = _userManager.GetUserId(User);
+        if (string.IsNullOrWhiteSpace(meId)) return Forbid();
 
         var req = await _context.TutorRequests
             .Include(r => r.StudentUser)
@@ -336,7 +388,7 @@ public class TutorsController : Controller
             .FirstOrDefaultAsync(r => r.Id == id);
 
         if (req == null) return NotFound();
-        if (req.StudentUserId != me && req.TutorUserId != me) return Forbid();
+        if (req.StudentUserId != meId && req.TutorUserId != meId) return Forbid();
 
         body = (body ?? "").Trim();
         if (body.Length == 0)
@@ -350,14 +402,14 @@ public class TutorsController : Controller
         _context.TutorRequestMessages.Add(new TutorRequestMessage
         {
             TutorRequestId = id,
-            SenderUserId = me,
+            SenderUserId = meId,
             Body = body,
             SentAt = DateTime.UtcNow
         });
 
         await _context.SaveChangesAsync();
 
-        var isTutorSending = me == req.TutorUserId;
+        var isTutorSending = meId == req.TutorUserId;
         var toEmail = isTutorSending ? req.StudentUser?.Email : req.TutorUser?.Email;
 
         if (!string.IsNullOrWhiteSpace(toEmail))
@@ -406,19 +458,18 @@ public class TutorsController : Controller
         ViewBag.IsStudentView = true;
         return View("Requests", list);
     }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteRequest(int id)
     {
-        var me = _userManager.GetUserId(User);
-        if (string.IsNullOrWhiteSpace(me)) return Forbid();
+        var meId = _userManager.GetUserId(User);
+        if (string.IsNullOrWhiteSpace(meId)) return Forbid();
 
-        var req = await _context.TutorRequests
-            .FirstOrDefaultAsync(r => r.Id == id);
-
+        var req = await _context.TutorRequests.FirstOrDefaultAsync(r => r.Id == id);
         if (req == null) return NotFound();
 
-        if (req.StudentUserId != me && req.TutorUserId != me)
+        if (req.StudentUserId != meId && req.TutorUserId != meId)
             return Forbid();
 
         _context.TutorRequests.Remove(req);
@@ -426,8 +477,7 @@ public class TutorsController : Controller
 
         TempData["ok"] = "Request deleted.";
 
-        var isTutor = req.TutorUserId == me;
+        var isTutor = req.TutorUserId == meId;
         return RedirectToAction(isTutor ? nameof(Requests) : nameof(MyRequests));
     }
-
 }

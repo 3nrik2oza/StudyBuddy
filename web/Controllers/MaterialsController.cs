@@ -33,11 +33,32 @@ public class MaterialsController : Controller
         _env = env;
     }
 
-    public IActionResult Index(int? subjectId, string? search)
+    // ✅ JSON endpoint: subjects by faculty (used by Index + Create)
+    [HttpGet]
+    public async Task<IActionResult> SubjectsByFaculty(int facultyId)
     {
+        var subjects = await _context.Subjects
+            .Where(s => s.FacultyId == facultyId)
+            .OrderBy(s => s.Name)
+            .Select(s => new { id = s.Id, name = s.Name })
+            .ToListAsync();
+
+        return Json(subjects);
+    }
+
+    public async Task<IActionResult> Index(int? facultyId, int? subjectId, string? search)
+    {
+        // ✅ default faculty = logged in user's faculty
+        var me = await _userManager.GetUserAsync(User);
+        if (!facultyId.HasValue && me != null && me.FacultyId != 0)
+            facultyId = me.FacultyId;
+
         var query = _context.Materials
             .Include(m => m.Subject)
             .AsQueryable();
+
+        if (facultyId.HasValue)
+            query = query.Where(m => m.FacultyId == facultyId.Value);
 
         if (subjectId.HasValue)
             query = query.Where(m => m.SubjectId == subjectId.Value);
@@ -48,38 +69,64 @@ public class MaterialsController : Controller
             query = query.Where(m => m.Title.ToLower().Contains(s));
         }
 
-        var items = query
+        var items = await query
             .OrderByDescending(m => m.CreatedAt)
             .Select(m => new MaterialListItemVM
             {
                 Id = m.Id,
                 Title = m.Title,
                 Description = m.Description,
-                SubjectName = m.Subject != null ? m.Subject.Name : "Neznan predmet",
+                SubjectName = m.Subject != null ? m.Subject.Name : "Unknown subject",
                 Type = m.Type,
                 Url = m.Url
             })
-            .ToList();
+            .ToListAsync();
 
-        ViewBag.Subjects = _context.Subjects.ToList();
+        ViewBag.Faculties = await _context.Faculties.OrderBy(f => f.Name).ToListAsync();
+
+        // ✅ subjects dropdown only for selected faculty
+        ViewBag.Subjects = facultyId.HasValue
+            ? await _context.Subjects.Where(s => s.FacultyId == facultyId.Value).OrderBy(s => s.Name).ToListAsync()
+            : new List<Subject>();
+
+        ViewBag.SelectedFacultyId = facultyId;
         ViewBag.SelectedSubjectId = subjectId;
-        ViewBag.Search = search;
+        ViewBag.Search = search ?? "";
 
         return View(items);
     }
 
     [HttpGet]
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
     {
-        ViewBag.Subjects = _context.Subjects.ToList();
+        ViewBag.Faculties = await _context.Faculties.OrderBy(f => f.Name).ToListAsync();
+
+        // default faculty = current user faculty (nice UX)
+        var me = await _userManager.GetUserAsync(User);
+        var defaultFacultyId = me?.FacultyId;
+
+        ViewBag.DefaultFacultyId = defaultFacultyId;
+        ViewBag.Subjects = defaultFacultyId.HasValue
+            ? await _context.Subjects.Where(s => s.FacultyId == defaultFacultyId.Value).OrderBy(s => s.Name).ToListAsync()
+            : new List<Subject>();
+
         return View(new MaterialCreateVM());
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(MaterialCreateVM vm)
+    public async Task<IActionResult> Create(MaterialCreateVM vm, int? facultyId)
     {
-        ViewBag.Subjects = _context.Subjects.ToList();
+        ViewBag.Faculties = await _context.Faculties.OrderBy(f => f.Name).ToListAsync();
+
+        // subjects depend on selected faculty (fallback user faculty)
+        var me = await _userManager.GetUserAsync(User);
+        var resolvedFacultyId = facultyId ?? me?.FacultyId;
+
+        ViewBag.DefaultFacultyId = resolvedFacultyId;
+        ViewBag.Subjects = resolvedFacultyId.HasValue
+            ? await _context.Subjects.Where(s => s.FacultyId == resolvedFacultyId.Value).OrderBy(s => s.Name).ToListAsync()
+            : new List<Subject>();
 
         var type = (vm.Type ?? "").Trim().ToLowerInvariant();
 
@@ -96,6 +143,11 @@ public class MaterialsController : Controller
             if (vm.UploadFile == null || vm.UploadFile.Length == 0)
                 ModelState.AddModelError(nameof(vm.UploadFile), "Please upload a file.");
         }
+
+        // ✅ validate subject exists
+        var subject = await _context.Subjects.FirstOrDefaultAsync(s => s.Id == vm.SubjectId);
+        if (subject == null)
+            ModelState.AddModelError(nameof(vm.SubjectId), "Please select a valid subject.");
 
         if (!ModelState.IsValid)
             return View(vm);
@@ -143,6 +195,7 @@ public class MaterialsController : Controller
 
         var userId = _userManager.GetUserId(User);
 
+        // ✅ FacultyId comes from subject (single source of truth)
         var entity = new Material
         {
             Id = newId,
@@ -151,7 +204,7 @@ public class MaterialsController : Controller
             Type = type,
             Url = type == "link" ? vm.Url?.Trim() : storedPath,
             SubjectId = vm.SubjectId,
-            FacultyId = 1,
+            FacultyId = subject!.FacultyId,
             AuthorUserId = userId,
             CreatedAt = DateTime.UtcNow
         };
@@ -160,6 +213,6 @@ public class MaterialsController : Controller
         await _context.SaveChangesAsync();
 
         TempData["ok"] = "The material has been successfully added.";
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Index), new { facultyId = entity.FacultyId, subjectId = entity.SubjectId });
     }
 }

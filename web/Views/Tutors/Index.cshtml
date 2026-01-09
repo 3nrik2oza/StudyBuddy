@@ -43,7 +43,7 @@
         </div>
 
         <div class="col-sm-3 col-md-2 d-grid">
-            <a class="btn btn-outline-secondary" asp-action="Index" asp-route-subjectId="@(selectedSubjectId)">
+            <a class="btn btn-outline-secondary" asp-action="Index">
                 Clear
             </a>
         </div>
@@ -56,6 +56,11 @@
     </div>
 </div>
 
+@if (TempData["ToastMessage"] != null)
+{
+    <div class="alert alert-success mb-3">@TempData["ToastMessage"]</div>
+}
+
 @if (!Model.Any())
 {
     <p>No tutors found.</p>
@@ -66,8 +71,8 @@ else
         @foreach (var tutor in Model)
         {
             var initial = string.IsNullOrWhiteSpace(tutor.Name)
-            ? "?"
-            : char.ToUpperInvariant(tutor.Name.Trim()[0]).ToString();
+                ? "?"
+                : char.ToUpperInvariant(tutor.Name.Trim()[0]).ToString();
 
             var hasPic = !string.IsNullOrWhiteSpace(tutor.ProfilePicturePath);
 

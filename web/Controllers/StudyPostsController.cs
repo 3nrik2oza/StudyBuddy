@@ -37,7 +37,8 @@ public class StudyPostsController : Controller
         _userManager = userManager;
     }
 
-    public IActionResult Index(int? subjectId, DateTime? from)
+    // ✅ AUTO faculty filter (from profile)
+    public async Task<IActionResult> Index(int? subjectId, DateTime? from)
     {
         DateTime minDateUtc;
 
@@ -53,46 +54,62 @@ public class StudyPostsController : Controller
             minDateUtc = localStartOfDay.ToUniversalTime();
         }
 
-        var userId = _userManager.GetUserId(User) ?? "";
+        var meId = _userManager.GetUserId(User) ?? "";
+        var me = await _userManager.GetUserAsync(User);
+        var myFacultyId = me?.FacultyId ?? 0;
 
         var query = _context.StudyPosts
             .Include(p => p.Subject)
             .Where(p => p.StartAt >= minDateUtc);
 
+        // ✅ filter by my faculty
+        if (myFacultyId != 0)
+            query = query.Where(p => p.FacultyId == myFacultyId);
+
         if (subjectId.HasValue)
             query = query.Where(p => p.SubjectId == subjectId.Value);
 
-        var items = query
+        var items = await query
             .OrderBy(p => p.StartAt)
             .Select(p => new StudyPostListItemVM
             {
                 Id = p.Id,
                 Title = p.Title,
-                SubjectName = p.Subject != null ? p.Subject.Name : "Neznan predmet",
+                SubjectName = p.Subject != null ? p.Subject.Name : "Unknown subject",
                 StartAt = p.StartAt,
                 Location = p.Location,
                 IsOnline = p.IsOnline,
                 MaxParticipants = p.MaxParticipants,
                 ParticipantsCount = _context.StudyPostParticipants.Count(x => x.StudyPostId == p.Id),
-                IsJoined = userId != "" && _context.StudyPostParticipants.Any(x => x.StudyPostId == p.Id && x.UserId == userId),
-                IsOwner = userId != "" && p.AuthorUserId == userId,
+                IsJoined = meId != "" && _context.StudyPostParticipants.Any(x => x.StudyPostId == p.Id && x.UserId == meId),
+                IsOwner = meId != "" && p.AuthorUserId == meId,
                 OrganizerName = _context.Users
                     .Where(u => u.Id == p.AuthorUserId)
                     .Select(u => (u.Name != null && u.Name != "") ? u.Name : (u.Email ?? "Unknown"))
                     .FirstOrDefault() ?? "Unknown"
             })
-            .ToList();
+            .ToListAsync();
 
-        ViewBag.Subjects = _context.Subjects.ToList();
+        // ✅ subjects only for my faculty
+        ViewBag.Subjects = myFacultyId != 0
+            ? await _context.Subjects.Where(s => s.FacultyId == myFacultyId).OrderBy(s => s.Name).ToListAsync()
+            : await _context.Subjects.OrderBy(s => s.Name).ToListAsync();
+
+        ViewBag.SelectedSubjectId = subjectId;
         ViewBag.From = from.HasValue ? from.Value.ToString("yyyy-MM-dd") : DateTime.Now.ToString("yyyy-MM-dd");
 
         return View(items);
     }
 
     [HttpGet]
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
     {
-        ViewBag.Subjects = _context.Subjects.ToList();
+        var me = await _userManager.GetUserAsync(User);
+        var myFacultyId = me?.FacultyId ?? 0;
+
+        ViewBag.Subjects = myFacultyId != 0
+            ? await _context.Subjects.Where(s => s.FacultyId == myFacultyId).OrderBy(s => s.Name).ToListAsync()
+            : await _context.Subjects.OrderBy(s => s.Name).ToListAsync();
 
         var vm = new StudyPostCreateVM
         {
@@ -105,20 +122,34 @@ public class StudyPostsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Create(StudyPostCreateVM vm)
+    public async Task<IActionResult> Create(StudyPostCreateVM vm)
     {
+        var me = await _userManager.GetUserAsync(User);
+        var myFacultyId = me?.FacultyId ?? 0;
+
+        ViewBag.Subjects = myFacultyId != 0
+            ? await _context.Subjects.Where(s => s.FacultyId == myFacultyId).OrderBy(s => s.Name).ToListAsync()
+            : await _context.Subjects.OrderBy(s => s.Name).ToListAsync();
+
         if (!ModelState.IsValid)
-        {
-            ViewBag.Subjects = _context.Subjects.ToList();
             return View(vm);
+
+        // ✅ safety: subject must belong to my faculty (if faculty set)
+        if (myFacultyId != 0)
+        {
+            var okSubject = await _context.Subjects.AnyAsync(s => s.Id == vm.SubjectId && s.FacultyId == myFacultyId);
+            if (!okSubject)
+            {
+                ModelState.AddModelError(nameof(vm.SubjectId), "Invalid subject for your faculty.");
+                return View(vm);
+            }
         }
 
-        var newId = _context.StudyPosts.Any()
-            ? _context.StudyPosts.Max(p => p.Id) + 1
+        var newId = await _context.StudyPosts.AnyAsync()
+            ? await _context.StudyPosts.MaxAsync(p => p.Id) + 1
             : 1;
 
         var startAtUtc = DateTime.SpecifyKind(vm.StartAt, DateTimeKind.Local).ToUniversalTime();
-
         var userId = _userManager.GetUserId(User) ?? "";
 
         var entity = new StudyPost
@@ -129,18 +160,19 @@ public class StudyPostsController : Controller
             StartAt = startAtUtc,
             Location = vm.Location,
             IsOnline = vm.IsOnline,
-            FacultyId = 1,
+            FacultyId = myFacultyId, // ✅ from profile (NOT 1)
             AuthorUserId = userId,
             CreatedAt = DateTime.UtcNow,
             MaxParticipants = vm.MaxParticipants
         };
 
         _context.StudyPosts.Add(entity);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
+        // auto-join author
         if (userId != "")
         {
-            var already = _context.StudyPostParticipants.Any(x => x.StudyPostId == entity.Id && x.UserId == userId);
+            var already = await _context.StudyPostParticipants.AnyAsync(x => x.StudyPostId == entity.Id && x.UserId == userId);
             if (!already)
             {
                 _context.StudyPostParticipants.Add(new StudyPostParticipant
@@ -149,7 +181,7 @@ public class StudyPostsController : Controller
                     UserId = userId,
                     JoinedAt = DateTime.UtcNow
                 });
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
 
@@ -300,5 +332,4 @@ public class StudyPostsController : Controller
 
         return View(post);
     }
-
 }
