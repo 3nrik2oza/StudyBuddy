@@ -213,6 +213,9 @@ namespace web.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("ProfilePicturePath")
+                        .HasColumnType("text");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
@@ -233,6 +236,35 @@ namespace web.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("web.Models.Entities.Bookmark", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("EntityId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Type", "EntityId")
+                        .IsUnique();
+
+                    b.ToTable("Bookmarks");
                 });
 
             modelBuilder.Entity("web.Models.Entities.Faculty", b =>
@@ -256,6 +288,39 @@ namespace web.Migrations
                     b.ToTable("Faculties");
                 });
 
+            modelBuilder.Entity("web.Models.Entities.ForumReply", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AuthorName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("AuthorUserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ForumThreadId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ForumThreadId");
+
+                    b.ToTable("ForumReplies");
+                });
+
             modelBuilder.Entity("web.Models.Entities.ForumThread", b =>
                 {
                     b.Property<int>("Id")
@@ -265,6 +330,10 @@ namespace web.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AuthorName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("AuthorUserId")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -318,6 +387,9 @@ namespace web.Migrations
                     b.Property<int>("FacultyId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("FileName")
+                        .HasColumnType("text");
+
                     b.Property<string>("FilePath")
                         .HasColumnType("text");
 
@@ -369,6 +441,9 @@ namespace web.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("MaxParticipants")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("StartAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -386,6 +461,34 @@ namespace web.Migrations
                     b.HasIndex("SubjectId");
 
                     b.ToTable("StudyPosts");
+                });
+
+            modelBuilder.Entity("web.Models.Entities.StudyPostParticipant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("JoinedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("StudyPostId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("StudyPostId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("StudyPostParticipants");
                 });
 
             modelBuilder.Entity("web.Models.Entities.Subject", b =>
@@ -436,6 +539,90 @@ namespace web.Migrations
                     b.HasIndex("FacultyId");
 
                     b.ToTable("Tutors");
+                });
+
+            modelBuilder.Entity("web.Models.Entities.TutorRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsOnline")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PreferredTime")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("RespondedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("StudentUserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("SubjectId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TutorResponseMessage")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TutorUserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentUserId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.HasIndex("TutorUserId");
+
+                    b.ToTable("TutorRequests");
+                });
+
+            modelBuilder.Entity("web.Models.Entities.TutorRequestMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("SenderUserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("TutorRequestId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SenderUserId");
+
+                    b.HasIndex("TutorRequestId");
+
+                    b.ToTable("TutorRequestMessages");
                 });
 
             modelBuilder.Entity("web.Models.Entities.TutorSubject", b =>
@@ -504,6 +691,28 @@ namespace web.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("web.Models.Entities.Bookmark", b =>
+                {
+                    b.HasOne("web.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("web.Models.Entities.ForumReply", b =>
+                {
+                    b.HasOne("web.Models.Entities.ForumThread", "ForumThread")
+                        .WithMany("Replies")
+                        .HasForeignKey("ForumThreadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ForumThread");
+                });
+
             modelBuilder.Entity("web.Models.Entities.Material", b =>
                 {
                     b.HasOne("web.Models.Entities.Faculty", "Faculty")
@@ -542,6 +751,25 @@ namespace web.Migrations
                     b.Navigation("Subject");
                 });
 
+            modelBuilder.Entity("web.Models.Entities.StudyPostParticipant", b =>
+                {
+                    b.HasOne("web.Models.Entities.StudyPost", "StudyPost")
+                        .WithMany()
+                        .HasForeignKey("StudyPostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("web.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("StudyPost");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("web.Models.Entities.Subject", b =>
                 {
                     b.HasOne("web.Models.Entities.Faculty", "Faculty")
@@ -564,6 +792,52 @@ namespace web.Migrations
                     b.Navigation("Faculty");
                 });
 
+            modelBuilder.Entity("web.Models.Entities.TutorRequest", b =>
+                {
+                    b.HasOne("web.Models.ApplicationUser", "StudentUser")
+                        .WithMany()
+                        .HasForeignKey("StudentUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("web.Models.Entities.Subject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("web.Models.ApplicationUser", "TutorUser")
+                        .WithMany()
+                        .HasForeignKey("TutorUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("StudentUser");
+
+                    b.Navigation("Subject");
+
+                    b.Navigation("TutorUser");
+                });
+
+            modelBuilder.Entity("web.Models.Entities.TutorRequestMessage", b =>
+                {
+                    b.HasOne("web.Models.ApplicationUser", "SenderUser")
+                        .WithMany()
+                        .HasForeignKey("SenderUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("web.Models.Entities.TutorRequest", "TutorRequest")
+                        .WithMany("Messages")
+                        .HasForeignKey("TutorRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SenderUser");
+
+                    b.Navigation("TutorRequest");
+                });
+
             modelBuilder.Entity("web.Models.Entities.TutorSubject", b =>
                 {
                     b.HasOne("web.Models.Entities.Subject", "Subject")
@@ -583,9 +857,19 @@ namespace web.Migrations
                     b.Navigation("Tutor");
                 });
 
+            modelBuilder.Entity("web.Models.Entities.ForumThread", b =>
+                {
+                    b.Navigation("Replies");
+                });
+
             modelBuilder.Entity("web.Models.Entities.Tutor", b =>
                 {
                     b.Navigation("TutorSubjects");
+                });
+
+            modelBuilder.Entity("web.Models.Entities.TutorRequest", b =>
+                {
+                    b.Navigation("Messages");
                 });
 #pragma warning restore 612, 618
         }

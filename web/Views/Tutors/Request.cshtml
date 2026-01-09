@@ -1,0 +1,62 @@
+@model web.Models.ViewModels.TutorRequestCreateVM
+@{
+    ViewData["Title"] = "Request a session";
+    var tutorName = ViewBag.TutorName as string ?? "Tutor";
+    var subjects = ViewBag.Subjects as List<web.Models.Entities.Subject>;
+}
+
+<div class="container py-4">
+    <h2 class="mb-1">Request a session</h2>
+    <p class="text-muted mb-4">Send a short request to <strong>@tutorName</strong>. The tutor will get an email notification.</p>
+
+    <form method="post" asp-action="Request">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="TutorUserId" />
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Subject</label>
+                <select asp-for="SubjectId" class="form-select">
+                    <option value="">-- Select subject --</option>
+                    @if (subjects != null)
+                    {
+                        foreach (var s in subjects)
+                        {
+                            <option value="@s.Id">@s.Name</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="SubjectId" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Mode</label>
+                <select class="form-select" asp-for="IsOnline">
+                    <option value="true">Online</option>
+                    <option value="false">On campus</option>
+                </select>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label">Preferred time (optional)</label>
+                <input asp-for="PreferredTime" class="form-control" placeholder="e.g. Friday 16:00, or any weekday after 18:00" />
+                <span asp-validation-for="PreferredTime" class="text-danger"></span>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label">Message</label>
+                <textarea asp-for="Message" class="form-control" rows="5" placeholder="Explain what you need help with…"></textarea>
+                <span asp-validation-for="Message" class="text-danger"></span>
+            </div>
+
+            <div class="col-12 d-flex gap-2">
+                <button class="btn btn-primary">Send request</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,9 +1,11 @@
 @model List<web.Controllers.TutorListItemVM>
 
 @{
-    ViewData[index: "Title"] = "Tutors";
+    ViewData["Title"] = "Tutors";
     List<web.Models.Entities.Subject>? subjects = ViewBag.Subjects as List<web.Models.Entities.Subject>;
     int? selectedSubjectId = ViewBag.SelectedSubjectId as int?;
+    var search = ViewBag.Search as string ?? "";
+    var isTutor = (ViewBag.IsCurrentUserTutor as bool?) == true;
 }
 
 <h2 class="mb-1">Tutors</h2>
@@ -11,33 +13,48 @@
     See who is offering help and how many help points they have earned.
 </p>
 
-<form method="get" class="row g-2 mb-4">
-    <div class="col-sm-4 col-md-3">
-        <label class="form-label mb-1">Filter by subject</label>
-        <select name="subjectId" class="form-select" onchange="this.form.submit()">
-            <option value="">All subjects</option>
-            @if (subjects != null)
-            {
-                foreach (web.Models.Entities.Subject s in subjects)
+<div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
+    <form method="get" class="row g-2 align-items-end flex-grow-1">
+        <div class="col-sm-4 col-md-3">
+            <label class="form-label mb-1">Filter by subject</label>
+            <select name="subjectId" class="form-select">
+                <option value="">All subjects</option>
+                @if (subjects != null)
                 {
-                    @if (selectedSubjectId == s.Id)
+                    foreach (var s in subjects)
                     {
-                        <option value="@s.Id" selected>@s.Name</option>
-                    }
-                    else
-                    {
-                        <option value="@s.Id">@s.Name</option>
+                        <option value="@s.Id" selected="@(selectedSubjectId == s.Id)">
+                            @s.Name
+                        </option>
                     }
                 }
-            }
-        </select>
-    </div>
-</form>
+            </select>
+        </div>
 
-@if (TempData[key: "ok"] != null)
-{
-    <div class="alert alert-success">@TempData["ok"]</div>
-}
+        <div class="col-sm-5 col-md-5">
+            <label class="form-label mb-1">Search</label>
+            <input name="search" value="@search" class="form-control" placeholder="Search by name or email..." />
+        </div>
+
+        <div class="col-sm-3 col-md-2 d-grid">
+            <button type="submit" class="btn btn-primary">
+                Search
+            </button>
+        </div>
+
+        <div class="col-sm-3 col-md-2 d-grid">
+            <a class="btn btn-outline-secondary" asp-action="Index" asp-route-subjectId="@(selectedSubjectId)">
+                Clear
+            </a>
+        </div>
+    </form>
+
+    <div class="d-grid">
+        <a asp-action="@(isTutor ? "Requests" : "MyRequests")" class="btn btn-outline-secondary">
+            @(isTutor ? "Incoming requests" : "My requests")
+        </a>
+    </div>
+</div>
 
 @if (!Model.Any())
 {
@@ -46,46 +63,35 @@
 else
 {
     <div class="row g-3">
-        @foreach (web.Controllers.TutorListItemVM tutor in Model)
+        @foreach (var tutor in Model)
         {
-            var primarySubject = tutor.Subjects.FirstOrDefault() ?? "";
-            string cardColorClass;
-
-            if (primarySubject.Contains("Mat", StringComparison.OrdinalIgnoreCase))
-            {
-                cardColorClass = "tutor-card-blue";
-            }
-            else if (primarySubject.Contains("Prog", StringComparison.OrdinalIgnoreCase) ||
-                     primarySubject.Contains("APS", StringComparison.OrdinalIgnoreCase))
-            {
-                cardColorClass = "tutor-card-yellow";
-            }
-            else if (primarySubject.Contains("Alg", StringComparison.OrdinalIgnoreCase))
-            {
-                cardColorClass = "tutor-card-red";
-            }
-            else if (primarySubject.Contains("baz", StringComparison.OrdinalIgnoreCase) ||
-                     primarySubject.Contains("SQL", StringComparison.OrdinalIgnoreCase))
-            {
-                cardColorClass = "tutor-card-green";
-            }
-            else
-            {
-                cardColorClass = "tutor-card-blue";
-            }
-
-            // samo prvi inicijal imena, npr. "Sara Horvat" -> "S"
             var initial = string.IsNullOrWhiteSpace(tutor.Name)
-                ? "?"
-                : char.ToUpperInvariant(tutor.Name.Trim()[0]).ToString();
+            ? "?"
+            : char.ToUpperInvariant(tutor.Name.Trim()[0]).ToString();
+
+            var hasPic = !string.IsNullOrWhiteSpace(tutor.ProfilePicturePath);
 
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="tutor-card @cardColorClass h-100">
+                <div class="tutor-card h-100">
                     <div class="d-flex align-items-center mb-3">
-                        <div class="tutor-avatar">@initial</div>
+                        @if (hasPic)
+                        {
+                            <div class="tutor-avatar-img">
+                                <img src="@tutor.ProfilePicturePath" alt="Tutor picture" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="tutor-avatar">@initial</div>
+                        }
+
                         <div class="ms-3">
                             <h5 class="mb-1">@tutor.Name</h5>
                             <p class="text-muted small mb-0">@tutor.FacultyName</p>
+                            @if (!string.IsNullOrWhiteSpace(tutor.Email))
+                            {
+                                <p class="text-muted small mb-0">@tutor.Email</p>
+                            }
                         </div>
                     </div>
 
@@ -93,7 +99,7 @@ else
                         <strong>Subjects:</strong>
                         @if (tutor.Subjects.Any())
                         {
-                            @string.Join(separator: ", ", tutor.Subjects)
+                            @string.Join(", ", tutor.Subjects)
                         }
                         else
                         {
@@ -101,17 +107,26 @@ else
                         }
                     </p>
 
-                    <div class="mt-auto d-flex justify-content-between align-items-center">
+                    <div class="mt-auto d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <span class="tutor-help-badge">
                             ⭐ Help points: @tutor.HelpPoints
                         </span>
 
-                        <form asp-action="GiveHelpPoint" method="post" class="m-0">
-                            <input type="hidden" name="tutorId" value="@tutor.Id" />
-                            <button type="submit" class="btn btn-outline-success btn-sm">
-                                Tutor helped me
-                            </button>
-                        </form>
+                        <div class="d-flex gap-2">
+                            <a asp-action="Request" asp-route-tutorId="@tutor.Id" class="btn btn-outline-primary btn-sm">
+                                Request session
+                            </a>
+
+                            <form asp-action="GiveHelpPoint" method="post" class="m-0">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="tutorId" value="@tutor.Id" />
+                                <input type="hidden" name="subjectId" value="@selectedSubjectId" />
+                                <input type="hidden" name="search" value="@search" />
+                                <button type="submit" class="btn btn-outline-success btn-sm">
+                                    Tutor helped me
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

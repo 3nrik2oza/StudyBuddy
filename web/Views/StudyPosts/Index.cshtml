@@ -1,14 +1,14 @@
 @model List<web.Controllers.StudyPostListItemVM>
 
 @{
-    ViewData["Title"] = "Study sessions";
+    ViewData["Title"] = "Study Post";
     var subjects = ViewBag.Subjects as List<web.Models.Entities.Subject>;
     var from = ViewBag.From as string;
 }
 
-<h2 class="mb-1">Study sessions</h2>
+<h2 class="mb-1">Study Post</h2>
 <p class="text-muted mb-4">
-    Discover upcoming sessions and study together with other students.
+    Discover upcoming post and study together with other students.
 </p>
 
 <form method="get" class="row g-2 mb-4 align-items-end">
@@ -46,41 +46,40 @@
 
 @if (TempData["ok"] != null)
 {
-    <div class="alert alert-success">@TempData["ok"]</div>
+    <div class="alert alert-success mb-3">@TempData["ok"]</div>
+}
+@if (TempData["ToastMessage"] != null)
+{
+    <div class="alert alert-success mb-3">@TempData["ToastMessage"]</div>
+}
+@if (TempData["err"] != null)
+{
+    <div class="alert alert-danger mb-3">@TempData["err"]</div>
 }
 
 @if (!Model.Any())
 {
-    <p>No study sessions found.</p>
+    <p>No study post found.</p>
 }
 else
 {
     <div class="row g-3">
         @foreach (var t in Model)
         {
-            // simple mapping subject -> image
             string imageUrl;
             var subjectName = t.SubjectName ?? "";
 
             if (subjectName.Contains("APS", StringComparison.OrdinalIgnoreCase))
-            {
                 imageUrl = "https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg";
-            }
             else if (subjectName.Contains("IS", StringComparison.OrdinalIgnoreCase))
-            {
                 imageUrl = "https://images.pexels.com/photos/3861964/pexels-photo-3861964.jpeg";
-            }
             else
-            {
                 imageUrl = "https://images.pexels.com/photos/4145190/pexels-photo-4145190.jpeg";
-            }
 
             <div class="col-12 col-md-6 col-lg-4">
                 <div class="session-card card h-100 border-0 shadow-sm">
                     <div class="ratio ratio-16x9 session-card-cover">
-                        <img src="@imageUrl"
-                             class="card-img-top"
-                             alt="Study session image for @t.SubjectName" />
+                        <img src="@imageUrl" class="card-img-top" alt="Study post image for @t.SubjectName" />
                     </div>
 
                     <div class="card-body d-flex flex-column">
@@ -90,15 +89,74 @@ else
 
                         <h5 class="card-title mb-1">@t.Title</h5>
 
+                        <p class="text-muted small mb-2">
+                            👤 Organizer: @(!string.IsNullOrWhiteSpace(t.OrganizerName) ? t.OrganizerName : "Unknown")
+                        </p>
+
                         <p class="card-text text-muted small mb-3">
                             @t.StartAt.ToString("dd.MM.yyyy HH:mm")
                             ·
                             @t.Location
                         </p>
 
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">
+                                👥 @t.ParticipantsCount / @t.MaxParticipants
+                                @if (t.IsFull)
+                                {
+                                    <span class="ms-2 badge bg-danger">Full</span>
+                                }
+                                else
+                                {
+                                    <span class="ms-2 badge bg-success">Open</span>
+                                }
+                            </small>
+
+                            <div class="d-flex gap-2">
+                                <form asp-controller="Bookmarks" asp-action="Toggle" method="post" class="m-0">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="type" value="2" />
+                                    <input type="hidden" name="entityId" value="@t.Id" />
+                                    <input type="hidden" name="returnUrl"
+                                        value="@Context.Request.Path@Context.Request.QueryString" />
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                        Save
+                                    </button>
+                                </form>
+
+                                @if (t.IsOwner)
+                                {
+                                    <a asp-action="Participants" asp-route-id="@t.Id" class="btn btn-outline-secondary btn-sm">
+                                        Manage
+                                    </a>
+                                }
+
+                                @if (t.IsJoined)
+                                {
+                                    <form asp-action="Leave" method="post" class="m-0">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@t.Id" />
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            Leave
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="Join" method="post" class="m-0">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@t.Id" />
+                                        <button type="submit" class="btn btn-primary btn-sm" @(t.IsFull ? "disabled" : "")>
+                                            Join
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+
                         <div class="mt-auto d-flex justify-content-between align-items-center">
                             <span class="text-muted small">
-                                Study session
+                                Study post
                             </span>
 
                             @if (t.IsOnline)

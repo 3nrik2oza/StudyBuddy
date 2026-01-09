@@ -1,0 +1,118 @@
+@model web.Models.Entities.TutorRequest
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Tutoring request";
+    var me = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+    var isTutor = Model.TutorUserId == me;
+    var otherName = isTutor ? (Model.StudentUser?.Name ?? "Student") : (Model.TutorUser?.Name ?? "Tutor");
+    var backAction = isTutor ? "Requests" : "MyRequests";
+    var backText = isTutor ? "Back to requests" : "Back to my requests";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+        <div>
+            <h2 class="mb-1">Tutoring request</h2>
+            <div class="text-muted">
+                <span><b>With:</b> @otherName</span>
+                <span class="mx-2">•</span>
+                <span><b>Subject:</b> @(Model.Subject?.Name ?? "-")</span>
+                <span class="mx-2">•</span>
+                <span><b>Status:</b> @Model.Status</span>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a asp-action="@backAction" class="btn btn-outline-secondary btn-sm">@backText</a>
+
+            <form asp-action="DeleteRequest" method="post" class="d-inline">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="btn btn-outline-danger btn-sm"
+                        onclick="return confirm('Delete this request and all messages?');">
+                    Delete
+                </button>
+            </form>
+        </div>
+    </div>
+
+    @if (TempData["ToastMessage"] != null)
+    {
+        <div class="alert alert-success mb-3">@TempData["ToastMessage"]</div>
+    }
+    @if (TempData["err"] != null)
+    {
+        <div class="alert alert-danger mb-3">@TempData["err"]</div>
+    }
+
+    <!-- CHAT -->
+    <div class="sb-chat">
+
+        <!-- Messages -->
+        <div class="sb-chat-messages">
+            @if (Model.Messages == null || !Model.Messages.Any())
+            {
+                <div class="sb-muted small">No messages yet.</div>
+            }
+            else
+            {
+                @foreach (var m in Model.Messages.OrderBy(x => x.SentAt))
+                {
+                    var mine = (m.SenderUserId == me);
+
+                    <div class="sb-bubble-row @(mine ? "is-mine" : "is-other")">
+                        <div class="sb-bubble">
+                            <div class="sb-bubble-meta">
+                                <span class="sb-bubble-name">@(m.SenderUser?.Name ?? "User")</span>
+                                <span class="sb-bubble-time">@m.SentAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                            </div>
+                            <div class="sb-bubble-body">@m.Body</div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- Composer -->
+        <form asp-action="SendRequestMessage" method="post" class="sb-chat-composer">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+
+            <label class="form-label mb-2">New message</label>
+            <textarea name="body"
+                      class="form-control sb-chat-input"
+                      rows="3"
+                      maxlength="2000"
+                      placeholder="Write a message..."></textarea>
+
+            <div class="d-flex justify-content-end mt-2">
+                <button type="submit" class="btn btn-sb btn-sm px-4">Send</button>
+            </div>
+        </form>
+
+    </div>
+
+    @if (isTutor && Model.Status == web.Models.Entities.TutorRequestStatus.Pending)
+    {
+        <div class="sb-glass-card mt-3">
+            <div class="card-body">
+                <h5 class="mb-2">Decision</h5>
+
+                <form asp-action="Decide" method="post" class="d-flex gap-2 flex-wrap align-items-end">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Id" />
+
+                    <div style="min-width:280px; flex:1;">
+                        <label class="form-label small mb-1">Optional response message</label>
+                        <input name="responseMessage" class="form-control sb-chat-input" placeholder="e.g. Friday 16:00 works..." />
+                    </div>
+
+                    <button name="accept" value="true" class="btn btn-success">Accept</button>
+                    <button name="accept" value="false" class="btn btn-outline-danger">Decline</button>
+                </form>
+            </div>
+        </div>
+    }
+</div>

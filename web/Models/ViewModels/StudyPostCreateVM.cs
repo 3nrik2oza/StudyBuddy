@@ -14,6 +14,8 @@ public class StudyPostCreateVM
 
     [Required]
     [Display(Name = "Date and time")]
+    [DataType(DataType.DateTime)]
+    [DisplayFormat(DataFormatString = "{0:yyyy-MM-ddTHH:mm}", ApplyFormatInEditMode = true)]
     public DateTime StartAt { get; set; }
 
     [Required]
@@ -22,4 +24,7 @@ public class StudyPostCreateVM
 
     [Display(Name = "Online session")]
     public bool IsOnline { get; set; }
+
+    [Range(1, 100)]
+    public int MaxParticipants { get; set; } = 10;
 }

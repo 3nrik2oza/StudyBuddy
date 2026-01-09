@@ -57,12 +57,12 @@
     background-color: #bfdbfe;
 }
 
-.home-card-sessions {
+.home-card-post {
     background-color: #fef3c7;      /* amber-100 */
     border-color: #fcd34d;
 }
 
-.home-card-sessions:hover {
+.home-card-post:hover {
     background-color: #fde68a;
 }
 
@@ -93,7 +93,7 @@
     border-color: #bfdbfe;
 }
 
-.page-header-sessions {
+.page-header-post {
     background-color: #fffbeb;   /* amber-50 */
     border-color: #fcd34d;
 }
@@ -685,4 +685,1323 @@
 
 .register-subtitle {
     margin-bottom: 1.4rem;
+}
+/* ===== Profile UI (sb-*) ===== */
+:root{
+    --sb-primary:#2563eb;
+    --sb-soft:#f3f6ff;
+    --sb-border:#e6e8ef;
+}
+
+.sb-page { background: #fafbff; }
+
+.sb-card{
+    border: 1px solid var(--sb-border);
+    border-radius: 18px;
+}
+.sb-card .card-header{
+    background: #fff;
+    border-bottom: 1px solid var(--sb-border);
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+}
+
+.sb-avatar{
+    width: 108px; height: 108px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #dbeafe, #eff6ff);
+    border: 2px solid #fff;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .08);
+    display:flex; align-items:center; justify-content:center;
+    margin: 0 auto;
+}
+.sb-avatar span{
+    font-size: 38px;
+    font-weight: 800;
+    color: #1d4ed8;
+}
+
+.sb-pill{
+    background: var(--sb-soft);
+    border: 1px solid var(--sb-border);
+    border-radius: 999px;
+    padding: .35rem .65rem;
+    font-size: .85rem;
+}
+
+.sb-chip{
+    font-size: .75rem;
+    border: 1px solid var(--sb-border);
+    padding: .2rem .5rem;
+    border-radius: 999px;
+    background: #fff;
+    color:#334155;
+}
+
+.sb-stat{
+    background: #fff;
+    border: 1px solid var(--sb-border);
+    border-radius: 18px;
+    padding: 18px;
+    height: 100%;
+}
+.sb-stat h3{ margin:0; font-weight: 800; }
+
+.sb-muted{ color:#64748b; }
+
+.btn-sb{
+    background: var(--sb-primary);
+    border-color: var(--sb-primary);
+}
+.btn-sb:hover{ filter: brightness(.95); }
+
+.sb-section-title{
+    font-weight: 800;
+    letter-spacing: .2px;
+}
+
+.sb-list-item{
+    border: 1px solid var(--sb-border);
+    border-radius: 14px;
+    padding: 14px 14px;
+    background: #fff;
+}
+
+.sb-subcard{
+    border: 1px solid var(--sb-border);
+    border-radius: 14px;
+    padding: 14px;
+    background: #fff;
+}
+
+.sb-subject-row{
+    border: 1px solid var(--sb-border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: #fff;
+    margin-bottom: 10px;
+}
+
+.sb-mini-row{
+    border: 1px solid var(--sb-border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+.sb-avatar-img{
+    width:108px;
+    height:108px;
+    border-radius:999px;
+    overflow:hidden;
+    margin:0 auto;
+    border:2px solid #fff;
+    box-shadow:0 8px 24px rgba(15,23,42,.08);
+    background: linear-gradient(135deg, #dbeafe, #eff6ff);
+}
+.sb-avatar-img img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+.tutor-avatar-img{
+    width:56px;
+    height:56px;
+    border-radius:50%;
+    overflow:hidden;
+    background:#dce6f5;
+    flex: 0 0 auto;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+}
+
+.tutor-avatar-img img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+/* ================================
+   StudyBuddy Dark Glass (v0)
+   Add this at the END of site.css
+================================ */
+
+/* Tokens */
+:root{
+  --sb-bg0: #070A12;          /* main background */
+  --sb-bg1: #0B1220;          /* depth layer */
+  --sb-surface: rgba(17, 25, 40, .58);   /* glass */
+  --sb-surface-2: rgba(17, 25, 40, .72);
+  --sb-border: rgba(255,255,255,.10);
+  --sb-border-2: rgba(255,255,255,.14);
+  --sb-text: rgba(255,255,255,.92);
+  --sb-muted: rgba(255,255,255,.70);
+  --sb-muted-2: rgba(255,255,255,.55);
+
+  --sb-accent: #3b82f6;      /* blue */
+  --sb-accent-2: #22c55e;    /* green */
+  --sb-radius: 18px;
+  --sb-shadow: 0 12px 40px rgba(0,0,0,.45);
+
+  /* navbar height (used to avoid overlap) */
+  --sb-nav-h: 64px;
+}
+
+/* Background + base text */
+html, body { height: 100%; }
+
+body{
+  background:
+    radial-gradient(900px 600px at 10% -10%, rgba(59,130,246,.35), transparent 60%),
+    radial-gradient(800px 500px at 90% 0%, rgba(34,197,94,.26), transparent 55%),
+    radial-gradient(900px 700px at 50% 120%, rgba(59,130,246,.16), transparent 60%),
+    linear-gradient(180deg, var(--sb-bg0), var(--sb-bg1));
+  color: var(--sb-text);
+}
+
+/* Make default bootstrap text behave nicely on dark */
+.text-dark, .text-body { color: var(--sb-text) !important; }
+.text-muted { color: var(--sb-muted) !important; }
+
+/* Layout spacing so navbar never covers content */
+.sb-container{ padding-top: calc(var(--sb-nav-h) + 14px); }
+.sb-main{ padding-bottom: 28px; }
+
+/* Navbar (glass, sticky, readable) */
+.sb-navbar{
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  min-height: var(--sb-nav-h);
+
+  background: rgba(8, 12, 20, .55) !important;
+  border-bottom: 1px solid var(--sb-border) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.sb-navbar .navbar-brand{
+  color: var(--sb-text) !important;
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+
+.sb-navbar .nav-link{
+  color: rgba(255,255,255,.78) !important;
+  border-radius: 999px;
+  padding: .45rem .85rem !important;
+}
+
+.sb-navbar .nav-link:hover{
+  color: var(--sb-text) !important;
+  background: rgba(255,255,255,.06);
+}
+
+.sb-navbar .nav-link.active,
+.sb-navbar .navbar-nav .nav-link[aria-current="page"]{
+  color: var(--sb-text) !important;
+  background: rgba(59,130,246,.18);
+  border: 1px solid rgba(59,130,246,.22);
+}
+
+/* Global "glass card" override (works even if you used .card/.material-card/.forum-card/etc.) */
+.card,
+.material-card,
+.tutor-card,
+.forum-card,
+.news-card,
+.session-card,
+.home-card,
+.home-info-card,
+.login-card,
+.sb-card,
+.sb-stat,
+.sb-list-item,
+.sb-subcard,
+.sb-subject-row,
+.sb-mini-row{
+  background: var(--sb-surface) !important;
+  border: 1px solid var(--sb-border) !important;
+  color: var(--sb-text) !important;
+  box-shadow: var(--sb-shadow);
+  border-radius: var(--sb-radius) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Card inner text */
+.card p,
+.material-card p,
+.forum-card p,
+.news-card p,
+.home-info-text{
+  color: var(--sb-muted) !important;
+}
+
+/* Small pills/badges/chips */
+.badge,
+.sb-pill,
+.sb-chip,
+.material-type-badge,
+.session-type-badge,
+.tutor-help-badge,
+.tutor-pill{
+  background: rgba(255,255,255,.08) !important;
+  border: 1px solid var(--sb-border) !important;
+  color: rgba(255,255,255,.86) !important;
+}
+
+/* Forms */
+.form-control, .form-select{
+  background: rgba(255,255,255,.06) !important;
+  border: 1px solid var(--sb-border-2) !important;
+  color: var(--sb-text) !important;
+  border-radius: 14px !important;
+}
+
+.form-control::placeholder{
+  color: var(--sb-muted-2) !important;
+}
+
+.form-control:focus, .form-select:focus{
+  border-color: rgba(59,130,246,.45) !important;
+  box-shadow: 0 0 0 .20rem rgba(59,130,246,.18) !important;
+  background: rgba(255,255,255,.08) !important;
+}
+
+/* Buttons */
+.btn{
+  border-radius: 14px !important;
+  border-color: rgba(255,255,255,.12) !important;
+}
+
+.btn-primary{
+  background: linear-gradient(135deg, rgba(59,130,246,.95), rgba(37,99,235,.95)) !important;
+  border: none !important;
+}
+
+.btn-success{
+  background: linear-gradient(135deg, rgba(34,197,94,.95), rgba(16,185,129,.95)) !important;
+  border: none !important;
+}
+
+.btn-outline-primary,
+.btn-outline-secondary,
+.btn-outline-success{
+  background: rgba(255,255,255,.04) !important;
+}
+
+.btn-outline-primary{ color: rgba(255,255,255,.85) !important; }
+.btn-outline-primary:hover{ background: rgba(59,130,246,.18) !important; border-color: rgba(59,130,246,.22) !important; }
+
+.btn-outline-secondary{ color: rgba(255,255,255,.78) !important; }
+.btn-outline-secondary:hover{ background: rgba(255,255,255,.10) !important; }
+
+/* Alerts (so they fit dark theme) */
+.alert{
+  border-radius: 16px !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  background: rgba(255,255,255,.06) !important;
+  color: var(--sb-text) !important;
+}
+
+/* Footer */
+.sb-footer{
+  border-top: 1px solid var(--sb-border) !important;
+  background: rgba(8, 12, 20, .35);
+  color: var(--sb-muted) !important;
+}
+.sb-footer a{ color: rgba(255,255,255,.75) !important; }
+.sb-footer a:hover{ color: var(--sb-text) !important; }
+
+/* Headings */
+h1,h2,h3,h4,h5{
+  color: var(--sb-text) !important;
+  letter-spacing: .2px;
+}
+/* =========================
+   Materials page (v1)
+========================= */
+
+/* Page title/subtitle */
+.sb-page-title{
+  font-weight: 800;
+  font-size: clamp(1.8rem, 2vw + 1rem, 2.4rem);
+  letter-spacing: .2px;
+}
+
+.sb-page-subtitle{
+  max-width: 62ch;
+  color: var(--sb-muted) !important;
+}
+
+/* Toolbar glass */
+.sb-toolbar{
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--sb-border);
+  border-radius: 18px;
+  padding: 14px 14px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Fix the WHITE subject pill inside cards */
+.material-card-header{
+  background: rgba(255,255,255,.06) !important;
+  border: 1px solid rgba(255,255,255,.10);
+  color: rgba(255,255,255,.75) !important;
+  padding: .32rem .7rem !important;
+}
+
+/* Make material cards more “designed” + accent strip */
+.material-card{
+  position: relative;
+  overflow: hidden;
+  padding: 18px !important; /* malo kompaktnije */
+}
+
+.material-card::before{
+  content:"";
+  position:absolute;
+  left: 12px;
+  right: 12px;
+  top: 10px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--sb-mat-accent, rgba(59,130,246,.75));
+  opacity: .9;
+}
+
+/* Subject accent mapping (keeps your existing logic/classes) */
+.material-card-default{ --sb-mat-accent: linear-gradient(90deg, rgba(59,130,246,.9), rgba(34,197,94,.7)); }
+.material-card-aps{     --sb-mat-accent: linear-gradient(90deg, rgba(34,197,94,.95), rgba(59,130,246,.55)); }
+.material-card-db{      --sb-mat-accent: linear-gradient(90deg, rgba(245,185,113,.95), rgba(59,130,246,.55)); }
+.material-card-algo{    --sb-mat-accent: linear-gradient(90deg, rgba(255,124,124,.95), rgba(59,130,246,.55)); }
+
+/* Emoji/icon spacing */
+.material-card-icon{
+  margin-bottom: 10px !important;
+  opacity: .95;
+}
+
+/* Buttons inside cards */
+.material-card .btn{
+  background: rgba(255,255,255,.04) !important;
+}
+
+.material-card .btn-outline-primary:hover{
+  background: rgba(59,130,246,.18) !important;
+}
+
+.material-card .btn-outline-secondary:hover{
+  background: rgba(255,255,255,.10) !important;
+}
+
+/* "No link" text a bit clearer */
+.material-card .text-muted.small{
+  color: rgba(255,255,255,.55) !important;
+}
+/* =========================
+   Home page (v1)
+========================= */
+
+/* HERO: dark glass with gradient accents */
+.sb-hero{
+  background:
+    radial-gradient(700px 320px at 10% 0%, rgba(59,130,246,.30), transparent 60%),
+    radial-gradient(700px 320px at 90% 10%, rgba(34,197,94,.22), transparent 60%),
+    rgba(255,255,255,.04) !important;
+
+  border: 1px solid var(--sb-border) !important;
+  box-shadow: var(--sb-shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* override old light hero text colors */
+.home-hero-title{
+  color: var(--sb-text) !important;
+}
+
+.home-hero-subtitle{
+  color: var(--sb-muted) !important;
+}
+
+/* hero button -> modern gradient */
+.sb-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  border-radius: 999px !important;
+  padding: .75rem 1.2rem !important;
+  font-weight: 700;
+  text-decoration: none;
+  color: rgba(255,255,255,.92) !important;
+
+  background: linear-gradient(135deg, rgba(59,130,246,.95), rgba(34,197,94,.70)) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  box-shadow: 0 12px 30px rgba(0,0,0,.35);
+}
+
+.sb-btn:hover{
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+/* image wrapper -> keep it clean on dark */
+.home-hero-image{
+  border: 1px solid rgba(255,255,255,.10);
+}
+
+/* HOME cards -> unify with glass look (even if old css exists) */
+.home-info-card{
+  background: var(--sb-surface) !important;
+  border: 1px solid var(--sb-border) !important;
+  border-radius: var(--sb-radius) !important;
+  box-shadow: var(--sb-shadow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.home-info-title{
+  color: var(--sb-text) !important;
+  font-weight: 750;
+}
+
+.home-info-text{
+  color: var(--sb-muted) !important;
+}
+
+/* section titles */
+.home-section-title{
+  color: var(--sb-text) !important;
+  font-weight: 800;
+}
+
+/* Optional: hero spacing a bit tighter on mobile */
+@media (max-width: 767.98px){
+  .home-hero-new{ padding: 1.6rem !important; }
+  .home-hero-image-wrapper{ min-width: 0 !important; }
+}
+/* =========================
+   Material Create – Link/File toggle + URL input
+========================= */
+
+/* --- URL input: single rounded shape (like file) --- */
+.sb-url-input{
+  position: relative;
+}
+
+.sb-url-input .form-control{
+  padding-left: 4.8rem !important;
+  border-radius: 14px !important;
+}
+
+.sb-url-prefix{
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255,255,255,.55);
+  font-size: .9rem;
+  pointer-events: none;
+}
+
+/* --- Toggle (btn-check + label) stays blue when selected --- */
+.btn-group .btn.btn-outline-primary{
+  background: rgba(255,255,255,.04) !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  color: rgba(255,255,255,.78) !important;
+  border-radius: 14px !important;
+  padding: .75rem 1rem !important;
+  font-weight: 650;
+}
+
+.btn-group .btn.btn-outline-primary:hover{
+  background: rgba(255,255,255,.08) !important;
+  border-color: rgba(255,255,255,.20) !important;
+  color: rgba(255,255,255,.90) !important;
+}
+
+/* Selected state (THIS is the important part) */
+.btn-check:checked + .btn.btn-outline-primary{
+  background: rgba(59,130,246,.22) !important;
+  border-color: rgba(59,130,246,.35) !important;
+  color: rgba(255,255,255,.95) !important;
+  box-shadow: 0 10px 24px rgba(59,130,246,.22);
+}
+
+/* Keep selected blue even on hover */
+.btn-check:checked + .btn.btn-outline-primary:hover{
+  background: rgba(59,130,246,.28) !important;
+  border-color: rgba(59,130,246,.42) !important;
+}
+
+/* Make the two buttons look like a segmented control */
+.btn-group{
+  gap: 10px; /* nicer than touching borders */
+}
+/* =========================
+   Login (Identity) – dark glass (v2)
+========================= */
+
+/* wrapper: use the same app background, no light gradient */
+.login-wrapper{
+  min-height: calc(100vh - var(--sb-nav-h)) !important;
+  padding: 2.5rem 1.25rem !important;
+  background: transparent !important; /* important: removes old light gradient */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* card: glass like the rest */
+.login-card{
+  width: 100%;
+  max-width: 460px;
+  background: var(--sb-surface) !important;
+  border: 1px solid var(--sb-border) !important;
+  border-radius: 22px !important;
+  box-shadow: var(--sb-shadow);
+  padding: 2.2rem 2.2rem !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* title/subtitle */
+.login-title{
+  color: var(--sb-text) !important;
+  font-weight: 850;
+  letter-spacing: .2px;
+  margin-bottom: .35rem;
+}
+
+.login-subtitle{
+  color: var(--sb-muted) !important;
+  margin-bottom: 1.3rem;
+}
+
+/* inputs (including floating labels) */
+.login-input{
+  background: rgba(255,255,255,.06) !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  color: var(--sb-text) !important;
+  border-radius: 14px !important;
+}
+
+.login-input::placeholder{
+  color: rgba(255,255,255,.45) !important;
+}
+
+.login-input:focus{
+  border-color: rgba(59,130,246,.45) !important;
+  box-shadow: 0 0 0 .20rem rgba(59,130,246,.18) !important;
+  background: rgba(255,255,255,.08) !important;
+}
+
+/* Floating labels on dark */
+.form-floating > label{
+  color: rgba(255,255,255,.55) !important;
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label{
+  color: rgba(255,255,255,.70) !important;
+  opacity: .95;
+}
+
+/* checkbox + links */
+.form-check-label,
+.form-check-input{
+  color: rgba(255,255,255,.75) !important;
+}
+
+.login-small-link,
+.login-links a{
+  color: rgba(255,255,255,.75) !important;
+  text-decoration: none;
+}
+
+.login-small-link:hover,
+.login-links a:hover{
+  color: var(--sb-text) !important;
+  text-decoration: underline;
+}
+
+/* button: match app primary */
+.login-btn{
+  border-radius: 999px !important;
+  padding: .78rem 1rem !important;
+  font-weight: 750;
+  background: linear-gradient(135deg, rgba(59,130,246,.95), rgba(37,99,235,.95)) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  box-shadow: 0 12px 28px rgba(59,130,246,.28);
+}
+
+.login-btn:hover{
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+/* =========================
+   Register (Identity) – dark + tutor subjects UI
+========================= */
+
+/* compact hero for auth pages */
+.sb-hero-compact{
+  padding: 1.6rem 2rem !important;
+}
+
+/* Make hero title readable on dark */
+.sb-hero-compact .home-hero-title{ color: var(--sb-text) !important; }
+.sb-hero-compact .home-hero-subtitle{ color: var(--sb-muted) !important; }
+
+/* If old home hero CSS still forces light, sb-hero wins, but this ensures it */
+.home-hero-new.sb-hero{
+  background:
+    radial-gradient(700px 320px at 10% 0%, rgba(59,130,246,.30), transparent 60%),
+    radial-gradient(700px 320px at 90% 10%, rgba(34,197,94,.22), transparent 60%),
+    rgba(255,255,255,.04) !important;
+  border: 1px solid var(--sb-border) !important;
+}
+
+/* Register card consistency */
+.sb-card{
+  background: var(--sb-surface) !important;
+  border: 1px solid var(--sb-border) !important;
+  border-radius: 22px !important;
+  box-shadow: var(--sb-shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Inputs already use .login-input; ensure select uses correct style */
+select.login-input.form-control{
+  appearance: none;
+}
+
+/* Tutor section controls (Add/Remove buttons + rows) */
+#tutorSubjectsSection label.fw-bold{
+  color: var(--sb-text);
+}
+
+#availableSubjects.form-control{
+  background: rgba(255,255,255,.06) !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  color: var(--sb-text) !important;
+  border-radius: 14px !important;
+}
+
+/* Add button -> subtle primary */
+#addSubjectBtn.btn.btn-secondary{
+  background: rgba(59,130,246,.18) !important;
+  border: 1px solid rgba(59,130,246,.28) !important;
+  color: rgba(255,255,255,.92) !important;
+  border-radius: 14px !important;
+  font-weight: 650;
+}
+
+#addSubjectBtn.btn.btn-secondary:hover{
+  background: rgba(59,130,246,.26) !important;
+  border-color: rgba(59,130,246,.40) !important;
+}
+
+/* Selected subjects rows (your JS creates: border p-2 mb-2) */
+#selectedSubjectsContainer > div{
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.12) !important;
+  border-radius: 14px;
+  padding: .65rem .75rem !important;
+}
+
+#selectedSubjectsContainer > div span{
+  color: rgba(255,255,255,.85);
+}
+
+/* Remove button -> red glass, not harsh bootstrap */
+#selectedSubjectsContainer .btn.btn-danger{
+  background: rgba(239,68,68,.14) !important;
+  border: 1px solid rgba(239,68,68,.28) !important;
+  color: rgba(255,255,255,.92) !important;
+  border-radius: 999px !important;
+  padding: .25rem .7rem !important;
+}
+
+#selectedSubjectsContainer .btn.btn-danger:hover{
+  background: rgba(239,68,68,.22) !important;
+  border-color: rgba(239,68,68,.40) !important;
+}
+
+/* Checkbox nicer on dark */
+.form-check-input{
+  background-color: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.18);
+}
+.form-check-input:checked{
+  background-color: rgba(59,130,246,.9);
+  border-color: rgba(59,130,246,.9);
+}
+/* =========================
+   Profile (sb-*) — DARK GLASS override
+   (paste at END of site.css)
+========================= */
+
+/* Dark tokens */
+:root{
+  --sb-bg: #070B12;
+  --sb-surface: rgba(255,255,255,.05);
+  --sb-surface-2: rgba(255,255,255,.035);
+  --sb-border: rgba(255,255,255,.12);
+  --sb-text: rgba(255,255,255,.92);
+  --sb-muted: rgba(255,255,255,.68);
+  --sb-shadow: 0 18px 60px rgba(0,0,0,.45);
+  --sb-primary: #3b82f6; /* blue */
+  --sb-danger: #ef4444;
+  --sb-warning: #f59e0b;
+}
+
+/* page background to match app */
+.sb-page{
+  background: transparent !important;
+}
+
+/* Base surface for all profile cards */
+.sb-card,
+.sb-stat,
+.sb-list-item,
+.sb-subcard,
+.sb-subject-row,
+.sb-mini-row{
+  background: var(--sb-surface) !important;
+  border: 1px solid var(--sb-border) !important;
+  color: var(--sb-text);
+  border-radius: 22px !important;
+  box-shadow: var(--sb-shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Headers inside cards */
+.sb-card .card-header,
+.sb-card .card-header *{
+  background: transparent !important;
+  color: var(--sb-text) !important;
+  border-bottom: 1px solid var(--sb-border) !important;
+}
+
+/* Muted text */
+.sb-muted{ color: var(--sb-muted) !important; }
+
+/* Pills + chips */
+.sb-pill{
+  background: rgba(255,255,255,.06) !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  color: rgba(255,255,255,.85) !important;
+}
+
+.sb-chip{
+  background: rgba(255,255,255,.06) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  color: rgba(255,255,255,.86) !important;
+}
+
+/* Fix: you used text-bg-* on sb-chip => keep it nice in dark */
+.sb-chip.text-bg-primary,
+.sb-chip.text-bg-success{
+  color: #fff !important;
+  border-color: rgba(255,255,255,.14) !important;
+}
+.sb-chip.text-bg-primary{ background: rgba(59,130,246,.28) !important; }
+.sb-chip.text-bg-success{ background: rgba(34,197,94,.22) !important; }
+
+/* Inputs/selects in profile */
+.sb-page .form-control,
+.sb-page .form-select{
+  background: rgba(255,255,255,.06) !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  color: var(--sb-text) !important;
+  border-radius: 14px !important;
+}
+
+.sb-page .form-control:focus,
+.sb-page .form-select:focus{
+  border-color: rgba(59,130,246,.55) !important;
+  box-shadow: 0 0 0 .22rem rgba(59,130,246,.18) !important;
+}
+
+/* Disabled/readonly email still readable */
+.sb-page .form-control[readonly],
+.sb-page .form-control:disabled{
+  opacity: .85;
+}
+
+/* Buttons: align to theme */
+.btn-sb{
+  background: linear-gradient(135deg, rgba(59,130,246,.95), rgba(59,130,246,.72)) !important;
+  border: 1px solid rgba(59,130,246,.55) !important;
+  color: #fff !important;
+  border-radius: 999px !important;
+  font-weight: 650;
+}
+.btn-sb:hover{ filter: brightness(1.05); }
+
+/* Outline buttons should become glass */
+.sb-page .btn-outline-primary,
+.sb-page .btn-outline-secondary,
+.sb-page .btn-outline-danger{
+  background: rgba(255,255,255,.04) !important;
+  border-color: rgba(255,255,255,.14) !important;
+  color: rgba(255,255,255,.85) !important;
+  border-radius: 999px !important;
+}
+
+.sb-page .btn-outline-primary:hover{
+  border-color: rgba(59,130,246,.45) !important;
+  background: rgba(59,130,246,.14) !important;
+}
+
+.sb-page .btn-outline-danger{
+  border-color: rgba(239,68,68,.28) !important;
+}
+.sb-page .btn-outline-danger:hover{
+  background: rgba(239,68,68,.14) !important;
+  border-color: rgba(239,68,68,.42) !important;
+}
+
+/* Your Quick links are btn-light border => force glass */
+.sb-page .btn-light{
+  background: rgba(255,255,255,.04) !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  color: rgba(255,255,255,.86) !important;
+  border-radius: 14px !important;
+}
+.sb-page .btn-light:hover{
+  background: rgba(255,255,255,.07) !important;
+}
+
+/* Warning button (Change Password) => match theme */
+.sb-page .btn-warning{
+  background: rgba(245,158,11,.18) !important;
+  border: 1px solid rgba(245,158,11,.35) !important;
+  color: rgba(255,255,255,.92) !important;
+  border-radius: 999px !important;
+  font-weight: 650;
+}
+.sb-page .btn-warning:hover{
+  background: rgba(245,158,11,.26) !important;
+  border-color: rgba(245,158,11,.45) !important;
+}
+
+/* Checkbox in profile */
+.sb-page .form-check-input{
+  background-color: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.18);
+}
+.sb-page .form-check-input:checked{
+  background-color: rgba(59,130,246,.9);
+  border-color: rgba(59,130,246,.9);
+}
+/* =========================
+   Dark glass tables (Participants etc.)
+========================= */
+
+.sb-glass-card{
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 22px;
+  box-shadow: 0 18px 60px rgba(0,0,0,.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  overflow: hidden;
+}
+
+/* table skin */
+.table.sb-table{
+  color: rgba(255,255,255,.9);
+  margin: 0;
+}
+
+.table.sb-table thead th{
+  background: rgba(255,255,255,.04);
+  color: rgba(255,255,255,.85);
+  border-bottom: 1px solid rgba(255,255,255,.12);
+  font-weight: 650;
+}
+
+.table.sb-table tbody td{
+  background: transparent;
+  border-top: 1px solid rgba(255,255,255,.10);
+  color: rgba(255,255,255,.88);
+}
+
+.table.sb-table tbody tr:hover td{
+  background: rgba(255,255,255,.04);
+}
+
+/* Make "Back" + outline buttons match glass */
+.btn-outline-secondary,
+.btn-outline-danger{
+  border-radius: 999px;
+}
+
+/* If any alert looks too dark in dark theme */
+.alert{
+  border-radius: 16px;
+}
+/* =========================
+   Alerts / Toast colors (dark)
+========================= */
+
+.alert{
+  border-radius: 16px !important;
+}
+
+/* Success */
+.alert-success{
+  background: rgba(34,197,94,.10) !important;
+  border: 1px solid rgba(34,197,94,.25) !important;
+  color: rgba(255,255,255,.92) !important;
+}
+
+/* Danger */
+.alert-danger{
+  background: rgba(239,68,68,.10) !important;
+  border: 1px solid rgba(239,68,68,.25) !important;
+  color: rgba(255,255,255,.92) !important;
+}
+
+/* Info (ako budeš koristila) */
+.alert-info{
+  background: rgba(59,130,246,.10) !important;
+  border: 1px solid rgba(59,130,246,.25) !important;
+  color: rgba(255,255,255,.92) !important;
+}
+
+/* Button X (close) on dark alerts */
+.alert .btn-close{
+  filter: invert(1) grayscale(1);
+  opacity: .7;
+}
+.alert .btn-close:hover{ opacity: 1; }
+.table.sb-table td,
+.table.sb-table th{
+  background: transparent !important;
+  color: rgba(255,255,255,.9) !important;
+}
+/* ===== Chat (TutorRequest Details) ===== */
+
+.sb-msg{
+  max-width: 760px;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 12px 40px rgba(0,0,0,.35);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.sb-msg-mine{
+  background: rgba(37, 99, 235, .18);       /* plava */
+  border-color: rgba(59, 130, 246, .35);
+}
+
+.sb-msg-other{
+  background: rgba(255,255,255,.06);       /* dark glass */
+}
+
+.sb-msg-meta{
+  font-size: 12px;
+  color: rgba(255,255,255,.70);
+  margin-bottom: 6px;
+}
+
+.sb-msg-body{
+  color: rgba(255,255,255,.92);
+  white-space: pre-wrap; /* zadrži enter/newline */
+}
+
+/* inputi u dark temi */
+.form-control.sb-input,
+.sb-glass-card .form-control,
+.sb-glass-card .form-select{
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.92);
+  border-radius: 14px;
+}
+
+.sb-glass-card .form-control::placeholder{
+  color: rgba(255,255,255,.55);
+}
+
+.sb-glass-card .form-control:focus,
+.sb-glass-card .form-select:focus{
+  background: rgba(255,255,255,.08);
+  border-color: rgba(59,130,246,.55);
+  box-shadow: 0 0 0 .2rem rgba(59,130,246,.18);
+  color: rgba(255,255,255,.95);
+}
+
+/* send button u tvom stilu */
+.btn.btn-sb{
+  background: linear-gradient(135deg, #2f6df6, #1d4ed8);
+  border: 0;
+  color: #fff;
+  border-radius: 999px;
+  padding: .55rem 1.1rem;
+}
+
+.btn.btn-sb:hover{
+  filter: brightness(1.06);
+}
+/* =========================
+   Tutor Request - Chat UI
+========================= */
+
+.sb-chat{
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 22px;
+  box-shadow: 0 18px 60px rgba(0,0,0,.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  overflow: hidden;
+}
+
+.sb-chat-messages{
+  padding: 18px 18px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 420px;          /* da ne ode u beskraj */
+  overflow: auto;
+}
+
+.sb-bubble-row{
+  display: flex;
+}
+
+.sb-bubble-row.is-other{
+  justify-content: flex-start;
+}
+
+.sb-bubble-row.is-mine{
+  justify-content: flex-end;
+}
+
+.sb-bubble{
+  width: fit-content;
+  max-width: 65%;
+  padding: 12px 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+
+.sb-bubble-row.is-other .sb-bubble{
+  background: rgba(255,255,255,.06);
+  border-top-left-radius: 10px;
+}
+
+.sb-bubble-row.is-mine .sb-bubble{
+  background: rgba(59,130,246,.18); /* plavi tint */
+  border-color: rgba(59,130,246,.35);
+  border-top-right-radius: 10px;
+}
+
+.sb-bubble-meta{
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  margin-bottom: 6px;
+  color: rgba(255,255,255,.7);
+  font-size: .82rem;
+}
+
+.sb-bubble-name{
+  color: rgba(255,255,255,.92);
+  font-weight: 650;
+}
+
+.sb-bubble-time{
+  opacity: .85;
+}
+
+.sb-bubble-body{
+  color: rgba(255,255,255,.92);
+  white-space: pre-wrap;
+  line-height: 1.35;
+}
+
+.sb-chat-composer{
+  padding: 14px 18px 18px;
+  border-top: 1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.10);
+}
+
+/* input style (da nije bijelo / ružno) */
+.sb-chat-input{
+  background: rgba(255,255,255,.06) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  color: rgba(255,255,255,.92) !important;
+  border-radius: 16px !important;
+}
+
+.sb-chat-input::placeholder{
+  color: rgba(255,255,255,.55) !important;
+}
+
+.sb-chat-input:focus{
+  box-shadow: 0 0 0 .2rem rgba(59,130,246,.25) !important;
+  border-color: rgba(59,130,246,.45) !important;
+}
+/* =========================
+   FORUM DETAILS (THREAD)
+========================= */
+
+/* Muted text helper (ako već nemaš) */
+.sb-muted{
+  color: rgba(255,255,255,.65) !important;
+}
+
+/* Pill (Thread badge) */
+.sb-pill{
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.82);
+  font-size: .78rem;
+  white-space: nowrap;
+}
+
+/* Base glass card */
+.sb-forum-card{
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,.06),
+    rgba(255,255,255,.02)
+  );
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 22px;
+  box-shadow: 0 18px 60px rgba(0,0,0,.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  overflow: hidden;
+}
+
+/* Header inside card */
+.sb-forum-card-header{
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.03);
+}
+
+/* Body inside card */
+.sb-forum-card-body{
+  padding: 18px;
+}
+
+/* Thread content */
+.sb-forum-content{
+  color: rgba(255,255,255,.92);
+  font-size: .95rem;
+}
+
+/* Replies wrapper */
+.sb-replies{
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Single reply card */
+.sb-reply-card{
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,.05),
+    rgba(255,255,255,.02)
+  );
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 18px;
+  padding: 16px 18px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.35);
+}
+
+/* Top row: meta + delete */
+.sb-reply-top{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+/* Meta row */
+.sb-reply-meta{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  color: rgba(255,255,255,.65);
+  font-size: .8rem;
+}
+
+.sb-reply-author{
+  font-weight: 650;
+  color: rgba(255,255,255,.9);
+}
+
+.sb-reply-dot{
+  opacity: .55;
+}
+
+.sb-reply-time{
+  opacity: .9;
+}
+
+/* Reply text */
+.sb-reply-body{
+  color: rgba(255,255,255,.92);
+  font-size: .92rem;
+}
+
+/* Input in add reply */
+.sb-forum-input{
+  background: rgba(255,255,255,.06) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  border-radius: 16px !important;
+  color: #fff !important;
+  padding: 14px 16px !important;
+  line-height: 1.6;
+}
+
+.sb-forum-input::placeholder{
+  color: rgba(255,255,255,.45) !important;
+}
+
+/* Main primary button style for project (ako već nemaš) */
+.btn-sb{
+  background: linear-gradient(180deg, #3b82f6, #2563eb);
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(37,99,235,.25);
+}
+
+.btn-sb:hover{
+  filter: brightness(1.05);
+  color: #fff;
+}
+
+/* Round outline buttons consistent */
+.btn-outline-secondary,
+.btn-outline-danger{
+  border-radius: 999px;
 }

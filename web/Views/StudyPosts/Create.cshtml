@@ -1,53 +1,92 @@
 @model web.Models.ViewModels.StudyPostCreateVM
 @{
-    ViewData["Title"] = "New study session";
+    ViewData["Title"] = "New study post";
     var subjects = ViewBag.Subjects as List<web.Models.Entities.Subject>;
 }
 
-<h2 class="mb-4">New study session</h2>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8 col-xl-7">
 
-<form asp-action="Create" method="post">
-    <div class="mb-3">
-        <label asp-for="Title" class="form-label"></label>
-        <input asp-for="Title" class="form-control" />
-        <span asp-validation-for="Title" class="text-danger"></span>
+            <div class="d-flex align-items-start justify-content-between mb-3">
+                <div>
+                    <h1 class="h3 mb-1">New study post</h1>
+                    <div class="text-muted">Create a study session and invite others to join.</div>
+                </div>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back</a>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4 p-md-5">
+
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label">Title</label>
+                            <input asp-for="Title" class="form-control form-control-lg" placeholder="e.g. APS1 — recursion practice" />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Subject</label>
+                            <select asp-for="SubjectId" class="form-select">
+                                <option value="">-- Select subject --</option>
+                                @if (subjects != null)
+                                {
+                                    foreach (var s in subjects)
+                                    {
+                                        <option value="@s.Id">@s.Name</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="SubjectId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="StartAt" class="form-label">Date and time</label>
+                            <input asp-for="StartAt"
+                                   class="form-control"
+                                   type="datetime-local"
+                                   step="60" />
+                            <span asp-validation-for="StartAt" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Location" class="form-label">Location</label>
+                            <input asp-for="Location" class="form-control" placeholder="e.g. FRI, room 3.12 or Zoom link" />
+                            <span asp-validation-for="Location" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Max participants</label>
+                                <input asp-for="MaxParticipants" type="number" min="1" max="100" class="form-control" />
+                                <span asp-validation-for="MaxParticipants" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12 col-md-6 d-flex align-items-end">
+                                <div class="form-check">
+                                    <input asp-for="IsOnline" class="form-check-input" type="checkbox" />
+                                    <label asp-for="IsOnline" class="form-check-label">Online session</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 pt-4">
+                            <button type="submit" class="btn btn-primary btn-lg px-4">Save</button>
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg">Cancel</a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
     </div>
-
-    <div class="mb-3">
-        <label class="form-label">Subject</label>
-        <select asp-for="SubjectId" class="form-select">
-            <option value="">-- All subjects --</option>
-            @if (subjects != null)
-            {
-                foreach (var s in subjects)
-                {
-                    <option value="@s.Id">@s.Name</option>
-                }
-            }
-        </select>
-        <span asp-validation-for="SubjectId" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="StartAt" class="form-label"></label>
-        <input asp-for="StartAt" class="form-control" type="datetime-local" />
-        <span asp-validation-for="StartAt" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Location" class="form-label"></label>
-        <input asp-for="Location" class="form-control" />
-        <span asp-validation-for="Location" class="text-danger"></span>
-    </div>
-
-    <div class="form-check mb-3">
-        <input asp-for="IsOnline" class="form-check-input" type="checkbox" />
-        <label asp-for="IsOnline" class="form-check-label"></label>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

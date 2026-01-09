@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,24 +10,24 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/web.styles.css" asp-append-version="true" />
 </head>
+
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm sb-navbar navbar-dark">
             <div class="container">
                 <a class="navbar-brand" asp-controller="Home" asp-action="Index">StudyBuddy</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
-                        aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                    aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between" id="mainNav">
-
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="StudyPosts" asp-action="Index">Study Sessions</a>
+                            <a class="nav-link text-dark" asp-controller="StudyPosts" asp-action="Index">Study Post</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Materials" asp-action="Index">Materials</a>
@@ -37,31 +38,40 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Forum" asp-action="Index">Forum</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Bookmarks" asp-action="My">Saved</a>
+                        </li>
                     </ul>
 
-                        <partial name="_LoginPartial" />
+                    <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
     </header>
 
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-
-            @* Toast poruke iz TempData *@
+    <div class="container sb-container">
+        <main role="main" class="sb-main">
             @if (TempData["ok"] is string okMsg)
             {
-                <div class="alert alert-success mt-3">@okMsg</div>
+                <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                    @okMsg
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
             }
+
             @if (TempData["err"] is string errMsg)
             {
-                <div class="alert alert-danger mt-3">@errMsg</div>
+                <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                    @errMsg
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
             }
+
+            @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="footer sb-footer">
         <div class="container">
             &copy; 2025 - StudyBuddy -
             <a asp-controller="Home" asp-action="Privacy">Privacy</a>
@@ -73,4 +83,5 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>

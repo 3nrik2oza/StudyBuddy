@@ -2,201 +2,387 @@
 @model web.Areas.Identity.Pages.Account.ProfileModel
 @{
     ViewData["Title"] = "Your Profile";
+
+    var displayName = string.IsNullOrWhiteSpace(Model.Input?.Name) ? "User" : Model.Input.Name;
+    var initial = !string.IsNullOrWhiteSpace(displayName) ? displayName.Trim()[0].ToString().ToUpper() : "U";
+
+    var isTutor = Model.Input?.IsTutor ?? false;
+
+    var hasPic = !string.IsNullOrWhiteSpace(Model.Input?.ProfilePicturePath);
+    var picUrl = hasPic ? Model.Input.ProfilePicturePath : "";
 }
 
-<div class="container py-4">
+<div class="sb-page">
+    <main class="container my-4 my-lg-5">
 
-    @if (TempData["StatusMessage"] != null)
-    {
-        <div class="alert alert-success">@TempData["StatusMessage"]</div>
-    }
+        @if (TempData["StatusMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                @TempData["StatusMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
 
-    <h2>Your Profile</h2>
-    <hr />
-
-    <form method="post" asp-page-handler="UpdateProfile">
-        <h4>Account Information</h4>
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-
-        <div class="form-floating mb-3">
-            <input asp-for="Input.Name" class="form-control" />
-            <label asp-for="Input.Name"></label>
-            <span asp-validation-for="Input.Name" class="text-danger"></span>
+        <div class="d-flex align-items-end justify-content-between flex-wrap gap-2 mb-3">
+            <div>
+                <h1 class="h3 mb-1 sb-section-title">Your Profile</h1>
+                <div class="sb-muted">Manage your account details, security, and your StudyBuddy activity.</div>
+            </div>
         </div>
 
+        <div class="row g-4">
 
-        <div class="form-floating mb-3">
-            <input asp-for="Input.Email" class="form-control" readonly />
-            <label asp-for="Input.Email"></label>
-        </div>
-        
+            <!-- LEFT -->
+            <div class="col-lg-4">
 
-        <div class="form-floating mb-3">
-            <textarea asp-for="Input.Description" class="form-control" style="height:100px"></textarea>
-            <label asp-for="Input.Description"></label>
-            <span asp-validation-for="Input.Description" class="text-danger"></span>
-        </div>
+                <!-- Profile card -->
+                <div class="card sb-card shadow-sm">
+                    <div class="card-body text-center p-4">
 
-
-        <div class="form-floating mb-3">
-            <select asp-for="Input.FacultyId" asp-items="Model.FacultyOptions" class="form-control"></select>
-            <label asp-for="Input.FacultyId">Faculty</label>
-            <span asp-validation-for="Input.FacultyId" class="text-danger"></span>
-        </div>
-
-
-        <div class="form-check mb-3">
-            <input asp-for="Input.IsTutor" class="form-check-input" id="isTutorCheckbox" />
-            <label asp-for="Input.IsTutor" class="form-check-label">Registered as Tutor</label>
-        </div>
-
-
-        <div id="tutorSubjectsSection" style="display:none;">
-            <label class="fw-bold">Subjects You Teach</label>
-
-
-            <div class="d-flex gap-2 align-items-center my-2">
-                <select id="availableSubjects" class="form-control">
-                    <option value="">-- Select Subject --</option>
-                    @foreach (var s in Model.SubjectOptions)
-                    {
-                        if (!Model.Input.SubjectIds.Contains(int.Parse(s.Value)))
+                        @* Avatar: show uploaded picture only if user is tutor AND has picture *@
+                        @if (isTutor && hasPic)
                         {
-                            <option value="@s.Value">@s.Text</option>
+                            <div class="sb-avatar-img mb-3">
+                                <img src="@picUrl" alt="Profile picture" />
+                            </div>
                         }
-                    }
-                </select>
+                        else
+                        {
+                            <div class="sb-avatar mb-3"><span>@initial</span></div>
+                        }
 
-                <button type="button" id="addSubjectBtn" class="btn btn-secondary">Add</button>
-            </div>
-
-
-            <div id="selectedSubjectsContainer">
-                @foreach (var subjectId in Model.Input.SubjectIds)
-                {
-                    var subject = Model.SubjectOptions.FirstOrDefault(o => o.Value == subjectId.ToString());
-                    if (subject != null)
-                    {
-                        <div class="d-flex justify-content-between align-items-center border p-2 mb-2"
-                             data-id="@subjectId">
-                            <span>@subject.Text</span>
-                            <button type="button" class="btn btn-danger btn-sm remove-subject-btn">Remove</button>
-
-
-                            <input type="hidden" name="Input.SubjectIds" value="@subjectId" />
+                        <h5 class="mb-1">@displayName</h5>
+                        <div class="sb-muted mb-3">
+                            Faculty: <strong>@(Model.Input?.FacultyName ?? "")</strong>
                         </div>
-                    }
-                }
+
+                        <div class="d-flex justify-content-center flex-wrap gap-2 mb-3">
+                            <span class="sb-chip text-bg-primary">Student</span>
+                            @if (isTutor)
+                            {
+                                <span class="sb-chip text-bg-success">Tutor</span>
+                            }
+                            <span class="sb-chip">StudyBuddy</span>
+                        </div>
+
+                        <div class="d-grid gap-2 ">
+
+                            @* Upload button: only visible if tutor *@
+                            @if (isTutor)
+                            {
+                                <form method="post" asp-page-handler="UploadAvatar" enctype="multipart/form-data" id="avatarForm">
+                                    <input type="file"
+                                           name="AvatarFile"
+                                           id="avatarFile"
+                                           accept=".jpg,.jpeg,.png,.webp,image/*"
+                                           class="d-none" />
+
+                                    <button type="button" class="btn btn-outline-primary" id="avatarBtn">
+                                        Add profile picture
+                                    </button>
+
+                                    <div class="sb-muted small mt-2">
+                                        JPG/PNG/WEBP • max 3MB
+                                    </div>
+                                </form>
+                            }
+                            else
+                            {
+                                <div class="sb-muted small">
+                                    Tip: enable “Registered as Tutor” to add a profile picture.
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick links -->
+                <div class="card sb-card shadow-sm mt-4">
+                    <div class="card-header px-4 py-3">
+                        <strong>Quick</strong> links
+                    </div>
+                    <div class="card-body px-4 py-3">
+                        <div class="d-grid gap-2">
+                            <a class="btn btn-light border" asp-controller="StudyPosts" asp-action="Index">Your Study Posts</a>
+                            <a class="btn btn-light border" asp-controller="Materials" asp-action="Index">Your Materials</a>
+                            <a class="btn btn-light border" asp-controller="Forum" asp-action="Index">Your Saved Threads</a>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div id="hiddenInputs"></div>
-        </div>
+            <!-- RIGHT -->
+            <div class="col-lg-8">
 
-        <button class="btn btn-primary mt-3">Save Profile</button>
-    </form>
-
-    <hr />
-
-
-    <h4>Change Password</h4>
-    <form method="post" asp-page-handler="ChangePassword">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-        <div class="form-floating mb-3">
-            <input asp-for="Input.CurrentPassword" class="form-control" type="password" />
-            <label asp-for="Input.CurrentPassword"></label>
-        </div>
-
-        <div class="form-floating mb-3">
-            <input asp-for="Input.NewPassword" class="form-control" type="password" />
-            <label asp-for="Input.NewPassword"></label>
-        </div>
-
-        <div class="form-floating mb-3">
-            <input asp-for="Input.ConfirmPassword" class="form-control" type="password" />
-            <label asp-for="Input.ConfirmPassword"></label>
-        </div>
-
-        <button class="btn btn-warning">Change Password</button>
-    </form>
-
-    <hr />
-
-
-    <h3>Your Study Sessions</h3>
-
-    @if (Model.UserStudyPosts.Count == 0)
-    {
-        <p class="text-muted">You haven't created any study sessions yet.</p>
-    }
-    else
-    {
-        <div class="list-group mb-4">
-            @foreach (var p in Model.UserStudyPosts)
-            {
-                <div class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>@p.Title</strong><br />
-                        <small>@p.Subject?.Name • @p.Faculty?.Name</small><br />
-                        <small class="text-muted">@p.CreatedAt.ToLocalTime()</small>
+                <!-- Account Information -->
+                <div class="card sb-card shadow-sm">
+                    <div class="card-header px-4 py-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <div>
+                            <div class="fw-bold">Account Information</div>
+                            <div class="sb-muted small">Keep your profile up to date so others can find you.</div>
+                        </div>
+                        <span class="sb-pill">Last updated: today</span>
                     </div>
 
-                    <form method="post" asp-page-handler="DeleteStudyPost" class="ms-3">
-                        <input type="hidden" name="id" value="@p.Id" />
-                        <button class="btn btn-danger btn-sm"
-                                onclick="return confirm('Delete this study session?')">
-                            Delete
-                        </button>
-                    </form>
+                    <div class="card-body p-4">
+                        <form method="post" asp-page-handler="UpdateProfile" id="profileForm">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label" asp-for="Input.Name"></label>
+                                    <input asp-for="Input.Name" class="form-control" />
+                                    <span asp-validation-for="Input.Name" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Faculty</label>
+                                    <select asp-for="Input.FacultyId" asp-items="Model.FacultyOptions" class="form-select"></select>
+                                    <span asp-validation-for="Input.FacultyId" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label" asp-for="Input.Email"></label>
+                                    <input asp-for="Input.Email" class="form-control" readonly disabled />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Role</label>
+                                    <input class="form-control" value="@(isTutor ? "Student + Tutor" : "Student")" readonly />
+                                </div>
+
+                                <div class="col-12 d-flex align-items-center justify-content-between flex-wrap gap-2 mt-1 pt-4">
+                                    <div class="form-check">
+                                        <input asp-for="Input.IsTutor" class="form-check-input" id="isTutorCheckbox" />
+                                        <label class="form-check-label" asp-for="Input.IsTutor">Registered as Tutor</label>
+                                    </div>
+
+                                    <div class="d-flex gap-2">
+                                        <a class="btn btn-outline-secondary" asp-page="./Profile">Cancel</a>
+                                        <button class="btn btn-sb text-white" type="submit">Save Profile</button>
+                                    </div>
+                                </div>
+
+                                <!-- Tutor subjects -->
+                                <div class="col-12" id="tutorSubjectsSection" style="display:none;">
+                                    <div class="sb-subcard mt-2">
+                                        <div class="fw-semibold mb-2">Subjects You Teach</div>
+
+                                        <div class="d-flex gap-2 align-items-center my-2 flex-wrap">
+                                            <select id="availableSubjects" class="form-select" style="max-width: 320px;">
+                                                <option value="">-- Select Subject --</option>
+                                                @foreach (var s in Model.SubjectOptions)
+                                                {
+                                                    if (!Model.Input.SubjectIds.Contains(int.Parse(s.Value)))
+                                                    {
+                                                        <option value="@s.Value">@s.Text</option>
+                                                    }
+                                                }
+                                            </select>
+
+                                            <button type="button" id="addSubjectBtn" class="btn btn-outline-secondary">
+                                                Add
+                                            </button>
+                                        </div>
+
+                                        <div id="selectedSubjectsContainer" class="mt-2">
+                                            @foreach (var subjectId in Model.Input.SubjectIds)
+                                            {
+                                                var subject = Model.SubjectOptions.FirstOrDefault(o => o.Value == subjectId.ToString());
+                                                if (subject != null)
+                                                {
+                                                    <div class="d-flex justify-content-between align-items-center sb-subject-row"
+                                                         data-id="@subjectId">
+                                                        <span>@subject.Text</span>
+                                                        <button type="button" class="btn btn-outline-danger btn-sm remove-subject-btn">Remove</button>
+
+                                                        <input type="hidden" name="Input.SubjectIds" value="@subjectId" />
+                                                    </div>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            }
-        </div>
-    }
 
-
-    <h3>Your Materials</h3>
-
-    @if (Model.UserMaterials.Count == 0)
-    {
-        <p class="text-muted">You haven't uploaded any materials yet.</p>
-    }
-    else
-    {
-        <div class="list-group">
-            @foreach (var m in Model.UserMaterials)
-            {
-                <div class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>@m.Title</strong><br />
-                        <small>@m.Type • @m.Subject?.Name • @m.Faculty?.Name</small><br />
-                        <small class="text-muted">@m.CreatedAt.ToLocalTime()</small>
+                <!-- Stats -->
+                <div class="row g-3 mt-1">
+                    <div class="col-md-4">
+                        <div class="sb-stat shadow-sm">
+                            <div class="sb-muted small">Study posts</div>
+                            <h3 class="mt-1">@Model.StudyPostsCount</h3>
+                            <div class="sb-muted small mt-1">Created by you</div>
+                        </div>
                     </div>
 
-                    <form method="post" asp-page-handler="DeleteMaterial" class="ms-3">
-                        <input type="hidden" name="id" value="@m.Id" />
-                        <button class="btn btn-danger btn-sm"
-                                onclick="return confirm('Delete this material?')">
-                            Delete
-                        </button>
-                    </form>
-                </div>
-            }
-        </div>
-    }
+                    <div class="col-md-4">
+                        <div class="sb-stat shadow-sm">
+                            <div class="sb-muted small">Materials</div>
+                            <h3 class="mt-1">@Model.MaterialsCount</h3>
+                            <div class="sb-muted small mt-1">Uploaded files</div>
+                        </div>
+                    </div>
 
+                    <div class="col-md-4">
+                        <div class="sb-stat shadow-sm">
+                            <div class="sb-muted small">Tutor rating</div>
+                            <h3 class="mt-1">—</h3>
+                            <div class="sb-muted small mt-1">No reviews yet</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security -->
+                <div class="card sb-card shadow-sm mt-4">
+                    <div class="card-header px-4 py-3">
+                        <div class="fw-bold">Security</div>
+                        <div class="sb-muted small">Change your password regularly to keep your account safe.</div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <form method="post" asp-page-handler="ChangePassword">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label" asp-for="Input.CurrentPassword"></label>
+                                    <input asp-for="Input.CurrentPassword" class="form-control" type="password" />
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label" asp-for="Input.NewPassword"></label>
+                                    <input asp-for="Input.NewPassword" class="form-control" type="password" />
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label" asp-for="Input.ConfirmPassword"></label>
+                                    <input asp-for="Input.ConfirmPassword" class="form-control" type="password" />
+                                </div>
+
+                                <div class="col-12 d-flex justify-content-end gap-2">
+                                    <button type="reset" class="btn btn-outline-secondary">Reset</button>
+                                    <button class="btn btn-warning">Change Password</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Activity -->
+                <div class="mt-4">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                        <h2 class="h5 mb-0 sb-section-title">Your Activity</h2>
+                    </div>
+
+                    <div class="row g-3">
+
+                        <!-- Study posts card -->
+                        <div class="col-md-6">
+                            <div class="sb-list-item shadow-sm">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="fw-semibold">Your Study Posts</div>
+                                        <div class="sb-muted small">
+                                            @(Model.StudyPostsCount == 0 ? "You haven’t created any study posts yet." : "Latest sessions you created.")
+                                        </div>
+                                    </div>
+                                    <span class="sb-pill">@Model.StudyPostsCount</span>
+                                </div>
+
+                                @if (Model.UserStudyPosts.Count > 0)
+                                {
+                                    <div class="mt-3 d-grid gap-2">
+                                        @foreach (var p in Model.UserStudyPosts.Take(3))
+                                        {
+                                            <div class="sb-mini-row">
+                                                <div>
+                                                    <div class="fw-semibold">@p.Title</div>
+                                                    <div class="sb-muted small">@p.Subject?.Name • @p.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+                                                </div>
+
+                                                <form method="post" asp-page-handler="DeleteStudyPost" class="ms-2">
+                                                    <input type="hidden" name="id" value="@p.Id" />
+                                                    <button class="btn btn-outline-danger btn-sm"
+                                                            onclick="return confirm('Delete this study post?')">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+
+                                <div class="mt-3 d-flex justify-content-end">
+                                    <a class="btn btn-outline-primary btn-sm" asp-controller="StudyPosts" asp-action="Create">Create a post</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Materials card -->
+                        <div class="col-md-6">
+                            <div class="sb-list-item shadow-sm">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="fw-semibold">Your Materials</div>
+                                        <div class="sb-muted small">
+                                            @(Model.MaterialsCount == 0 ? "You haven’t uploaded any materials yet." : "Latest materials you uploaded.")
+                                        </div>
+                                    </div>
+                                    <span class="sb-pill">@Model.MaterialsCount</span>
+                                </div>
+
+                                @if (Model.UserMaterials.Count > 0)
+                                {
+                                    <div class="mt-3 d-grid gap-2">
+                                        @foreach (var m in Model.UserMaterials.Take(3))
+                                        {
+                                            <div class="sb-mini-row">
+                                                <div>
+                                                    <div class="fw-semibold">@m.Title</div>
+                                                    <div class="sb-muted small">@m.Type • @m.Subject?.Name • @m.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+                                                </div>
+
+                                                <form method="post" asp-page-handler="DeleteMaterial" class="ms-2">
+                                                    <input type="hidden" name="id" value="@m.Id" />
+                                                    <button class="btn btn-outline-danger btn-sm"
+                                                            onclick="return confirm('Delete this material?')">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+
+                                <div class="mt-3 d-flex justify-content-end">
+                                    <a class="btn btn-outline-primary btn-sm" asp-controller="Materials" asp-action="Create">Upload material</a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
     <script>
+        // tutor subjects toggle
         const isTutorCheckbox = document.getElementById("isTutorCheckbox");
         const tutorSection = document.getElementById("tutorSubjectsSection");
         const availableSubjects = document.getElementById("availableSubjects");
         const addSubjectBtn = document.getElementById("addSubjectBtn");
         const selectedContainer = document.getElementById("selectedSubjectsContainer");
-        const hiddenInputs = document.getElementById("hiddenInputs");
 
         function toggleTutorSection() {
             tutorSection.style.display = isTutorCheckbox.checked ? "block" : "none";
@@ -208,18 +394,17 @@
         function addSubject() {
             const subjectId = availableSubjects.value;
             const subjectName = availableSubjects.options[availableSubjects.selectedIndex].text;
-
             if (!subjectId) return;
 
             availableSubjects.remove(availableSubjects.selectedIndex);
 
             const row = document.createElement("div");
-            row.className = "d-flex justify-content-between align-items-center border p-2 mb-2";
+            row.className = "d-flex justify-content-between align-items-center sb-subject-row";
             row.dataset.id = subjectId;
 
             row.innerHTML = `
                 <span>${subjectName}</span>
-                <button type="button" class="btn btn-danger btn-sm remove-subject-btn">Remove</button>
+                <button type="button" class="btn btn-outline-danger btn-sm remove-subject-btn">Remove</button>
                 <input type="hidden" name="Input.SubjectIds" value="${subjectId}" />
             `;
 
@@ -237,7 +422,6 @@
 
         addSubjectBtn.addEventListener("click", addSubject);
 
-        // Remove existing subject items
         document.querySelectorAll(".remove-subject-btn").forEach(btn => {
             btn.addEventListener("click", function () {
                 const row = this.closest("[data-id]");
@@ -252,5 +436,19 @@
                 availableSubjects.appendChild(opt);
             });
         });
+
+        // avatar upload UX
+        const avatarBtn = document.getElementById("avatarBtn");
+        const avatarFile = document.getElementById("avatarFile");
+        const avatarForm = document.getElementById("avatarForm");
+
+        if (avatarBtn && avatarFile && avatarForm) {
+            avatarBtn.addEventListener("click", () => avatarFile.click());
+            avatarFile.addEventListener("change", () => {
+                if (avatarFile.files && avatarFile.files.length > 0) {
+                    avatarForm.submit();
+                }
+            });
+        }
     </script>
 }

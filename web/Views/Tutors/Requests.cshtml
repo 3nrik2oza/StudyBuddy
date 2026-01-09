@@ -1,0 +1,112 @@
+@using web.Models.Entities
+@model List<web.Models.ViewModels.TutorRequestListItemVM>
+
+@{
+    ViewData["Title"] = "Tutoring requests";
+    var isStudentView = (ViewBag.IsStudentView as bool?) == true;
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
+        <div>
+            <h2 class="mb-1">@(isStudentView ? "My tutoring requests" : "Tutoring requests")</h2>
+            <p class="text-muted mb-0">
+                @(isStudentView
+                                ? "Open a thread and continue the conversation with the tutor."
+                                : "Accept or decline requests. Student will get an email notification.")
+            </p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to tutors</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-muted">No requests yet.</div>
+    }
+    else
+    {
+        <div class="d-grid gap-3">
+            @foreach (var r in Model)
+            {
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between flex-wrap gap-2">
+                            <div>
+                                @if (!isStudentView)
+                                {
+                                    <div class="fw-semibold">
+                                        @r.StudentName <span class="text-muted small">(@r.StudentEmail)</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="fw-semibold">Your request</div>
+                                }
+
+                                <div class="text-muted small">@r.SubjectName • @(r.IsOnline ? "Online" : "On campus")</div>
+                                <div class="text-muted small">@r.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+                            </div>
+
+                            <div class="d-flex align-items-start gap-2 flex-wrap">
+                                <div>
+                                    @if (r.Status == TutorRequestStatus.Pending)
+                                    {
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    }
+                                    else if (r.Status == TutorRequestStatus.Accepted)
+                                    {
+                                        <span class="badge bg-success">Accepted</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Declined</span>
+                                    }
+                                </div>
+
+                                <a asp-action="RequestDetails" asp-route-id="@r.Id" class="btn btn-outline-primary btn-sm">
+                                    Open thread
+                                </a>
+                                <form asp-action="DeleteRequest" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@r.Id" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm"
+                                        onclick="return confirm('Delete this request and all messages?');">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="mb-2">
+                            <strong>Preferred time:</strong>
+                            @(string.IsNullOrWhiteSpace(r.PreferredTime) ? "-" : r.PreferredTime)
+                        </div>
+
+                        <div class="mb-3">
+                            <strong>Message:</strong><br />@r.Message
+                        </div>
+
+                        @if (!isStudentView && r.Status == TutorRequestStatus.Pending)
+                        {
+                            <form asp-action="Decide" method="post" class="d-flex gap-2 flex-wrap align-items-end">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@r.Id" />
+
+                                <div style="min-width:280px; flex:1;">
+                                    <label class="form-label small mb-1">Optional response message</label>
+                                    <input name="responseMessage" class="form-control"
+                                        placeholder="e.g. Yes, Friday 16:00 works. Contact me on email…" />
+                                </div>
+
+                                <button name="accept" value="true" class="btn btn-success">Accept</button>
+                                <button name="accept" value="false" class="btn btn-outline-danger">Decline</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
