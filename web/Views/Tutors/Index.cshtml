@@ -33,10 +33,7 @@
 
         <div class="col-sm-5 col-md-5">
             <label class="form-label mb-1">Search</label>
-            <input name="search"
-                   value="@search"
-                   class="form-control"
-                   placeholder="Search by name or email..." />
+            <input name="search" value="@search" class="form-control" placeholder="Search by name or email..." />
         </div>
 
         <div class="col-sm-3 col-md-2 d-grid">
@@ -46,9 +43,7 @@
         </div>
 
         <div class="col-sm-3 col-md-2 d-grid">
-            <a class="btn btn-outline-secondary"
-               asp-action="Index"
-               asp-route-subjectId="@(selectedSubjectId)">
+            <a class="btn btn-outline-secondary" asp-action="Index" asp-route-subjectId="@(selectedSubjectId)">
                 Clear
             </a>
         </div>
@@ -70,30 +65,14 @@ else
     <div class="row g-3">
         @foreach (var tutor in Model)
         {
-            var primarySubject = tutor.Subjects.FirstOrDefault() ?? "";
-            string cardColorClass;
-
-            if (primarySubject.Contains("Mat", StringComparison.OrdinalIgnoreCase))
-                cardColorClass = "tutor-card-blue";
-            else if (primarySubject.Contains("Prog", StringComparison.OrdinalIgnoreCase) ||
-                     primarySubject.Contains("APS", StringComparison.OrdinalIgnoreCase))
-                cardColorClass = "tutor-card-yellow";
-            else if (primarySubject.Contains("Alg", StringComparison.OrdinalIgnoreCase))
-                cardColorClass = "tutor-card-red";
-            else if (primarySubject.Contains("baz", StringComparison.OrdinalIgnoreCase) ||
-                     primarySubject.Contains("SQL", StringComparison.OrdinalIgnoreCase))
-                cardColorClass = "tutor-card-green";
-            else
-                cardColorClass = "tutor-card-blue";
-
             var initial = string.IsNullOrWhiteSpace(tutor.Name)
-                ? "?"
-                : char.ToUpperInvariant(tutor.Name.Trim()[0]).ToString();
+            ? "?"
+            : char.ToUpperInvariant(tutor.Name.Trim()[0]).ToString();
 
             var hasPic = !string.IsNullOrWhiteSpace(tutor.ProfilePicturePath);
 
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="tutor-card @cardColorClass h-100">
+                <div class="tutor-card h-100">
                     <div class="d-flex align-items-center mb-3">
                         @if (hasPic)
                         {
@@ -134,9 +113,7 @@ else
                         </span>
 
                         <div class="d-flex gap-2">
-                            <a asp-action="Request"
-                               asp-route-tutorId="@tutor.Id"
-                               class="btn btn-outline-primary btn-sm">
+                            <a asp-action="Request" asp-route-tutorId="@tutor.Id" class="btn btn-outline-primary btn-sm">
                                 Request session
                             </a>
 

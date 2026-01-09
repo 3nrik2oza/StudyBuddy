@@ -28,13 +28,15 @@
 
                         <div class="mb-3">
                             <label asp-for="Title" class="form-label">Title</label>
-                            <input asp-for="Title" class="form-control form-control-lg" placeholder="e.g. APS1 summary - sorting" />
+                            <input asp-for="Title" class="form-control form-control-lg"
+                                placeholder="e.g. APS1 summary - sorting" />
                             <span asp-validation-for="Title" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="Description" class="form-label">Description</label>
-                            <textarea asp-for="Description" class="form-control" rows="4" placeholder="Short description (optional)"></textarea>
+                            <textarea asp-for="Description" class="form-control" rows="4"
+                                placeholder="Short description (optional)"></textarea>
                             <span asp-validation-for="Description" class="text-danger small"></span>
                         </div>
 
@@ -57,14 +59,16 @@
                             <label class="form-label d-block mb-2">Type</label>
 
                             <div class="btn-group w-100" role="group">
-                                <input asp-for="Type" type="radio" class="btn-check" id="typeLink" value="link" checked="@(!isFile)">
+                                <input asp-for="Type" type="radio" class="btn-check" id="typeLink" value="link"
+                                    checked="@(!isFile)">
                                 <label class="btn btn-outline-primary" for="typeLink">Link</label>
 
-                                <input asp-for="Type" type="radio" class="btn-check" id="typeFile" value="file" checked="@(isFile)">
+                                <input asp-for="Type" type="radio" class="btn-check" id="typeFile" value="file"
+                                    checked="@(isFile)">
                                 <label class="btn btn-outline-primary" for="typeFile">File</label>
                             </div>
 
-                            <div class="form-text mt-2">
+                            <div class="form-text mt-2 text-white">
                                 Choose link for external resources or file to upload notes.
                             </div>
 
@@ -73,17 +77,19 @@
 
                         <div class="mb-3 @(isFile ? "d-none" : "")" id="linkBox">
                             <label asp-for="Url" class="form-label">URL</label>
-                            <div class="input-group">
-                                <span class="input-group-text">https://</span>
-                                <input asp-for="Url" class="form-control" placeholder="example.com/resource" />
+
+                            <div class="sb-url-input">
+                                <span class="sb-url-prefix ">https://</span>
+                                <input asp-for="Url" class="form-control" />
                             </div>
+
                             <span asp-validation-for="Url" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3 @(!isFile ? "d-none" : "")" id="fileBox">
                             <label asp-for="UploadFile" class="form-label">Upload file</label>
                             <input asp-for="UploadFile" type="file" class="form-control" />
-                            <div class="form-text">PDF, images, docs… (max 15MB)</div>
+                            <div class="form-text text-white">PDF, images, docs… (max 15MB)</div>
                             <span asp-validation-for="UploadFile" class="text-danger small"></span>
                         </div>
 

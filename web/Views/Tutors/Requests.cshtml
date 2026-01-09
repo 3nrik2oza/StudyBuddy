@@ -88,7 +88,6 @@
                             <strong>Message:</strong><br />@r.Message
                         </div>
 
-                        @* ✅ SAMO tutor i samo kad je Pending *@
                         @if (!isStudentView && r.Status == TutorRequestStatus.Pending)
                         {
                             <form asp-action="Decide" method="post" class="d-flex gap-2 flex-wrap align-items-end">

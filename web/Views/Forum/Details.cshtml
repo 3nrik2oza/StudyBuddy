@@ -14,90 +14,119 @@
         || (!string.IsNullOrEmpty(currentName) && Model.Thread.AuthorName == currentName);
 }
 
-@if (TempData["ok"] != null)
-{
-    <div class="alert alert-success mb-3">@TempData["ok"]</div>
-}
-@if (TempData["err"] != null)
-{
-    <div class="alert alert-danger mb-3">@TempData["err"]</div>
-}
+<div class="container py-3 py-md-4">
 
-<div class="d-flex justify-content-between align-items-start mb-2">
-    <div>
-        <h2 class="mb-1">@Model.Thread.Title</h2>
-        <p class="text-muted mb-0">
-            👤 @Model.Thread.AuthorName |
-            📅 @Model.Thread.CreatedAt.ToLocalTime().ToString("dd. MM. yyyy")
-        </p>
-    </div>
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+        <div>
+            <h2 class="mb-1">@Model.Thread.Title</h2>
+            <div class="sb-muted">
+                <span>👤 <b>@Model.Thread.AuthorName</b></span>
+                <span class="mx-2">•</span>
+                <span>📅 @Model.Thread.CreatedAt.ToLocalTime().ToString("dd. MM. yyyy")</span>
+            </div>
+        </div>
 
-    @if (isThreadOwner)
-    {
-        <form asp-action="DeleteThread" method="post">
-            @Html.AntiForgeryToken()
-            <input type="hidden" name="id" value="@Model.Thread.Id" />
-            <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete this thread?');">
-                Delete thread
-            </button>
-        </form>
-    }
-</div>
+        <div class="d-flex gap-2 align-items-center">
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back</a>
 
-<p>@Model.Thread.Content</p>
-
-<hr />
-
-<h4 class="mb-3">Replies (@Model.Replies.Count)</h4>
-
-@if (Model.Replies.Any())
-{
-    foreach (var r in Model.Replies)
-    {
-        var isReplyOwner = !string.IsNullOrEmpty(currentUserId) && r.AuthorUserId == currentUserId;
-
-        <div class="border rounded p-3 mb-2">
-            <p class="mb-2">@r.Content</p>
-            <small class="text-muted">
-                👤 @r.AuthorName |
-                📅 @r.CreatedAt.ToLocalTime().ToString("dd. MM. yyyy HH:mm")
-            </small>
-
-            @if (isReplyOwner)
+            @if (isThreadOwner)
             {
-                <form asp-action="DeleteReply" method="post" class="mt-2">
+                <form asp-action="DeleteThread" method="post" class="m-0">
                     @Html.AntiForgeryToken()
-                    <input type="hidden" name="id" value="@r.Id" />
-                    <input type="hidden" name="threadId" value="@Model.Thread.Id" />
-                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete this reply?');">
+                    <input type="hidden" name="id" value="@Model.Thread.Id" />
+                    <button type="submit" class="btn btn-outline-danger btn-sm"
+                            onclick="return confirm('Delete this thread?');">
                         Delete
                     </button>
                 </form>
             }
         </div>
-    }
-}
-else
-{
-    <p>No replies yet.</p>
-}
-
-<hr />
-
-<h5 class="mb-2">Add reply</h5>
-
-<form asp-action="AddReply" method="post">
-    @Html.AntiForgeryToken()
-    <input asp-for="NewReply.ForumThreadId" type="hidden" />
-
-    <div class="mb-2">
-        <textarea asp-for="NewReply.Content" class="form-control" rows="4"></textarea>
-        <span asp-validation-for="NewReply.Content" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Reply</button>
-    <a asp-action="Index" class="btn btn-outline-secondary ms-2">Back</a>
-</form>
+    <!-- Thread content -->
+    <div class="sb-forum-card mb-4">
+        <div class="sb-forum-card-body">
+            <div class="sb-forum-content">
+                @Model.Thread.Content
+            </div>
+        </div>
+    </div>
+
+    <!-- Replies -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+        <h4 class="mb-0">Replies (@Model.Replies.Count)</h4>
+        <span class="sb-pill">Thread</span>
+    </div>
+
+    @if (Model.Replies.Any())
+    {
+        <div class="sb-replies">
+            @foreach (var r in Model.Replies)
+            {
+                var isReplyOwner = !string.IsNullOrEmpty(currentUserId) && r.AuthorUserId == currentUserId;
+
+                <div class="sb-reply-card">
+                    <div class="sb-reply-top">
+                        <div class="sb-reply-meta">
+                            <span class="sb-reply-author">👤 @r.AuthorName</span>
+                            <span class="sb-reply-dot">•</span>
+                            <span class="sb-reply-time">📅 @r.CreatedAt.ToLocalTime().ToString("dd. MM. yyyy HH:mm")</span>
+                        </div>
+
+                        @if (isReplyOwner)
+                        {
+                            <form asp-action="DeleteReply" method="post" class="m-0">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@r.Id" />
+                                <input type="hidden" name="threadId" value="@Model.Thread.Id" />
+                                <button type="submit" class="btn btn-outline-danger btn-sm"
+                                        onclick="return confirm('Delete this reply?');">
+                                    Delete
+                                </button>
+                            </form>
+                        }
+                    </div>
+
+                    <div class="sb-reply-body">
+                        @r.Content
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="sb-muted">No replies yet.</div>
+    }
+
+    <!-- Add reply -->
+    <div class="sb-forum-card mt-4">
+        <div class="sb-forum-card-header">
+            <h5 class="mb-0">Add reply</h5>
+        </div>
+
+        <div class="sb-forum-card-body">
+            <form asp-action="AddReply" method="post" class="m-0">
+                @Html.AntiForgeryToken()
+                <input asp-for="NewReply.ForumThreadId" type="hidden" />
+
+                <div class="mb-2">
+                    <textarea asp-for="NewReply.Content"
+                              class="form-control sb-forum-input"
+                              rows="4"
+                              placeholder="Write your reply..."></textarea>
+                    <span asp-validation-for="NewReply.Content" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex gap-2 justify-content-end">
+                    <button type="submit" class="btn btn-sb btn-sm px-4">Reply</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
