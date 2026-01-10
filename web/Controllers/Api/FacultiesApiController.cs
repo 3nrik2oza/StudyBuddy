@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using web.Data;
 using web.Models.Entities;
+using web.Filters;
 
 namespace web.Controllers_Api
 {
@@ -23,6 +24,7 @@ namespace web.Controllers_Api
 
         // GET: api/FacultiesApi
         [HttpGet]
+        [ApiKeyAuth]
         public async Task<ActionResult<IEnumerable<Faculty>>> GetFaculties()
         {
             return await _context.Faculties.ToListAsync();
@@ -30,6 +32,7 @@ namespace web.Controllers_Api
 
         // GET: api/FacultiesApi/5
         [HttpGet("{id}")]
+        [ApiKeyAuth]
         public async Task<ActionResult<Faculty>> GetFaculty(int id)
         {
             var faculty = await _context.Faculties.FindAsync(id);
@@ -45,6 +48,7 @@ namespace web.Controllers_Api
         // PUT: api/FacultiesApi/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [ApiKeyAuth]
         public async Task<IActionResult> PutFaculty(int id, Faculty faculty)
         {
             if (id != faculty.Id)
@@ -76,6 +80,7 @@ namespace web.Controllers_Api
         // POST: api/FacultiesApi
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [ApiKeyAuth]
         public async Task<ActionResult<Faculty>> PostFaculty(Faculty faculty)
         {
             _context.Faculties.Add(faculty);
@@ -86,6 +91,7 @@ namespace web.Controllers_Api
 
         // DELETE: api/FacultiesApi/5
         [HttpDelete("{id}")]
+        [ApiKeyAuth]
         public async Task<IActionResult> DeleteFaculty(int id)
         {
             var faculty = await _context.Faculties.FindAsync(id);

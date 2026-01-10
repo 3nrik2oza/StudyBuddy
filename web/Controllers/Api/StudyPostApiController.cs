@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using web.Data;
 using web.Models.Entities;
+using web.Filters;
 
 namespace web.Controllers_Api
 {
@@ -23,6 +24,7 @@ namespace web.Controllers_Api
 
         // GET: api/StudyPostApi
         [HttpGet]
+        [ApiKeyAuth]
         public async Task<ActionResult<IEnumerable<StudyPost>>> GetStudyPosts()
         {
             return await _context.StudyPosts.ToListAsync();
@@ -30,6 +32,7 @@ namespace web.Controllers_Api
 
         // GET: api/StudyPostApi/5
         [HttpGet("{id}")]
+        [ApiKeyAuth]
         public async Task<ActionResult<StudyPost>> GetStudyPost(int id)
         {
             var studyPost = await _context.StudyPosts.FindAsync(id);
@@ -45,6 +48,7 @@ namespace web.Controllers_Api
         // PUT: api/StudyPostApi/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [ApiKeyAuth]
         public async Task<IActionResult> PutStudyPost(int id, StudyPost studyPost)
         {
             if (id != studyPost.Id)
@@ -76,6 +80,7 @@ namespace web.Controllers_Api
         // POST: api/StudyPostApi
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [ApiKeyAuth]
         public async Task<ActionResult<StudyPost>> PostStudyPost(StudyPost studyPost)
         {
             _context.StudyPosts.Add(studyPost);
@@ -86,6 +91,7 @@ namespace web.Controllers_Api
 
         // DELETE: api/StudyPostApi/5
         [HttpDelete("{id}")]
+        [ApiKeyAuth]
         public async Task<IActionResult> DeleteStudyPost(int id)
         {
             var studyPost = await _context.StudyPosts.FindAsync(id);

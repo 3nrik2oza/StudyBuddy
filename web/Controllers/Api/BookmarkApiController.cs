@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using web.Data;
 using web.Models.Entities;
+using web.Filters;
 
 namespace web.Controllers_Api
 {
@@ -23,6 +24,7 @@ namespace web.Controllers_Api
 
         // GET: api/BookmarkApi
         [HttpGet]
+        [ApiKeyAuth]
         public async Task<ActionResult<IEnumerable<Bookmark>>> GetBookmarks()
         {
             return await _context.Bookmarks.ToListAsync();
@@ -30,6 +32,7 @@ namespace web.Controllers_Api
 
         // GET: api/BookmarkApi/5
         [HttpGet("{id}")]
+        [ApiKeyAuth]
         public async Task<ActionResult<Bookmark>> GetBookmark(int id)
         {
             var bookmark = await _context.Bookmarks.FindAsync(id);
@@ -45,6 +48,7 @@ namespace web.Controllers_Api
         // PUT: api/BookmarkApi/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [ApiKeyAuth]
         public async Task<IActionResult> PutBookmark(int id, Bookmark bookmark)
         {
             if (id != bookmark.Id)
@@ -76,6 +80,7 @@ namespace web.Controllers_Api
         // POST: api/BookmarkApi
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [ApiKeyAuth]
         public async Task<ActionResult<Bookmark>> PostBookmark(Bookmark bookmark)
         {
             _context.Bookmarks.Add(bookmark);
@@ -86,6 +91,7 @@ namespace web.Controllers_Api
 
         // DELETE: api/BookmarkApi/5
         [HttpDelete("{id}")]
+        [ApiKeyAuth]
         public async Task<IActionResult> DeleteBookmark(int id)
         {
             var bookmark = await _context.Bookmarks.FindAsync(id);
