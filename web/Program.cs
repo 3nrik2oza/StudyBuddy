@@ -4,6 +4,7 @@ using web.Models;
 using Microsoft.EntityFrameworkCore;
 using web.Services;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<StudyBuddyDbContext>(options => options.UseNpgsql(
@@ -11,6 +12,8 @@ builder.Services.AddDbContext<StudyBuddyDbContext>(options => options.UseNpgsql(
 ));
 
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddHostedService<web.Services.StudyPostCleanupService>();
 
@@ -32,20 +35,31 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.MapRazorPages();
+
 
 app.UseHttpsRedirection();
 app.UseRouting();
 
-// 🔥 Important ordering
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V3");
+});
+
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
 
+app.MapRazorPages();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+
 
 app.Run();
