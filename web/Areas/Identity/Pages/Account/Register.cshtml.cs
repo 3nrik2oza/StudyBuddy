@@ -76,9 +76,8 @@ namespace web.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             FacultyOptions = new SelectList(await _context.Faculties.ToListAsync(), "Id", "Name");
-            SubjectOptions = await _context.Subjects
-                .Select(s => new SelectListItem { Value = s.Id.ToString(), Text = s.Name })
-                .ToListAsync();
+            SubjectOptions = new List<SelectListItem>();
+
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
@@ -88,9 +87,7 @@ namespace web.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             FacultyOptions = new SelectList(await _context.Faculties.ToListAsync(), "Id", "Name");
-            SubjectOptions = await _context.Subjects
-                .Select(s => new SelectListItem { Value = s.Id.ToString(), Text = s.Name })
-                .ToListAsync();
+            SubjectOptions = new List<SelectListItem>();
 
             if (!ModelState.IsValid)
                 return Page();

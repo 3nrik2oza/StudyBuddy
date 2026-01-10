@@ -56,7 +56,8 @@
                     <label asp-for="Input.FacultyId" class="form-label">Faculty</label>
                     <select asp-for="Input.FacultyId"
                             asp-items="Model.FacultyOptions"
-                            class="form-control login-input">
+                            class="form-control login-input"
+                            id="facultySelect">
                         <option value="">-- Select Faculty --</option>
                     </select>
                     <span asp-validation-for="Input.FacultyId" class="text-danger"></span>
@@ -177,3 +178,86 @@
         addSubjectBtn.addEventListener("click", addSubject);
     </script>
 }
+<script>
+    const facultySelect = document.getElementById("facultySelect");
+
+    const isTutorCheckbox = document.getElementById("isTutorCheckbox");
+    const tutorSection = document.getElementById("tutorSubjectsSection");
+    const availableSubjects = document.getElementById("availableSubjects");
+    const addSubjectBtn = document.getElementById("addSubjectBtn");
+    const selectedContainer = document.getElementById("selectedSubjectsContainer");
+    const hiddenInputs = document.getElementById("hiddenInputs");
+
+    function toggleTutorSection() {
+        tutorSection.style.display = isTutorCheckbox.checked ? "block" : "none";
+    }
+
+    toggleTutorSection();
+    isTutorCheckbox.addEventListener("change", toggleTutorSection);
+
+    async function loadSubjectsForFaculty(facultyId) {
+        // clear selected subjects on faculty change
+        selectedContainer.innerHTML = "";
+        hiddenInputs.innerHTML = "";
+
+        availableSubjects.innerHTML = `<option value="">-- Select Subject --</option>`;
+        if (!facultyId) return;
+
+        const res = await fetch(`/lookup/subjects?facultyId=${facultyId}`);
+        const data = await res.json();
+
+        for (const s of data) {
+            const opt = document.createElement("option");
+            opt.value = s.id;
+            opt.text = s.name;
+            availableSubjects.appendChild(opt);
+        }
+    }
+
+    facultySelect.addEventListener("change", () => {
+        loadSubjectsForFaculty(facultySelect.value);
+    });
+
+    // initial
+    loadSubjectsForFaculty(facultySelect.value);
+
+    function addSubject() {
+        const subjectId = availableSubjects.value;
+        const subjectName = availableSubjects.options[availableSubjects.selectedIndex]?.text;
+        if (!subjectId) return;
+
+        availableSubjects.remove(availableSubjects.selectedIndex);
+
+        const row = document.createElement("div");
+        row.className = "d-flex justify-content-between align-items-center border p-2 mb-2";
+        row.dataset.id = subjectId;
+
+        row.innerHTML = `
+            <span>${subjectName}</span>
+            <button type="button" class="btn btn-danger btn-sm">Remove</button>
+        `;
+
+        const hidden = document.createElement("input");
+        hidden.type = "hidden";
+        hidden.name = "Input.SubjectIds";
+        hidden.value = subjectId;
+        hidden.dataset.id = subjectId;
+
+        hiddenInputs.appendChild(hidden);
+
+        row.querySelector("button").addEventListener("click", () => {
+            row.remove();
+            hidden.remove();
+
+            const opt = document.createElement("option");
+            opt.value = subjectId;
+            opt.text = subjectName;
+            availableSubjects.appendChild(opt);
+        });
+
+        selectedContainer.appendChild(row);
+        availableSubjects.value = "";
+    }
+
+    addSubjectBtn.addEventListener("click", addSubject);
+</script>

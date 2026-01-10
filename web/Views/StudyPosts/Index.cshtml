@@ -3,7 +3,8 @@
 @{
     ViewData["Title"] = "Study Post";
     var subjects = ViewBag.Subjects as List<web.Models.Entities.Subject>;
-    var from = ViewBag.From as string;
+    var from = ViewBag.From as string ?? "";
+    int? selectedSubjectId = ViewBag.SelectedSubjectId as int?;
 }
 
 <h2 class="mb-1">Study Post</h2>
@@ -20,7 +21,9 @@
             {
                 foreach (var s in subjects)
                 {
-                    <option value="@s.Id">@s.Name</option>
+                    <option value="@s.Id" selected="@(selectedSubjectId == s.Id)">
+                        @s.Name
+                    </option>
                 }
             }
         </select>
@@ -94,7 +97,7 @@ else
                         </p>
 
                         <p class="card-text text-muted small mb-3">
-                            @t.StartAt.ToString("dd.MM.yyyy HH:mm")
+                            @t.StartAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
                             ·
                             @t.Location
                         </p>
@@ -118,7 +121,7 @@ else
                                     <input type="hidden" name="type" value="2" />
                                     <input type="hidden" name="entityId" value="@t.Id" />
                                     <input type="hidden" name="returnUrl"
-                                        value="@Context.Request.Path@Context.Request.QueryString" />
+                                           value="@Context.Request.Path@Context.Request.QueryString" />
                                     <button type="submit" class="btn btn-outline-secondary btn-sm">
                                         Save
                                     </button>
@@ -155,21 +158,15 @@ else
                         </div>
 
                         <div class="mt-auto d-flex justify-content-between align-items-center">
-                            <span class="text-muted small">
-                                Study post
-                            </span>
+                            <span class="text-muted small">Study post</span>
 
                             @if (t.IsOnline)
                             {
-                                <span class="session-type-badge session-type-online">
-                                    Online
-                                </span>
+                                <span class="session-type-badge session-type-online">Online</span>
                             }
                             else
                             {
-                                <span class="session-type-badge session-type-physical">
-                                    On campus
-                                </span>
+                                <span class="session-type-badge session-type-physical">On campus</span>
                             }
                         </div>
                     </div>

@@ -2,8 +2,12 @@
 
 @{
     ViewData["Title"] = "Study materials";
+
+    var faculties = ViewBag.Faculties as List<web.Models.Entities.Faculty>;
     var subjects = ViewBag.Subjects as List<web.Models.Entities.Subject>;
+
     var search = ViewBag.Search as string ?? "";
+    var selectedFacultyId = ViewBag.SelectedFacultyId as int?;
     var selectedSubjectId = ViewBag.SelectedSubjectId as int?;
 }
 
@@ -13,9 +17,18 @@
 </p>
 
 <form method="get" class="row g-2 mb-4 align-items-end sb-toolbar">
+
+    <div class="col-sm-4">
+        <label class="form-label mb-1">Faculty</label>
+        <div class="form-control" style="opacity:.9;">
+            @faculties?.FirstOrDefault(f => f.Id == selectedFacultyId)?.Name
+        </div>
+        <input type="hidden" name="facultyId" value="@selectedFacultyId" />
+    </div>
+
     <div class="col-sm-4">
         <label class="form-label mb-1">Subject</label>
-        <select name="subjectId" class="form-select">
+        <select name="subjectId" id="subjectSelect" class="form-select" @(selectedFacultyId.HasValue ? "" : "disabled")>
             <option value="">All subjects</option>
             @if (subjects != null)
             {
@@ -35,21 +48,17 @@
     </div>
 
     <div class="col-sm-2 d-grid">
-        <button type="submit" class="btn btn-primary mt-2 mt-sm-0">
-            Filter
-        </button>
+        <button type="submit" class="btn btn-primary mt-2 mt-sm-0">Filter</button>
     </div>
 
     <div class="col-sm-2 d-grid">
-        <a asp-action="Create" class="btn btn-success mt-2 mt-sm-0">
-            Add material
-        </a>
+        <a asp-action="Create" class="btn btn-success mt-2 mt-sm-0">Add material</a>
     </div>
 </form>
 
 @if (!Model.Any())
 {
-    <p>No materials found.</p>
+    <p class="sb-muted">No materials found.</p>
 }
 else
 {
@@ -82,22 +91,18 @@ else
                 emoji = "📘";
             }
 
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="material-card @cardColorClass h-100">
-                <div class="material-card-icon">
-                    @emoji
-                </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="material-card @cardColorClass h-100">
+                    <div class="material-card-icon">@emoji</div>
 
-                <div class="material-card-header text-muted small fw-semibold">
-                    @m.SubjectName
-                </div>
+                    <div class="material-card-header text-muted small fw-semibold">
+                        @m.SubjectName
+                    </div>
 
-                <h5 class="mt-3 mb-1">@m.Title</h5>
+                    <h5 class="mt-3 mb-1">@m.Title</h5>
 
-                <p class="text-muted small mb-3">
-                    @(string.IsNullOrWhiteSpace(m.Description)
-                                    ? "No description provided."
-                                                            : m.Description)
+                    <p class="text-muted small mb-3">
+                        @(string.IsNullOrWhiteSpace(m.Description) ? "No description provided." : m.Description)
                     </p>
 
                     <div class="d-flex justify-content-between align-items-center mt-auto">
@@ -117,15 +122,13 @@ else
                                 <input type="hidden" name="entityId" value="@m.Id" />
                                 <input type="hidden" name="returnUrl"
                                     value="@Context.Request.Path@Context.Request.QueryString" />
-                                <button type="submit" class="btn btn-outline-secondary btn-sm">
-                                    Save
-                                </button>
+                                <button type="submit" class="btn btn-outline-secondary btn-sm">Save</button>
                             </form>
 
                             @if (!string.IsNullOrWhiteSpace(m.Url))
                             {
                                 <a href="@m.Url" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">
-                                    Open link
+                                    Open
                                 </a>
                             }
                             else
@@ -138,4 +141,48 @@ else
             </div>
         }
     </div>
+}
+
+@section Scripts {
+    <script>
+        const facultySelect = document.getElementById("facultySelect");
+        const subjectSelect = document.getElementById("subjectSelect");
+
+        async function loadSubjects(facultyId, keepSelected) {
+            subjectSelect.innerHTML = `<option value="">All subjects</option>`;
+
+            if (!facultyId) {
+                subjectSelect.disabled = true;
+                return;
+            }
+
+            subjectSelect.disabled = false;
+
+            const res = await fetch(`@Url.Action("SubjectsByFaculty", "Materials")?facultyId=${facultyId}`);
+            if (!res.ok) return;
+
+            const data = await res.json();
+
+            for (const s of data) {
+                const opt = document.createElement("option");
+                opt.value = s.id;
+                opt.textContent = s.name;
+                subjectSelect.appendChild(opt);
+            }
+
+            if (keepSelected) {
+                subjectSelect.value = keepSelected;
+            }
+        }
+
+        facultySelect.addEventListener("change", () => {
+            loadSubjects(facultySelect.value, "");
+        });
+
+        const initialFaculty = facultySelect.value;
+        const initialSubject = "@(selectedSubjectId?.ToString() ?? "")";
+        if (initialFaculty) {
+            loadSubjects(initialFaculty, initialSubject);
+        }
+    </script>
 }

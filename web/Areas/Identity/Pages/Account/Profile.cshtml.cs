@@ -74,7 +74,14 @@ namespace web.Areas.Identity.Pages.Account
             if (user == null) return NotFound();
 
             FacultyOptions = new SelectList(await _context.Faculties.ToListAsync(), "Id", "Name");
-            SubjectOptions = new SelectList(await _context.Subjects.ToListAsync(), "Id", "Name");
+            SubjectOptions = new SelectList(
+                await _context.Subjects
+                    .Where(s => s.FacultyId == user.FacultyId)
+                    .OrderBy(s => s.Name)
+                    .ToListAsync(),
+                "Id", "Name"
+            );
+
 
             var faculty = await _context.Faculties.FindAsync(user.FacultyId);
 
@@ -130,6 +137,16 @@ namespace web.Areas.Identity.Pages.Account
             user.Description = Input.Description;
             user.FacultyId = Input.FacultyId;
             user.IsTutor = Input.IsTutor;
+
+            var allowedSubjectIds = await _context.Subjects
+                .Where(s => s.FacultyId == user.FacultyId)
+                .Select(s => s.Id)
+                .ToListAsync();
+
+            Input.SubjectIds = (Input.SubjectIds ?? new List<int>())
+                .Where(id => allowedSubjectIds.Contains(id))
+                .ToList();
+
 
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
