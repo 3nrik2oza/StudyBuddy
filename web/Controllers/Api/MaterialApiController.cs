@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using web.Data;
 using web.Models.Entities;
+using web.Filters;
 
 namespace web.Controllers_Api
 {
@@ -23,6 +24,7 @@ namespace web.Controllers_Api
 
         // GET: api/MaterialApi
         [HttpGet]
+        [ApiKeyAuth]
         public async Task<ActionResult<IEnumerable<Material>>> GetMaterials()
         {
             return await _context.Materials.ToListAsync();
@@ -30,6 +32,7 @@ namespace web.Controllers_Api
 
         // GET: api/MaterialApi/5
         [HttpGet("{id}")]
+        [ApiKeyAuth]
         public async Task<ActionResult<Material>> GetMaterial(int id)
         {
             var material = await _context.Materials.FindAsync(id);
@@ -45,6 +48,7 @@ namespace web.Controllers_Api
         // PUT: api/MaterialApi/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [ApiKeyAuth]
         public async Task<IActionResult> PutMaterial(int id, Material material)
         {
             if (id != material.Id)
@@ -76,6 +80,7 @@ namespace web.Controllers_Api
         // POST: api/MaterialApi
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [ApiKeyAuth]
         public async Task<ActionResult<Material>> PostMaterial(Material material)
         {
             _context.Materials.Add(material);
@@ -86,6 +91,7 @@ namespace web.Controllers_Api
 
         // DELETE: api/MaterialApi/5
         [HttpDelete("{id}")]
+        [ApiKeyAuth]
         public async Task<IActionResult> DeleteMaterial(int id)
         {
             var material = await _context.Materials.FindAsync(id);

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using web.Data;
 using web.Models.Entities;
+using web.Filters;
 
 namespace web.Controllers_Api
 {
@@ -23,6 +24,7 @@ namespace web.Controllers_Api
 
         // GET: api/ForumThreadApi
         [HttpGet]
+        [ApiKeyAuth]
         public async Task<ActionResult<IEnumerable<ForumThread>>> GetForumThreads()
         {
             return await _context.ForumThreads.ToListAsync();
@@ -30,6 +32,7 @@ namespace web.Controllers_Api
 
         // GET: api/ForumThreadApi/5
         [HttpGet("{id}")]
+        [ApiKeyAuth]
         public async Task<ActionResult<ForumThread>> GetForumThread(int id)
         {
             var forumThread = await _context.ForumThreads.FindAsync(id);
@@ -45,6 +48,7 @@ namespace web.Controllers_Api
         // PUT: api/ForumThreadApi/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [ApiKeyAuth]
         public async Task<IActionResult> PutForumThread(int id, ForumThread forumThread)
         {
             if (id != forumThread.Id)
@@ -76,6 +80,7 @@ namespace web.Controllers_Api
         // POST: api/ForumThreadApi
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [ApiKeyAuth]
         public async Task<ActionResult<ForumThread>> PostForumThread(ForumThread forumThread)
         {
             _context.ForumThreads.Add(forumThread);
@@ -86,6 +91,7 @@ namespace web.Controllers_Api
 
         // DELETE: api/ForumThreadApi/5
         [HttpDelete("{id}")]
+        [ApiKeyAuth]
         public async Task<IActionResult> DeleteForumThread(int id)
         {
             var forumThread = await _context.ForumThreads.FindAsync(id);

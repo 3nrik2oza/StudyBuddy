@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using web.Data;
 using web.Models.Entities;
+using web.Filters;
 
 namespace web.Controllers_Api
 {
@@ -23,6 +24,7 @@ namespace web.Controllers_Api
 
         // GET: api/StudyPostParticipantApi
         [HttpGet]
+        [ApiKeyAuth]
         public async Task<ActionResult<IEnumerable<StudyPostParticipant>>> GetStudyPostParticipants()
         {
             return await _context.StudyPostParticipants.ToListAsync();
@@ -30,6 +32,7 @@ namespace web.Controllers_Api
 
         // GET: api/StudyPostParticipantApi/5
         [HttpGet("{id}")]
+        [ApiKeyAuth]
         public async Task<ActionResult<StudyPostParticipant>> GetStudyPostParticipant(int id)
         {
             var studyPostParticipant = await _context.StudyPostParticipants.FindAsync(id);
@@ -45,6 +48,7 @@ namespace web.Controllers_Api
         // PUT: api/StudyPostParticipantApi/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [ApiKeyAuth]
         public async Task<IActionResult> PutStudyPostParticipant(int id, StudyPostParticipant studyPostParticipant)
         {
             if (id != studyPostParticipant.Id)
@@ -76,6 +80,7 @@ namespace web.Controllers_Api
         // POST: api/StudyPostParticipantApi
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [ApiKeyAuth]
         public async Task<ActionResult<StudyPostParticipant>> PostStudyPostParticipant(StudyPostParticipant studyPostParticipant)
         {
             _context.StudyPostParticipants.Add(studyPostParticipant);
@@ -86,6 +91,7 @@ namespace web.Controllers_Api
 
         // DELETE: api/StudyPostParticipantApi/5
         [HttpDelete("{id}")]
+        [ApiKeyAuth]
         public async Task<IActionResult> DeleteStudyPostParticipant(int id)
         {
             var studyPostParticipant = await _context.StudyPostParticipants.FindAsync(id);

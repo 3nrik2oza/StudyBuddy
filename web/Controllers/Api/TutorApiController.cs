@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using web.Data;
 using web.Models.Entities;
+using web.Filters;
 
 namespace web.Controllers_Api
 {
@@ -23,6 +24,7 @@ namespace web.Controllers_Api
 
         // GET: api/TutorApi
         [HttpGet]
+        [ApiKeyAuth]
         public async Task<ActionResult<IEnumerable<Tutor>>> GetTutors()
         {
             return await _context.Tutors.ToListAsync();
@@ -30,6 +32,7 @@ namespace web.Controllers_Api
 
         // GET: api/TutorApi/5
         [HttpGet("{id}")]
+        [ApiKeyAuth]
         public async Task<ActionResult<Tutor>> GetTutor(string id)
         {
             var tutor = await _context.Tutors.FindAsync(id);
@@ -45,6 +48,7 @@ namespace web.Controllers_Api
         // PUT: api/TutorApi/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [ApiKeyAuth]
         public async Task<IActionResult> PutTutor(string id, Tutor tutor)
         {
             if (id != tutor.Id)
@@ -76,6 +80,7 @@ namespace web.Controllers_Api
         // POST: api/TutorApi
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [ApiKeyAuth]
         public async Task<ActionResult<Tutor>> PostTutor(Tutor tutor)
         {
             _context.Tutors.Add(tutor);
@@ -100,6 +105,7 @@ namespace web.Controllers_Api
 
         // DELETE: api/TutorApi/5
         [HttpDelete("{id}")]
+        [ApiKeyAuth]
         public async Task<IActionResult> DeleteTutor(string id)
         {
             var tutor = await _context.Tutors.FindAsync(id);

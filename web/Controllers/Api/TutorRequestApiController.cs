@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using web.Data;
 using web.Models.Entities;
+using web.Filters;
 
 namespace web.Controllers_Api
 {
@@ -23,6 +24,7 @@ namespace web.Controllers_Api
 
         // GET: api/TutorRequestApi
         [HttpGet]
+        [ApiKeyAuth]
         public async Task<ActionResult<IEnumerable<TutorRequest>>> GetTutorRequests()
         {
             return await _context.TutorRequests.ToListAsync();
@@ -30,6 +32,7 @@ namespace web.Controllers_Api
 
         // GET: api/TutorRequestApi/5
         [HttpGet("{id}")]
+        [ApiKeyAuth]
         public async Task<ActionResult<TutorRequest>> GetTutorRequest(int id)
         {
             var tutorRequest = await _context.TutorRequests.FindAsync(id);
@@ -45,6 +48,7 @@ namespace web.Controllers_Api
         // PUT: api/TutorRequestApi/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [ApiKeyAuth]
         public async Task<IActionResult> PutTutorRequest(int id, TutorRequest tutorRequest)
         {
             if (id != tutorRequest.Id)
@@ -76,6 +80,7 @@ namespace web.Controllers_Api
         // POST: api/TutorRequestApi
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [ApiKeyAuth]
         public async Task<ActionResult<TutorRequest>> PostTutorRequest(TutorRequest tutorRequest)
         {
             _context.TutorRequests.Add(tutorRequest);
@@ -86,6 +91,7 @@ namespace web.Controllers_Api
 
         // DELETE: api/TutorRequestApi/5
         [HttpDelete("{id}")]
+        [ApiKeyAuth]
         public async Task<IActionResult> DeleteTutorRequest(int id)
         {
             var tutorRequest = await _context.TutorRequests.FindAsync(id);
