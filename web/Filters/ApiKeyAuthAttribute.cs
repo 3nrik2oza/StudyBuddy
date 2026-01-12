@@ -23,7 +23,7 @@ namespace web.Filters
             var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
             var apiKey = configuration.GetValue<string>("ApiKey");
 
-            if (!apiKey.Equals(potentialApiKey))
+            if (string.IsNullOrWhiteSpace(apiKey) || apiKey != potentialApiKey)
             {
                 context.Result = new UnauthorizedResult();
                 return;
