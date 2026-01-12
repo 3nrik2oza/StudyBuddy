@@ -5,63 +5,95 @@ Ajla Suljanović 63220443
 
 Enrik Roža 63240381
 
-## Kratek opis aplikacije
+## Kratek opis projekta
 
-StudyBuddy je spletna aplikacija ASP.NET MVC, ki študentom pomaga lažje organizirati učenje, najti študijske materiale, tutorje in študijske skupine ter komunicirati prek foruma.
+StudyBuddy je spletna aplikacija, razvita v ogrodju **ASP.NET Core MVC**, namenjena študentom za lažjo organizacijo učenja, iskanje študijskih gradiv, tutorjev, študijskih skupin ter komunikacijo prek foruma.
 
-StudyBuddy je platforma za študente, ki omogoča:
+Aplikacija deluje kot centralna platforma, kjer lahko študenti:
+- dostopajo do študijskih gradiv,
+- najdejo tutorje in zaprosijo za pomoč,
+- organizirajo ali se pridružijo study sessionom,
+- sodelujejo v forumu,
+- upravljajo svojo uporabniško identiteto (prijava/registracija).
 
-- pregled in dodajanje študijskih gradiv (povezave, zapiski, PDF-i, vaje),
-- pregled tutorjev in sistem »help points« za nagrajevanje pomoči,
-- organizacijo study sessionov (termini za skupno učenje),
-- forum za vprašanja, odgovore in izmenjavo nasvetov,
-- prijavo in registracijo uporabnikov (avtentikacija z Identity).
+---
 
-Aplikacija je zasnovana kot centralno mesto, kjer študenti lahko najdejo gradiva, pomoč in skupnost za lažje in bolj strukturirano učenje.
+## Funkcionalnosti sistema
+
+### Spletna aplikacija
+- prijava in registracija uporabnikov (ASP.NET Identity),
+- pregled in dodajanje študijskih gradiv (Materials),
+- pregled tutorjev + sistem »help points«,
+- pošiljanje tutoring zahtevkov in komunikacija,
+- organizacija study sessionov (StudyPosts),
+- forum s temami in odgovori,
+- filtriranje vsebin po predmetih,
+- moderna in dodelana uporabniška izkušnja (custom CSS + Bootstrap).
+
+### Spletna storitev (REST API)
+- REST API razvit v .NET,
+- JSON komunikacija,
+- CRUD operacije nad entitetami,
+- avtentikacija in avtorizacija,
+- Swagger UI dokumentacija.
+
+---
 
 ## Tehnologije
 
-- **Backend:** ASP.NET Core MVC (.NET 9), Entity Framework Core, Identity
-- **Frontend:** Razor Views, Bootstrap 5, custom CSS (modern, pastel UI)
-- **Baza:** PostgreSQL (Docker, Npgsql provider)
-- **Ostalo:** EF Core migracije, seeding začetnih podatkov
+- **Backend:** ASP.NET Core MVC (.NET 9)
+- **ORM:** Entity Framework Core
+- **Avtentikacija:** ASP.NET Identity
+- **Baza podatkov:** PostgreSQL (Azure)
+- **Frontend:** Razor Views, Bootstrap 5, custom CSS
+- **API dokumentacija:** Swagger / OpenAPI
 
-## Funkcionalnosti (trenutno implementirane)
+---
 
-- Landing stran / Home z modernim UI (hero sekcija, "Why StudyBuddy?", "How it works?")
-- Prijava in registracija uporabnikov (Identity)
-- Prikaz imena prijavljenega uporabnika v navigaciji
-- Pregled tutorjev + filtriranje po predmetu
-- Sistem "help points" za tutorje
-- Top 3 tutorji prikazani na Home strani
-- Seznam študijskih gradiv (Materials) + filtriranje po predmetu in iskanju
-- Dodajanje novega gradiva (link) v bazo
-- Seznam study sessionov (Study Sessions) + filtriranje po datumu in predmetu
-- Dodajanje novega study sessiona
-- Forum (seznam threadov) z informacijami o kategoriji, predmetu, avtorju in številom odgovorov
-- Podatkovni model z več povezanimi entitetami (Faculty, Subject, Tutor, TutorSubject, Material, StudyPost, ForumThread)
+## Podatkovna baza
 
-## Podatkovni model (entitete)
+Podatkovna baza vsebuje več kot 5 tabel, med drugim:
 
-Trenutno uporabljamo naslednje entitete:
+- AspNetUsers (Identity)
+- Faculties
+- Subjects
+- Materials
+- Tutors
+- TutorSubjects
+- TutorRequests
+- TutorRequestMessages
+- StudyPosts
+- StudyPostParticipants
+- ForumThreads
+- ForumReplies
+- Bookmarks
 
-- `Faculty` – fakultete (npr. FRI)
-- `Subject` – predmeti (IS, APS1, …)
-- `Tutor` – tutorji (ime, fakulteta, help points)
-- `TutorSubject` – povezava med tutorjem in predmeti
-- `Material` – študijsko gradivo (naslov, opis, tip, url, predmet, avtor)
-- `StudyPost` – study session (naslov, predmet, lokacija/online, datum in čas, avtor)
-- `ForumThread` – forum teme (naslov, vsebina, kategorija, predmet, avtor, število odgovorov)
+Ista PostgreSQL baza se uporablja:
+- v spletni aplikaciji,
+- v REST spletni storitvi.
 
-Vsi podatki se shranjujejo v **PostgreSQL** bazo preko Entity Framework Core.
+---
 
-## Nastavitev in zagon projekta
+## Javni dostop
 
-### 1. Zagon PostgreSQL baze (Docker)
+- **Spletna aplikacija:**  
+  👉 https://studdybuddyapp.azurewebsites.net/
 
-```bash
-docker run --name studybuddy-postgres \
-  -e POSTGRES_PASSWORD=pass123 \
-  -e POSTGRES_DB=studybuddy \
-  -p 5432:5432 \
-  -d postgres:16
+- **REST API (Swagger):**  
+  👉 https://studdybuddyapp.azurewebsites.net/swagger/index.html
+
+---
+
+## GitHub repozitoriji
+
+- **Web aplikacija + API:**  
+  👉 (bo dodano)
+
+- **Android aplikacija:**  
+  👉 (bo dodano)
+
+---
+
+## Zaslonske slike (screenshots)
+
+Screenshoti uporabniškega vmesnika so dodani v mapo:
