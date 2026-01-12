@@ -1,59 +1,109 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
 using web.Data;
 using web.Models;
-using Microsoft.EntityFrameworkCore;
 using web.Services;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<StudyBuddyDbContext>(options => options.UseNpgsql(
-    builder.Configuration.GetConnectionString("DefaultConnection")
-));
+// DB
+builder.Services.AddDbContext<StudyBuddyDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
 
+// MVC + Razor
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
 
+// Hosted service
+builder.Services.AddHostedService<StudyPostCleanupService>();
+
+// Identity
+builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+})
+.AddRoles<IdentityRole>()
+.AddEntityFrameworkStores<StudyBuddyDbContext>();
+
+// Email
+builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
+
+// JWT AUTH
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+})
+.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+{
+    var key = builder.Configuration["Jwt:Key"]!;
+
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(key)
+        ),
+        ClockSkew = TimeSpan.FromSeconds(30)
+    };
+});
+
+builder.Services.AddAuthorization();
+
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new() { Title = "My API V3", Version = "v1" });
+    c.SwaggerDoc("v1", new() { Title = "StudyBuddy API", Version = "v1" });
 
-    c.AddSecurityDefinition("ApiKey", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    // ApiKey
+    c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
     {
-        Description = "ApiKey header. Example: SecretKey",
         Name = "ApiKey",
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Description = "ApiKey header"
     });
 
-    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    // JWT Bearer
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
-            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            new OpenApiSecurityScheme
             {
-                Reference = new Microsoft.OpenApi.Models.OpenApiReference
-                {
-                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                    Id = "ApiKey"
-                }
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "ApiKey" }
+            },
+            new List<string>()
+        },
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
             },
             new List<string>()
         }
     });
 });
-
-
-builder.Services.AddHostedService<web.Services.StudyPostCleanupService>();
-
-builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
-    options.SignIn.RequireConfirmedAccount = false)
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<StudyBuddyDbContext>();
-
-builder.Services.Configure<web.Services.SmtpOptions>(builder.Configuration.GetSection("Smtp"));
-builder.Services.AddScoped<web.Services.IEmailSender, web.Services.SmtpEmailSender>();
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -65,33 +115,25 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-
-
 app.UseHttpsRedirection();
 app.UseRouting();
-
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V3");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "StudyBuddy API v1");
 });
-
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
-
 app.MapRazorPages();
-
 app.MapControllers();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
-
 
 app.Run();
