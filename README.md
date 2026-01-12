@@ -87,7 +87,7 @@ Ista PostgreSQL baza se uporablja:
 ## GitHub repozitoriji
 
 - **Web aplikacija + API:**  
-  👉 (bo dodano)
+  👉 https://github.com/3nrik2oza/StudyBuddy/edit/main
 
 - **Android aplikacija:**  
   👉 (bo dodano)
@@ -97,3 +97,5 @@ Ista PostgreSQL baza se uporablja:
 ## Zaslonske slike (screenshots)
 
 Screenshoti uporabniškega vmesnika so dodani v mapo:
+web/wwwroot/images
+
