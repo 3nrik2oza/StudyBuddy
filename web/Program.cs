@@ -25,6 +25,9 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 builder.Services.Configure<web.Services.SmtpOptions>(builder.Configuration.GetSection("Smtp"));
 builder.Services.AddScoped<web.Services.IEmailSender, web.Services.SmtpEmailSender>();
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
 SeedData.Initialize(app.Services);
