@@ -22,7 +22,6 @@ namespace web.Controllers_Api
             _context = context;
         }
 
-        // GET: api/FacultiesApi
         [HttpGet]
         [ApiKeyAuth]
         public async Task<ActionResult<IEnumerable<Faculty>>> GetFaculties()
@@ -30,7 +29,6 @@ namespace web.Controllers_Api
             return await _context.Faculties.ToListAsync();
         }
 
-        // GET: api/FacultiesApi/5
         [HttpGet("{id}")]
         [ApiKeyAuth]
         public async Task<ActionResult<Faculty>> GetFaculty(int id)
@@ -77,8 +75,6 @@ namespace web.Controllers_Api
             return NoContent();
         }
 
-        // POST: api/FacultiesApi
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [ApiKeyAuth]
         public async Task<ActionResult<Faculty>> PostFaculty(Faculty faculty)
@@ -89,7 +85,6 @@ namespace web.Controllers_Api
             return CreatedAtAction("GetFaculty", new { id = faculty.Id }, faculty);
         }
 
-        // DELETE: api/FacultiesApi/5
         [HttpDelete("{id}")]
         [ApiKeyAuth]
         public async Task<IActionResult> DeleteFaculty(int id)

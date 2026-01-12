@@ -9,7 +9,6 @@ public class StudyPost
     public Subject? Subject { get; set; }
 
     public string AuthorUserId { get; set; } = "";
-    //public ApplicationUser? Author { get; set; }
 
     public string Location { get; set; } = "";
     public DateTime StartAt { get; set; }

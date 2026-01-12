@@ -22,7 +22,6 @@ namespace web.Controllers_Api
             _context = context;
         }
 
-        // GET: api/TutorRequestMessageApi
         [HttpGet]
         [ApiKeyAuth]
         public async Task<ActionResult<IEnumerable<TutorRequestMessage>>> GetTutorRequestMessages()
@@ -30,7 +29,6 @@ namespace web.Controllers_Api
             return await _context.TutorRequestMessages.ToListAsync();
         }
 
-        // GET: api/TutorRequestMessageApi/5
         [HttpGet("{id}")]
         [ApiKeyAuth]
         public async Task<ActionResult<TutorRequestMessage>> GetTutorRequestMessage(int id)
@@ -45,8 +43,6 @@ namespace web.Controllers_Api
             return tutorRequestMessage;
         }
 
-        // PUT: api/TutorRequestMessageApi/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [ApiKeyAuth]
         public async Task<IActionResult> PutTutorRequestMessage(int id, TutorRequestMessage tutorRequestMessage)
@@ -77,8 +73,6 @@ namespace web.Controllers_Api
             return NoContent();
         }
 
-        // POST: api/TutorRequestMessageApi
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [ApiKeyAuth]
         public async Task<ActionResult<TutorRequestMessage>> PostTutorRequestMessage(TutorRequestMessage tutorRequestMessage)
@@ -89,7 +83,6 @@ namespace web.Controllers_Api
             return CreatedAtAction("GetTutorRequestMessage", new { id = tutorRequestMessage.Id }, tutorRequestMessage);
         }
 
-        // DELETE: api/TutorRequestMessageApi/5
         [HttpDelete("{id}")]
         [ApiKeyAuth]
         public async Task<IActionResult> DeleteTutorRequestMessage(int id)

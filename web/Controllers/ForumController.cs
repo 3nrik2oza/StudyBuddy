@@ -21,7 +21,7 @@ public class ForumController : Controller
         _userManager = userManager;
     }
 
-    // LISTA THREAD-OVA
+    // LIST THREADS
     public IActionResult Index(int? subjectId, string? category, string? search)
     {
         var threads = _context.ForumThreads.AsQueryable();

@@ -33,7 +33,6 @@ public class MaterialsController : Controller
         _env = env;
     }
 
-    // ✅ JSON endpoint: subjects by faculty (used by Index + Create)
     [HttpGet]
     public async Task<IActionResult> SubjectsByFaculty(int facultyId)
     {
@@ -48,7 +47,6 @@ public class MaterialsController : Controller
 
     public async Task<IActionResult> Index(int? facultyId, int? subjectId, string? search)
     {
-        // ✅ default faculty = logged in user's faculty
         var me = await _userManager.GetUserAsync(User);
         if (!facultyId.HasValue && me != null && me.FacultyId != 0)
             facultyId = me.FacultyId;
@@ -84,7 +82,6 @@ public class MaterialsController : Controller
 
         ViewBag.Faculties = await _context.Faculties.OrderBy(f => f.Name).ToListAsync();
 
-        // ✅ subjects dropdown only for selected faculty
         ViewBag.Subjects = facultyId.HasValue
             ? await _context.Subjects.Where(s => s.FacultyId == facultyId.Value).OrderBy(s => s.Name).ToListAsync()
             : new List<Subject>();
@@ -101,7 +98,6 @@ public class MaterialsController : Controller
     {
         ViewBag.Faculties = await _context.Faculties.OrderBy(f => f.Name).ToListAsync();
 
-        // default faculty = current user faculty (nice UX)
         var me = await _userManager.GetUserAsync(User);
         var defaultFacultyId = me?.FacultyId;
 
@@ -119,7 +115,6 @@ public class MaterialsController : Controller
     {
         ViewBag.Faculties = await _context.Faculties.OrderBy(f => f.Name).ToListAsync();
 
-        // subjects depend on selected faculty (fallback user faculty)
         var me = await _userManager.GetUserAsync(User);
         var resolvedFacultyId = facultyId ?? me?.FacultyId;
 
@@ -144,7 +139,6 @@ public class MaterialsController : Controller
                 ModelState.AddModelError(nameof(vm.UploadFile), "Please upload a file.");
         }
 
-        // ✅ validate subject exists
         var subject = await _context.Subjects.FirstOrDefaultAsync(s => s.Id == vm.SubjectId);
         if (subject == null)
             ModelState.AddModelError(nameof(vm.SubjectId), "Please select a valid subject.");
@@ -195,7 +189,6 @@ public class MaterialsController : Controller
 
         var userId = _userManager.GetUserId(User);
 
-        // ✅ FacultyId comes from subject (single source of truth)
         var entity = new Material
         {
             Id = newId,

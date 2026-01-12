@@ -36,20 +36,17 @@ public class TutorsController : Controller
         _email = email;
     }
 
-    // ✅ AUTO faculty filter (from profile)
     public async Task<IActionResult> Index(int? subjectId, string? search)
     {
         var me = await _userManager.GetUserAsync(User);
         var myFacultyId = me?.FacultyId ?? 0;
 
-        // tutors scoped to my faculty
         var tutorsQuery = _context.Tutors.AsQueryable();
         if (myFacultyId != 0)
             tutorsQuery = tutorsQuery.Where(t => t.FacultyId == myFacultyId);
 
         var tutors = await tutorsQuery.ToListAsync();
 
-        // subjects scoped to my faculty (for filter dropdown)
         var subjectsForFaculty = myFacultyId != 0
             ? await _context.Subjects.Where(s => s.FacultyId == myFacultyId).OrderBy(s => s.Name).ToListAsync()
             : await _context.Subjects.OrderBy(s => s.Name).ToListAsync();
@@ -58,12 +55,10 @@ public class TutorsController : Controller
         ViewBag.SelectedSubjectId = subjectId;
         ViewBag.Search = search ?? "";
 
-        // faculty name for badge text
         var facultyName = "Unknown faculty";
         if (myFacultyId != 0)
             facultyName = await _context.Faculties.Where(f => f.Id == myFacultyId).Select(f => f.Name).FirstOrDefaultAsync() ?? "Unknown faculty";
 
-        // tutor -> subjectIds lookup (only for relevant tutors)
         var tutorIds = tutors.Select(t => t.Id).ToList();
 
         var tutorSubjectLookup = await _context.TutorSubjects
@@ -71,13 +66,11 @@ public class TutorsController : Controller
             .GroupBy(ts => ts.UserId)
             .ToDictionaryAsync(g => g.Key, g => g.Select(x => x.SubjectId).ToList());
 
-        // user lookup for email + avatar
         var userLookup = await _context.Users
             .Where(u => tutorIds.Contains(u.Id))
             .Select(u => new { u.Id, u.Email, u.ProfilePicturePath })
             .ToDictionaryAsync(x => x.Id, x => new { x.Email, x.ProfilePicturePath });
 
-        // subject names lookup (only for this faculty’s subjects)
         var subjectNameById = subjectsForFaculty.ToDictionary(s => s.Id, s => s.Name);
 
         var items = new List<TutorListItemVM>();
@@ -152,11 +145,9 @@ public class TutorsController : Controller
         var me = await _userManager.GetUserAsync(User);
         var myFacultyId = me?.FacultyId ?? 0;
 
-        // ensure tutor exists
         var tutorUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == tutorId);
         if (tutorUser == null) return NotFound();
 
-        // optional: block requesting tutors from other faculties
         if (myFacultyId != 0)
         {
             var tutorFacultyId = await _context.Tutors.Where(t => t.Id == tutorId).Select(t => (int?)t.FacultyId).FirstOrDefaultAsync();
@@ -166,7 +157,6 @@ public class TutorsController : Controller
 
         ViewBag.TutorName = tutorUser.Name;
 
-        // subjects only from my faculty
         ViewBag.Subjects = myFacultyId != 0
             ? await _context.Subjects.Where(s => s.FacultyId == myFacultyId).OrderBy(s => s.Name).ToListAsync()
             : await _context.Subjects.OrderBy(s => s.Name).ToListAsync();
@@ -199,7 +189,6 @@ public class TutorsController : Controller
 
         if (!ModelState.IsValid) return View(vm);
 
-        // ✅ safety: subject must belong to my faculty
         if (myFacultyId != 0)
         {
             var okSubject = await _context.Subjects.AnyAsync(s => s.Id == vm.SubjectId && s.FacultyId == myFacultyId);
@@ -209,7 +198,6 @@ public class TutorsController : Controller
                 return View(vm);
             }
 
-            // also block requesting tutor from other faculty (if tutor exists as Tutor record)
             var tutorFacultyId = await _context.Tutors.Where(t => t.Id == vm.TutorUserId).Select(t => (int?)t.FacultyId).FirstOrDefaultAsync();
             if (tutorFacultyId.HasValue && tutorFacultyId.Value != myFacultyId)
                 return Forbid();

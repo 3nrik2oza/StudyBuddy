@@ -37,7 +37,6 @@ public class StudyPostsController : Controller
         _userManager = userManager;
     }
 
-    // ✅ AUTO faculty filter (from profile)
     public async Task<IActionResult> Index(int? subjectId, DateTime? from)
     {
         DateTime minDateUtc;
@@ -61,8 +60,6 @@ public class StudyPostsController : Controller
         var query = _context.StudyPosts
             .Include(p => p.Subject)
             .Where(p => p.StartAt >= minDateUtc);
-
-        // ✅ filter by my faculty
         if (myFacultyId != 0)
             query = query.Where(p => p.FacultyId == myFacultyId);
 
@@ -90,7 +87,6 @@ public class StudyPostsController : Controller
             })
             .ToListAsync();
 
-        // ✅ subjects only for my faculty
         ViewBag.Subjects = myFacultyId != 0
             ? await _context.Subjects.Where(s => s.FacultyId == myFacultyId).OrderBy(s => s.Name).ToListAsync()
             : await _context.Subjects.OrderBy(s => s.Name).ToListAsync();
@@ -134,7 +130,6 @@ public class StudyPostsController : Controller
         if (!ModelState.IsValid)
             return View(vm);
 
-        // ✅ safety: subject must belong to my faculty (if faculty set)
         if (myFacultyId != 0)
         {
             var okSubject = await _context.Subjects.AnyAsync(s => s.Id == vm.SubjectId && s.FacultyId == myFacultyId);
@@ -160,7 +155,7 @@ public class StudyPostsController : Controller
             StartAt = startAtUtc,
             Location = vm.Location,
             IsOnline = vm.IsOnline,
-            FacultyId = myFacultyId, // ✅ from profile (NOT 1)
+            FacultyId = myFacultyId, 
             AuthorUserId = userId,
             CreatedAt = DateTime.UtcNow,
             MaxParticipants = vm.MaxParticipants
@@ -169,7 +164,6 @@ public class StudyPostsController : Controller
         _context.StudyPosts.Add(entity);
         await _context.SaveChangesAsync();
 
-        // auto-join author
         if (userId != "")
         {
             var already = await _context.StudyPostParticipants.AnyAsync(x => x.StudyPostId == entity.Id && x.UserId == userId);

@@ -22,7 +22,6 @@ namespace web.Controllers_Api
             _context = context;
         }
 
-        // GET: api/ForumReplyApi
         [HttpGet]
         [ApiKeyAuth]
         public async Task<ActionResult<IEnumerable<ForumReply>>> GetForumReplies()
@@ -30,7 +29,6 @@ namespace web.Controllers_Api
             return await _context.ForumReplies.ToListAsync();
         }
 
-        // GET: api/ForumReplyApi/5
         [HttpGet("{id}")]
         [ApiKeyAuth]
         public async Task<ActionResult<ForumReply>> GetForumReply(int id)
@@ -45,8 +43,6 @@ namespace web.Controllers_Api
             return forumReply;
         }
 
-        // PUT: api/ForumReplyApi/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [ApiKeyAuth]
         public async Task<IActionResult> PutForumReply(int id, ForumReply forumReply)
@@ -77,8 +73,6 @@ namespace web.Controllers_Api
             return NoContent();
         }
 
-        // POST: api/ForumReplyApi
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [ApiKeyAuth]
         public async Task<ActionResult<ForumReply>> PostForumReply(ForumReply forumReply)
@@ -89,7 +83,6 @@ namespace web.Controllers_Api
             return CreatedAtAction("GetForumReply", new { id = forumReply.Id }, forumReply);
         }
 
-        // DELETE: api/ForumReplyApi/5
         [HttpDelete("{id}")]
         [ApiKeyAuth]
         public async Task<IActionResult> DeleteForumReply(int id)

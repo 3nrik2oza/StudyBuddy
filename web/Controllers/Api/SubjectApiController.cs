@@ -22,7 +22,6 @@ namespace web.Controllers_Api
             _context = context;
         }
 
-        // GET: api/SubjectApi
         [HttpGet]
         [ApiKeyAuth]
         public async Task<ActionResult<IEnumerable<Subject>>> GetSubjects()
@@ -30,7 +29,6 @@ namespace web.Controllers_Api
             return await _context.Subjects.ToListAsync();
         }
 
-        // GET: api/SubjectApi/5
         [HttpGet("{id}")]
         [ApiKeyAuth]
         public async Task<ActionResult<Subject>> GetSubject(int id)
@@ -45,8 +43,6 @@ namespace web.Controllers_Api
             return subject;
         }
 
-        // PUT: api/SubjectApi/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [ApiKeyAuth]
         public async Task<IActionResult> PutSubject(int id, Subject subject)
@@ -77,8 +73,6 @@ namespace web.Controllers_Api
             return NoContent();
         }
 
-        // POST: api/SubjectApi
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [ApiKeyAuth]
         public async Task<ActionResult<Subject>> PostSubject(Subject subject)
@@ -89,7 +83,6 @@ namespace web.Controllers_Api
             return CreatedAtAction("GetSubject", new { id = subject.Id }, subject);
         }
 
-        // DELETE: api/SubjectApi/5
         [HttpDelete("{id}")]
         [ApiKeyAuth]
         public async Task<IActionResult> DeleteSubject(int id)

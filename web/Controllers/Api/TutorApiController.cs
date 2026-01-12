@@ -22,7 +22,6 @@ namespace web.Controllers_Api
             _context = context;
         }
 
-        // GET: api/TutorApi
         [HttpGet]
         [ApiKeyAuth]
         public async Task<ActionResult<IEnumerable<Tutor>>> GetTutors()
@@ -30,7 +29,6 @@ namespace web.Controllers_Api
             return await _context.Tutors.ToListAsync();
         }
 
-        // GET: api/TutorApi/5
         [HttpGet("{id}")]
         [ApiKeyAuth]
         public async Task<ActionResult<Tutor>> GetTutor(string id)
@@ -45,8 +43,6 @@ namespace web.Controllers_Api
             return tutor;
         }
 
-        // PUT: api/TutorApi/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [ApiKeyAuth]
         public async Task<IActionResult> PutTutor(string id, Tutor tutor)
@@ -77,8 +73,6 @@ namespace web.Controllers_Api
             return NoContent();
         }
 
-        // POST: api/TutorApi
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [ApiKeyAuth]
         public async Task<ActionResult<Tutor>> PostTutor(Tutor tutor)
@@ -103,7 +97,6 @@ namespace web.Controllers_Api
             return CreatedAtAction("GetTutor", new { id = tutor.Id }, tutor);
         }
 
-        // DELETE: api/TutorApi/5
         [HttpDelete("{id}")]
         [ApiKeyAuth]
         public async Task<IActionResult> DeleteTutor(string id)

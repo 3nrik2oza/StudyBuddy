@@ -27,7 +27,7 @@ public class SmtpEmailSender : IEmailSender
     public async Task SendAsync(string toEmail, string subject, string htmlBody)
     {
         if (string.IsNullOrWhiteSpace(_opt.Host) || string.IsNullOrWhiteSpace(_opt.FromEmail))
-            return; // fail-safe: u devu neće rušiti app ako nema SMTP
+            return; 
 
         using var client = new SmtpClient(_opt.Host, _opt.Port)
         {

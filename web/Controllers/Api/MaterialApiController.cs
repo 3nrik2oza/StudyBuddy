@@ -22,7 +22,6 @@ namespace web.Controllers_Api
             _context = context;
         }
 
-        // GET: api/MaterialApi
         [HttpGet]
         [ApiKeyAuth]
         public async Task<ActionResult<IEnumerable<Material>>> GetMaterials()
@@ -30,7 +29,6 @@ namespace web.Controllers_Api
             return await _context.Materials.ToListAsync();
         }
 
-        // GET: api/MaterialApi/5
         [HttpGet("{id}")]
         [ApiKeyAuth]
         public async Task<ActionResult<Material>> GetMaterial(int id)
@@ -45,8 +43,6 @@ namespace web.Controllers_Api
             return material;
         }
 
-        // PUT: api/MaterialApi/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [ApiKeyAuth]
         public async Task<IActionResult> PutMaterial(int id, Material material)
@@ -77,8 +73,6 @@ namespace web.Controllers_Api
             return NoContent();
         }
 
-        // POST: api/MaterialApi
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [ApiKeyAuth]
         public async Task<ActionResult<Material>> PostMaterial(Material material)
@@ -89,7 +83,6 @@ namespace web.Controllers_Api
             return CreatedAtAction("GetMaterial", new { id = material.Id }, material);
         }
 
-        // DELETE: api/MaterialApi/5
         [HttpDelete("{id}")]
         [ApiKeyAuth]
         public async Task<IActionResult> DeleteMaterial(int id)

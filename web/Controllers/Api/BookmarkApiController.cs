@@ -22,7 +22,6 @@ namespace web.Controllers_Api
             _context = context;
         }
 
-        // GET: api/BookmarkApi
         [HttpGet]
         [ApiKeyAuth]
         public async Task<ActionResult<IEnumerable<Bookmark>>> GetBookmarks()
@@ -30,7 +29,6 @@ namespace web.Controllers_Api
             return await _context.Bookmarks.ToListAsync();
         }
 
-        // GET: api/BookmarkApi/5
         [HttpGet("{id}")]
         [ApiKeyAuth]
         public async Task<ActionResult<Bookmark>> GetBookmark(int id)
@@ -45,8 +43,6 @@ namespace web.Controllers_Api
             return bookmark;
         }
 
-        // PUT: api/BookmarkApi/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [ApiKeyAuth]
         public async Task<IActionResult> PutBookmark(int id, Bookmark bookmark)
@@ -77,8 +73,6 @@ namespace web.Controllers_Api
             return NoContent();
         }
 
-        // POST: api/BookmarkApi
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [ApiKeyAuth]
         public async Task<ActionResult<Bookmark>> PostBookmark(Bookmark bookmark)
@@ -89,7 +83,6 @@ namespace web.Controllers_Api
             return CreatedAtAction("GetBookmark", new { id = bookmark.Id }, bookmark);
         }
 
-        // DELETE: api/BookmarkApi/5
         [HttpDelete("{id}")]
         [ApiKeyAuth]
         public async Task<IActionResult> DeleteBookmark(int id)

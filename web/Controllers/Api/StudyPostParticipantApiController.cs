@@ -22,7 +22,6 @@ namespace web.Controllers_Api
             _context = context;
         }
 
-        // GET: api/StudyPostParticipantApi
         [HttpGet]
         [ApiKeyAuth]
         public async Task<ActionResult<IEnumerable<StudyPostParticipant>>> GetStudyPostParticipants()
@@ -30,7 +29,6 @@ namespace web.Controllers_Api
             return await _context.StudyPostParticipants.ToListAsync();
         }
 
-        // GET: api/StudyPostParticipantApi/5
         [HttpGet("{id}")]
         [ApiKeyAuth]
         public async Task<ActionResult<StudyPostParticipant>> GetStudyPostParticipant(int id)
@@ -45,8 +43,6 @@ namespace web.Controllers_Api
             return studyPostParticipant;
         }
 
-        // PUT: api/StudyPostParticipantApi/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [ApiKeyAuth]
         public async Task<IActionResult> PutStudyPostParticipant(int id, StudyPostParticipant studyPostParticipant)
@@ -77,8 +73,6 @@ namespace web.Controllers_Api
             return NoContent();
         }
 
-        // POST: api/StudyPostParticipantApi
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [ApiKeyAuth]
         public async Task<ActionResult<StudyPostParticipant>> PostStudyPostParticipant(StudyPostParticipant studyPostParticipant)
@@ -89,7 +83,6 @@ namespace web.Controllers_Api
             return CreatedAtAction("GetStudyPostParticipant", new { id = studyPostParticipant.Id }, studyPostParticipant);
         }
 
-        // DELETE: api/StudyPostParticipantApi/5
         [HttpDelete("{id}")]
         [ApiKeyAuth]
         public async Task<IActionResult> DeleteStudyPostParticipant(int id)
