@@ -90,7 +90,7 @@ Ista PostgreSQL baza se uporablja:
   👉 https://github.com/3nrik2oza/StudyBuddy/edit/main
 
 - **Android aplikacija:**  
-  👉 (bo dodano)
+  👉 https://github.com/3nrik2oza/StudyBuddyMobile
 
 ---
 
