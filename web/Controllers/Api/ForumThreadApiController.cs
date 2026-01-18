@@ -75,12 +75,14 @@ namespace web.Controllers_Api
 
         [HttpPost]
         [ApiKeyAuth]
-        public async Task<ActionResult<ForumThread>> PostForumThread(ForumThread forumThread)
+        public async Task<ActionResult<ForumThread>> PostForumThread([FromBody] ForumThread forumThread)
         {
+            forumThread.CreatedAt = DateTime.UtcNow;
+
             _context.ForumThreads.Add(forumThread);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetForumThread", new { id = forumThread.Id }, forumThread);
+            return CreatedAtAction(nameof(GetForumThread), new { id = forumThread.Id }, forumThread);
         }
 
         [HttpDelete("{id}")]
