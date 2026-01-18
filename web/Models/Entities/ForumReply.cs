@@ -9,7 +9,7 @@ namespace web.Models.Entities
 
         public int ForumThreadId { get; set; }  
         [JsonIgnore]   
-        public ForumThread ForumThread { get; set; } = null!;
+        public ForumThread? ForumThread { get; set; } = null!;
         public string AuthorUserId { get; set; } = "";
         public string AuthorName { get; set; } = "";
 
