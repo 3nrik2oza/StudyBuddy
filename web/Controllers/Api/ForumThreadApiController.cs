@@ -84,21 +84,7 @@ namespace web.Controllers_Api
                 forumThread.CreatedAt = DateTime.UtcNow;
                 forumThread.Replies ??= new List<ForumReply>();
                 forumThread.RepliesCount = 0;
-
-                /*
-                            var entity = new ForumThread
-                            {
-                                Id = 100,
-                                Title = "vm.Title",
-                                Content = "vm.Content",
-                                Category = "vm.Category",
-                                SubjectId = 1,
-                                FacultyId = 1,
-                                AuthorUserId = "",
-                                AuthorName = "displayName",
-                                CreatedAt = DateTime.UtcNow,
-                                RepliesCount = 0
-                            };*/
+                forumThread.Id = _context.ForumThreads.Any() ? _context.ForumThreads.Max(t => t.Id) + 1 : 1;
 
                 _context.ForumThreads.Add(forumThread);
                 await _context.SaveChangesAsync();
