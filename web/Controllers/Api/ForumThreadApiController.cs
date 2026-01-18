@@ -77,19 +77,40 @@ namespace web.Controllers_Api
         [ApiKeyAuth]
         public async Task<ActionResult<ForumThread>> PostForumThread([FromBody] ForumThread forumThread)
         {
-            forumThread.CreatedAt = DateTime.UtcNow;
-            forumThread.Replies ??= new List<ForumReply>();
-            forumThread.RepliesCount = 0;
-
             try
             {
+
+
+                forumThread.CreatedAt = DateTime.UtcNow;
+                forumThread.Replies ??= new List<ForumReply>();
+                forumThread.RepliesCount = 0;
+
+                /*
+                            var entity = new ForumThread
+                            {
+                                Id = 100,
+                                Title = "vm.Title",
+                                Content = "vm.Content",
+                                Category = "vm.Category",
+                                SubjectId = 1,
+                                FacultyId = 1,
+                                AuthorUserId = "",
+                                AuthorName = "displayName",
+                                CreatedAt = DateTime.UtcNow,
+                                RepliesCount = 0
+                            };*/
+
                 _context.ForumThreads.Add(forumThread);
                 await _context.SaveChangesAsync();
-            }catch(Exception ex)
-            {
-                return StatusCode(500, ex.Message);
+
+                return CreatedAtAction(nameof(GetForumThread), new { id = forumThread.Id }, forumThread);
+
             }
-            return CreatedAtAction(nameof(GetForumThread), new { id = forumThread.Id }, forumThread);
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, ex.InnerException?.Message ?? ex.Message);
+            }
+
         }
 
         [HttpDelete("{id}")]
