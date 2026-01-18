@@ -46,6 +46,7 @@ namespace web.Controllers_Api
                 userId = user.Id,
                 email = user.Email,
                 name = user.Name,
+                facultyId = user.FacultyId,
                 roles = roles
             });
         }
