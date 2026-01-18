@@ -45,7 +45,7 @@ namespace web.Controllers_Api
                 accessToken = token,
                 userId = user.Id,
                 email = user.Email,
-                name = user.UserName,
+                name = user.Name,
                 roles = roles
             });
         }
