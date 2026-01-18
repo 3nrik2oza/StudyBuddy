@@ -77,10 +77,25 @@ namespace web.Controllers_Api
         [ApiKeyAuth]
         public async Task<ActionResult<ForumReply>> PostForumReply(ForumReply forumReply)
         {
-            _context.ForumReplies.Add(forumReply);
-            await _context.SaveChangesAsync();
+            try
+            {
+                forumReply.CreatedAt = DateTime.UtcNow;
+                forumReply.Id = _context.ForumReplies.Any() ? _context.ForumReplies.Max(t => t.Id) + 1 : 1;
 
-            return CreatedAtAction("GetForumReply", new { id = forumReply.Id }, forumReply);
+                _context.ForumReplies.Add(forumReply);
+                var threadToUpdate = await _context.ForumThreads.FirstOrDefaultAsync(t => t.Id == forumReply.ForumThreadId);
+                if (threadToUpdate != null)
+                    threadToUpdate.RepliesCount += 1;
+                await _context.SaveChangesAsync();
+                return CreatedAtAction(nameof(GetForumReply), new { id = forumReply.Id }, forumReply);
+            }
+            catch( DbUpdateException ex)
+            {
+                return StatusCode(500, ex.InnerException?.Message ?? ex.Message);
+            }
+           
+
+            //return CreatedAtAction("GetForumReply", new { id = forumReply.Id }, forumReply);
         }
 
         [HttpDelete("{id}")]
