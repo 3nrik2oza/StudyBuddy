@@ -75,17 +75,22 @@ namespace web.Controllers_Api
 
         [HttpPost]
         [ApiKeyAuth]
-        public async Task<ActionResult<ForumReply>> PostForumReply(ForumReply forumReply)
+        public async Task<ActionResult<ForumReply>> PostForumReply([FromBody] ForumReply forumReply)
         {
             try
             {
+                var threadToUpdate = await _context.ForumThreads.FirstOrDefaultAsync(t => t.Id == forumReply.ForumThreadId);
+                if (threadToUpdate != null){
+
+                    threadToUpdate.RepliesCount += 1;
+                    forumReply.ForumThread = threadToUpdate;
+            }
+
                 forumReply.CreatedAt = DateTime.UtcNow;
                 forumReply.Id = _context.ForumReplies.Any() ? _context.ForumReplies.Max(t => t.Id) + 1 : 1;
-
+                
                 _context.ForumReplies.Add(forumReply);
-                var threadToUpdate = await _context.ForumThreads.FirstOrDefaultAsync(t => t.Id == forumReply.ForumThreadId);
-                if (threadToUpdate != null)
-                    threadToUpdate.RepliesCount += 1;
+
                 await _context.SaveChangesAsync();
                 return CreatedAtAction(nameof(GetForumReply), new { id = forumReply.Id }, forumReply);
             }
