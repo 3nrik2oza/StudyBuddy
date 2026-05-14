@@ -1,101 +1,146 @@
 # StudyBuddy
 
 ## Avtorji
-Ajla Suljanović 63220443
 
-Enrik Roža 63240381
+* Ajla Suljanović – 63220443
+* Enrik Roža – 63240381
 
-## Kratek opis projekta
+---
 
-StudyBuddy je spletna aplikacija, razvita v ogrodju **ASP.NET Core MVC**, namenjena študentom za lažjo organizacijo učenja, iskanje študijskih gradiv, tutorjev, študijskih skupin ter komunikacijo prek foruma.
+# Kratek opis projekta
+
+StudyBuddy je spletna aplikacija, razvita v ogrodju ASP.NET Core MVC, namenjena študentom za lažjo organizacijo učenja, iskanje študijskih gradiv, tutorjev, študijskih skupin ter komunikacijo prek foruma.
 
 Aplikacija deluje kot centralna platforma, kjer lahko študenti:
-- dostopajo do študijskih gradiv,
-- najdejo tutorje in zaprosijo za pomoč,
-- organizirajo ali se pridružijo study sessionom,
-- sodelujejo v forumu,
-- upravljajo svojo uporabniško identiteto (prijava/registracija).
+
+* dostopajo do študijskih gradiv,
+* najdejo tutorje in zaprosijo za pomoč,
+* organizirajo ali se pridružijo study sessionom,
+* sodelujejo v forumu,
+* upravljajo svojo uporabniško identiteto (prijava/registracija).
 
 ---
 
-## Funkcionalnosti sistema
+# Funkcionalnosti sistema
 
-### Spletna aplikacija
-- prijava in registracija uporabnikov (ASP.NET Identity),
-- pregled in dodajanje študijskih gradiv (Materials),
-- pregled tutorjev + sistem »help points«,
-- pošiljanje tutoring zahtevkov in komunikacija,
-- organizacija study sessionov (StudyPosts),
-- forum s temami in odgovori,
-- filtriranje vsebin po predmetih,
-- moderna in dodelana uporabniška izkušnja (custom CSS + Bootstrap).
+## Spletna aplikacija
 
-### Spletna storitev (REST API)
-- REST API razvit v .NET,
-- JSON komunikacija,
-- CRUD operacije nad entitetami,
-- avtentikacija in avtorizacija,
-- Swagger UI dokumentacija.
+* prijava in registracija uporabnikov (ASP.NET Identity),
+* pregled in dodajanje študijskih gradiv (Materials),
+* pregled tutorjev + sistem »help points«,
+* pošiljanje tutoring zahtevkov in komunikacija,
+* organizacija study sessionov (StudyPosts),
+* forum s temami in odgovori,
+* filtriranje vsebin po predmetih,
+* moderna uporabniška izkušnja (Bootstrap + custom CSS),
+* REST API integracija,
+* Swagger dokumentacija.
 
----
+## REST API
 
-## Tehnologije
-
-- **Backend:** ASP.NET Core MVC (.NET 9)
-- **ORM:** Entity Framework Core
-- **Avtentikacija:** ASP.NET Identity
-- **Baza podatkov:** PostgreSQL (Azure)
-- **Frontend:** Razor Views, Bootstrap 5, custom CSS
-- **API dokumentacija:** Swagger / OpenAPI
+* CRUD operacije nad entitetami,
+* JSON komunikacija,
+* avtentikacija in avtorizacija,
+* Swagger/OpenAPI dokumentacija.
 
 ---
 
-## Podatkovna baza
+# Tehnologije
 
-Podatkovna baza vsebuje več kot 5 tabel, med drugim:
+* Backend: ASP.NET Core MVC (.NET 9)
+* ORM: Entity Framework Core
+* Avtentikacija: ASP.NET Identity
+* Podatkovna baza: PostgreSQL
+* Frontend: Razor Views, Bootstrap 5, custom CSS
+* API dokumentacija: Swagger / OpenAPI
+* Deployment: Azure App Service
+* Docker: PostgreSQL container
 
-- AspNetUsers (Identity)
-- Faculties
-- Subjects
-- Materials
-- Tutors
-- TutorSubjects
-- TutorRequests
-- TutorRequestMessages
-- StudyPosts
-- StudyPostParticipants
-- ForumThreads
-- ForumReplies
-- Bookmarks
+---
+
+# Podatkovna baza
+
+Podatkovna baza vsebuje več tabel, med drugim:
+
+* AspNetUsers
+* Faculties
+* Subjects
+* Materials
+* Tutors
+* TutorSubjects
+* TutorRequests
+* TutorRequestMessages
+* StudyPosts
+* StudyPostParticipants
+* ForumThreads
+* ForumReplies
+* Bookmarks
 
 Ista PostgreSQL baza se uporablja:
-- v spletni aplikaciji,
-- v REST spletni storitvi.
+
+* v spletni aplikaciji,
+* v REST API storitvi.
 
 ---
 
-## Javni dostop
+# Lokalni zagon aplikacije
 
-- **Spletna aplikacija:**  
-  👉 https://studdybuddyapp.azurewebsites.net/
+## Zahteve
 
-- **REST API (Swagger):**  
-  👉 https://studdybuddyapp.azurewebsites.net/swagger/index.html
+* .NET 9 SDK
+* Docker Desktop
+* PostgreSQL container
+
+## Zagon PostgreSQL containerja
+
+```bash
+docker start studybuddy-postgres
+```
+
+## Zagon aplikacije
+
+```bash
+cd web
+dotnet restore
+dotnet run
+```
+
+## Lokalni dostop
+
+```txt
+http://localhost:5027
+```
 
 ---
 
-## GitHub repozitoriji
+# Javni dostop
 
-- **Web aplikacija + API:**  
-  👉 https://github.com/3nrik2oza/StudyBuddy/edit/main
+## Spletna aplikacija
 
-- **Android aplikacija:**  
-  👉 https://github.com/3nrik2oza/StudyBuddyMobile
+https://studdybuddyapp.azurewebsites.net/
+
+## Swagger API
+
+https://studdybuddyapp.azurewebsites.net/swagger/index.html
 
 ---
 
-## Zaslonske slike (screenshots)
+# GitHub repozitoriji
+
+## Web aplikacija + API
+
+https://github.com/3nrik2oza/StudyBuddy
+
+## Android aplikacija
+
+https://github.com/3nrik2oza/StudyBuddyMobile
+
+---
+
+# Screenshoti
 
 Screenshoti uporabniškega vmesnika so dodani v mapo:
-web/wwwroot/images
 
+```txt
+web/wwwroot/images
+```
