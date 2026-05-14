@@ -127,6 +127,21 @@ public class StudyPostsController : Controller
             ? await _context.Subjects.Where(s => s.FacultyId == myFacultyId).OrderBy(s => s.Name).ToListAsync()
             : await _context.Subjects.OrderBy(s => s.Name).ToListAsync();
 
+        if (vm.StartAt <= DateTime.Now)
+        {
+            ModelState.AddModelError(nameof(vm.StartAt), "Date and time must be in the future.");
+        }
+
+        if (!vm.IsOnline && string.IsNullOrWhiteSpace(vm.Location))
+        {
+            ModelState.AddModelError(nameof(vm.Location), "Location is required for on-campus sessions.");
+        }
+
+        if (vm.MaxParticipants < 1)
+        {
+            ModelState.AddModelError(nameof(vm.MaxParticipants), "Maximum participants must be at least 1.");
+        }
+
         if (!ModelState.IsValid)
             return View(vm);
 
@@ -155,7 +170,7 @@ public class StudyPostsController : Controller
             StartAt = startAtUtc,
             Location = vm.Location,
             IsOnline = vm.IsOnline,
-            FacultyId = myFacultyId, 
+            FacultyId = myFacultyId,
             AuthorUserId = userId,
             CreatedAt = DateTime.UtcNow,
             MaxParticipants = vm.MaxParticipants
@@ -318,12 +333,62 @@ public class StudyPostsController : Controller
     [HttpGet]
     public async Task<IActionResult> Details(int id)
     {
+        var meId = _userManager.GetUserId(User) ?? "";
+
         var post = await _context.StudyPosts
             .Include(p => p.Subject)
             .FirstOrDefaultAsync(p => p.Id == id);
 
         if (post == null) return NotFound();
 
-        return View(post);
+        var participants = await _context.StudyPostParticipants
+            .Where(x => x.StudyPostId == id)
+            .OrderBy(x => x.JoinedAt)
+            .ToListAsync();
+
+        var userIds = participants.Select(x => x.UserId).Distinct().ToList();
+
+        var users = await _userManager.Users
+            .Where(u => userIds.Contains(u.Id) || u.Id == post.AuthorUserId)
+            .Select(u => new { u.Id, u.Name, u.Email })
+            .ToListAsync();
+
+        var lookup = users.ToDictionary(x => x.Id, x => x);
+
+        lookup.TryGetValue(post.AuthorUserId, out var organizer);
+
+        var vm = new StudyPostDetailsVM
+        {
+            Id = post.Id,
+            Title = post.Title,
+            SubjectName = post.Subject?.Name ?? "Unknown subject",
+            OrganizerName = organizer != null
+                ? (!string.IsNullOrWhiteSpace(organizer.Name) ? organizer.Name : organizer.Email ?? "Unknown")
+                : "Unknown",
+            Location = post.Location,
+            IsOnline = post.IsOnline,
+            StartAt = post.StartAt,
+            CreatedAt = post.CreatedAt,
+            MaxParticipants = post.MaxParticipants,
+            ParticipantsCount = participants.Count,
+            IsJoined = meId != "" && participants.Any(x => x.UserId == meId),
+            IsOwner = meId != "" && post.AuthorUserId == meId,
+            Participants = participants.Select(p =>
+            {
+                lookup.TryGetValue(p.UserId, out var u);
+
+                return new StudyPostParticipantItemVM
+                {
+                    ParticipantId = p.Id,
+                    UserId = p.UserId,
+                    Name = u != null && !string.IsNullOrWhiteSpace(u.Name) ? u.Name : "",
+                    Email = u?.Email ?? "",
+                    JoinedAt = p.JoinedAt,
+                    CanRemove = p.UserId != meId
+                };
+            }).ToList()
+        };
+
+        return View(vm);
     }
 }

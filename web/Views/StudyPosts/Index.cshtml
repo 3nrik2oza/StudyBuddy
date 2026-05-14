@@ -62,7 +62,18 @@
 
 @if (!Model.Any())
 {
-    <p>No study post found.</p>
+    <div class="card border-0 shadow-sm session-card">
+        <div class="card-body text-center py-5">
+            <div class="display-6 mb-3">📚</div>
+            <h4 class="mb-2">No study sessions found</h4>
+            <p class="text-muted mb-4">
+                Create a new study session and start learning together with other students.
+            </p>
+            <a asp-action="Create" class="btn btn-success">
+                New session
+            </a>
+        </div>
+    </div>
 }
 else
 {
@@ -116,12 +127,15 @@ else
                             </small>
 
                             <div class="d-flex gap-2">
+                                <a asp-action="Details" asp-route-id="@t.Id" class="btn btn-outline-secondary btn-sm">
+                                    Open
+                                </a>
                                 <form asp-controller="Bookmarks" asp-action="Toggle" method="post" class="m-0">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="type" value="2" />
                                     <input type="hidden" name="entityId" value="@t.Id" />
                                     <input type="hidden" name="returnUrl"
-                                           value="@Context.Request.Path@Context.Request.QueryString" />
+                                        value="@Context.Request.Path@Context.Request.QueryString" />
                                     <button type="submit" class="btn btn-outline-secondary btn-sm">
                                         Save
                                     </button>

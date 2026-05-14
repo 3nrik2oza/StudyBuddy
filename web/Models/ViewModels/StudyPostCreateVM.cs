@@ -18,7 +18,6 @@ public class StudyPostCreateVM
     [DisplayFormat(DataFormatString = "{0:yyyy-MM-ddTHH:mm}", ApplyFormatInEditMode = true)]
     public DateTime StartAt { get; set; }
 
-    [Required]
     [Display(Name = "Location")]
     public string Location { get; set; } = "";
 
