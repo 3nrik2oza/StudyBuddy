@@ -42,16 +42,15 @@
     {
         <div class="alert alert-success mb-3">@TempData["ToastMessage"]</div>
     }
+
     @if (TempData["err"] != null)
     {
         <div class="alert alert-danger mb-3">@TempData["err"]</div>
     }
 
-    <!-- CHAT -->
     <div class="sb-chat">
 
-        <!-- Messages -->
-        <div class="sb-chat-messages">
+        <div id="messagesList" class="sb-chat-messages">
             @if (Model.Messages == null || !Model.Messages.Any())
             {
                 <div class="sb-muted small">No messages yet.</div>
@@ -60,7 +59,7 @@
             {
                 @foreach (var m in Model.Messages.OrderBy(x => x.SentAt))
                 {
-                    var mine = (m.SenderUserId == me);
+                    var mine = m.SenderUserId == me;
 
                     <div class="sb-bubble-row @(mine ? "is-mine" : "is-other")">
                         <div class="sb-bubble">
@@ -75,20 +74,28 @@
             }
         </div>
 
-        <!-- Composer -->
-        <form asp-action="SendRequestMessage" method="post" class="sb-chat-composer">
-            @Html.AntiForgeryToken()
-            <input type="hidden" name="id" value="@Model.Id" />
+        <form id="chatForm" class="sb-chat-composer">
+            <input type="hidden" id="requestId" value="@Model.Id" />
 
             <label class="form-label mb-2">New message</label>
-            <textarea name="body"
+
+            <textarea id="messageInput"
                       class="form-control sb-chat-input"
                       rows="3"
                       maxlength="2000"
                       placeholder="Write a message..."></textarea>
 
-            <div class="d-flex justify-content-end mt-2">
-                <button type="submit" class="btn btn-sb btn-sm px-4">Send</button>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+                <small id="chatStatus" class="text-muted">
+                    Connecting...
+                </small>
+
+                <button id="sendButton"
+                        type="submit"
+                        class="btn btn-sb btn-sm px-4"
+                        disabled>
+                    Send
+                </button>
             </div>
         </form>
 
@@ -106,7 +113,9 @@
 
                     <div style="min-width:280px; flex:1;">
                         <label class="form-label small mb-1">Optional response message</label>
-                        <input name="responseMessage" class="form-control sb-chat-input" placeholder="e.g. Friday 16:00 works..." />
+                        <input name="responseMessage"
+                               class="form-control sb-chat-input"
+                               placeholder="e.g. Friday 16:00 works..." />
                     </div>
 
                     <button name="accept" value="true" class="btn btn-success">Accept</button>
@@ -115,4 +124,122 @@
             </div>
         </div>
     }
+
 </div>
+
+@section Scripts {
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+
+    <script>
+        const requestId = parseInt(document.getElementById("requestId").value);
+        const currentUserId = "@me";
+        const messagesList = document.getElementById("messagesList");
+        const chatForm = document.getElementById("chatForm");
+        const messageInput = document.getElementById("messageInput");
+        const sendButton = document.getElementById("sendButton");
+        const chatStatus = document.getElementById("chatStatus");
+
+        function scrollToBottom() {
+            messagesList.scrollTop = messagesList.scrollHeight;
+        }
+
+        function escapeHtml(value) {
+            return value
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+
+        function removeEmptyMessage() {
+            const empty = messagesList.querySelector(".sb-muted");
+            if (empty) empty.remove();
+        }
+
+        function appendMessage(message) {
+            removeEmptyMessage();
+
+            const mine = message.senderUserId === currentUserId;
+            const row = document.createElement("div");
+
+            row.className = `sb-bubble-row ${mine ? "is-mine" : "is-other"}`;
+
+            row.innerHTML = `
+                <div class="sb-bubble">
+                    <div class="sb-bubble-meta">
+                        <span class="sb-bubble-name">${escapeHtml(message.senderName || "User")}</span>
+                        <span class="sb-bubble-time">${escapeHtml(message.sentAt || "")}</span>
+                    </div>
+                    <div class="sb-bubble-body">${escapeHtml(message.body || "")}</div>
+                </div>
+            `;
+
+            messagesList.appendChild(row);
+            scrollToBottom();
+        }
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/hubs/tutor-request-chat")
+            .withAutomaticReconnect()
+            .build();
+
+        connection.on("ReceiveMessage", appendMessage);
+
+        connection.onreconnecting(() => {
+            chatStatus.textContent = "Reconnecting...";
+            sendButton.disabled = true;
+        });
+
+        connection.onreconnected(async () => {
+            await connection.invoke("JoinRequestGroup", requestId);
+            chatStatus.textContent = "Live chat connected";
+            sendButton.disabled = false;
+        });
+
+        connection.onclose(() => {
+            chatStatus.textContent = "Disconnected";
+            sendButton.disabled = true;
+        });
+
+        async function startChat() {
+            try {
+                await connection.start();
+                await connection.invoke("JoinRequestGroup", requestId);
+
+                chatStatus.textContent = "Live chat connected";
+                sendButton.disabled = false;
+
+                scrollToBottom();
+            } catch (err) {
+                console.error(err);
+                chatStatus.textContent = "Could not connect to live chat";
+                sendButton.disabled = true;
+            }
+        }
+
+        chatForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const body = messageInput.value.trim();
+            if (!body) return;
+
+            sendButton.disabled = true;
+
+            try {
+                await connection.invoke("SendMessage", requestId, body);
+                messageInput.value = "";
+            } catch (err) {
+                console.error(err);
+                alert(err.message || "Message could not be sent.");
+            } finally {
+                if (connection.state === signalR.HubConnectionState.Connected) {
+                    sendButton.disabled = false;
+                    messageInput.focus();
+                }
+            }
+        });
+
+        startChat();
+    </script>
+}

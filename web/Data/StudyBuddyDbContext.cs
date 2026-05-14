@@ -24,6 +24,7 @@ namespace web.Data
         public DbSet<ForumReply> ForumReplies { get; set; }
         public DbSet<StudyPostParticipant> StudyPostParticipants { get; set; }
         public DbSet<TutorRequest> TutorRequests { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -97,6 +98,12 @@ namespace web.Data
                 .IsUnique();
 
             modelBuilder.Entity<Bookmark>()
+                .HasOne(x => x.User)
+                .WithMany()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Notification>()
                 .HasOne(x => x.User)
                 .WithMany()
                 .HasForeignKey(x => x.UserId)

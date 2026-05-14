@@ -1,4 +1,27 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using web.Data
+@using web.Models
+
+@inject UserManager<ApplicationUser> UserManager
+@inject StudyBuddyDbContext DbContext
+
+@{
+    var unreadNotificationsCount = 0;
+
+    if (User.Identity?.IsAuthenticated == true)
+    {
+        var currentUserId = UserManager.GetUserId(User);
+
+        if (!string.IsNullOrWhiteSpace(currentUserId))
+        {
+            unreadNotificationsCount = await DbContext.Notifications
+                .CountAsync(n => n.UserId == currentUserId && !n.IsRead);
+        }
+    }
+}
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -15,35 +38,92 @@
     <header>
         <nav class="navbar navbar-expand-sm sb-navbar navbar-dark">
             <div class="container">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">StudyBuddy</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
-                    aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    StudyBuddy
+                </a>
+
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#mainNav"
+                        aria-controls="mainNav"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between" id="mainNav">
+
                     <ul class="navbar-nav flex-grow-1">
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="StudyPosts" asp-action="Index">Study Post</a>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Materials" asp-action="Index">Materials</a>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Tutors" asp-action="Index">Tutors</a>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Forum" asp-action="Index">Forum</a>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Bookmarks" asp-action="My">Saved</a>
                         </li>
+
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link text-dark position-relative dropdown-toggle"
+                                   href="#"
+                                   id="notificationsDropdown"
+                                   role="button"
+                                   data-bs-toggle="dropdown"
+                                   aria-expanded="false">
+                                    Notifications
+
+                                    <span id="notificationBadge"
+                                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger @(unreadNotificationsCount > 0 ? "" : "d-none")">
+                                        @unreadNotificationsCount
+                                    </span>
+                                </a>
+
+                                <div class="dropdown-menu dropdown-menu-end sb-notification-dropdown"
+                                     aria-labelledby="notificationsDropdown">
+
+                                    <div class="sb-notification-header">
+                                        <span class="sb-notification-title">Notifications</span>
+
+                                        <a class="sb-notification-view-all"
+                                           asp-controller="Notifications"
+                                           asp-action="Index">
+                                            View all
+                                        </a>
+                                    </div>
+
+                                    <div id="notificationDropdownItems">
+                                        <div class="sb-notification-empty">
+                                            Loading notifications...
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        }
+
                     </ul>
 
                     <partial name="_LoginPartial" />
+
                 </div>
             </div>
         </nav>
@@ -51,6 +131,7 @@
 
     <div class="container sb-container">
         <main role="main" class="sb-main">
+
             @if (TempData["ok"] is string okMsg)
             {
                 <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
@@ -68,6 +149,7 @@
             }
 
             @RenderBody()
+
         </main>
     </div>
 
@@ -81,7 +163,112 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+
+        <script>
+            const notificationBadge = document.getElementById("notificationBadge");
+            const notificationDropdownItems = document.getElementById("notificationDropdownItems");
+            const notificationsDropdown = document.getElementById("notificationsDropdown");
+
+            function setNotificationBadge(count) {
+                if (!notificationBadge) return;
+
+                notificationBadge.innerText = count;
+
+                if (count > 0) {
+                    notificationBadge.classList.remove("d-none");
+                } else {
+                    notificationBadge.classList.add("d-none");
+                }
+            }
+
+            function escapeHtml(value) {
+                return (value || "")
+                    .replaceAll("&", "&amp;")
+                    .replaceAll("<", "&lt;")
+                    .replaceAll(">", "&gt;")
+                    .replaceAll('"', "&quot;")
+                    .replaceAll("'", "&#039;");
+            }
+
+            function renderNotificationItems(items) {
+                if (!notificationDropdownItems) return;
+
+                if (!items || items.length === 0) {
+                    notificationDropdownItems.innerHTML = `
+                        <div class="sb-notification-empty">
+                            No notifications yet.
+                        </div>
+                    `;
+                    return;
+                }
+
+                notificationDropdownItems.innerHTML = items.map(item => `
+                    <a href="${escapeHtml(item.link || "/Notifications")}"
+                       class="sb-notification-item">
+
+                        <div class="d-flex justify-content-between gap-2 align-items-start">
+                            <div class="sb-notification-item-title">
+                                ${escapeHtml(item.title)}
+                            </div>
+
+                            ${item.count > 0
+                                ? `<span class="badge bg-danger rounded-pill">${item.count}</span>`
+                                : ""}
+                        </div>
+
+                        <div class="sb-notification-item-message text-truncate">
+                            ${escapeHtml(item.message)}
+                        </div>
+
+                        <div class="sb-notification-item-time">
+                            ${escapeHtml(item.createdAt)}
+                        </div>
+                    </a>
+                `).join("");
+            }
+
+            async function loadNotificationDropdown() {
+                try {
+                    const response = await fetch("/Notifications/Dropdown");
+
+                    if (!response.ok) return;
+
+                    const data = await response.json();
+
+                    setNotificationBadge(data.unreadCount || 0);
+                    renderNotificationItems(data.items || []);
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+
+            notificationsDropdown?.addEventListener("click", () => {
+                loadNotificationDropdown();
+            });
+
+            loadNotificationDropdown();
+
+            const notificationConnection = new signalR.HubConnectionBuilder()
+                .withUrl("/hubs/tutor-request-chat")
+                .withAutomaticReconnect()
+                .build();
+
+            notificationConnection.on("ReceiveNotification", () => {
+                const current = parseInt(notificationBadge?.innerText || "0");
+                setNotificationBadge(current + 1);
+                loadNotificationDropdown();
+            });
+
+            notificationConnection.start().catch(err => console.error(err));
+        </script>
+    }
+
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 
 </html>

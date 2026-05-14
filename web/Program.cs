@@ -7,8 +7,12 @@ using System.Text;
 using web.Data;
 using web.Models;
 using web.Services;
+using web.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//SignalR
+builder.Services.AddSignalR();
 
 // DB
 builder.Services.AddDbContext<StudyBuddyDbContext>(options =>
@@ -124,6 +128,8 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "StudyBuddy API v1");
 });
 
+app.MapHub<TutorRequestChatHub>("/hubs/tutor-request-chat");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -137,3 +143,4 @@ app.MapControllerRoute(
     .WithStaticAssets();
 
 app.Run();
+
