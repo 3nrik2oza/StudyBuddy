@@ -64,7 +64,7 @@ public class NotificationsController : Controller
             return Unauthorized();
 
         var notifications = await _context.Notifications
-            .Where(n => n.UserId == meId)
+            .Where(n => n.UserId == meId && !n.IsRead)
             .OrderByDescending(n => n.CreatedAt)
             .Take(20)
             .ToListAsync();
@@ -110,5 +110,27 @@ public class NotificationsController : Controller
             })
             .OrderByDescending(x => x.LastCreatedAt)
             .ToList();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> MarkAsRead()
+    {
+        var meId = _userManager.GetUserId(User);
+
+        if (string.IsNullOrWhiteSpace(meId))
+            return Unauthorized();
+
+        var unread = await _context.Notifications
+            .Where(n => n.UserId == meId && !n.IsRead)
+            .ToListAsync();
+
+        foreach (var notification in unread)
+        {
+            notification.IsRead = true;
+        }
+
+        await _context.SaveChangesAsync();
+
+        return Ok();
     }
 }

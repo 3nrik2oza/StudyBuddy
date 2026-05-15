@@ -16,7 +16,7 @@
         if (!string.IsNullOrWhiteSpace(currentUserId))
         {
             unreadNotificationsCount = await DbContext.Notifications
-                .CountAsync(n => n.UserId == currentUserId && !n.IsRead);
+            .CountAsync(n => n.UserId == currentUserId && !n.IsRead);
         }
     }
 }
@@ -43,13 +43,8 @@
                     StudyBuddy
                 </a>
 
-                <button class="navbar-toggler"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#mainNav"
-                        aria-controls="mainNav"
-                        aria-expanded="false"
-                        aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                    aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
@@ -84,29 +79,25 @@
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item dropdown">
-                                <a class="nav-link text-dark position-relative dropdown-toggle"
-                                   href="#"
-                                   id="notificationsDropdown"
-                                   role="button"
-                                   data-bs-toggle="dropdown"
-                                   aria-expanded="false">
+                                <a class="nav-link text-dark position-relative dropdown-toggle" href="#"
+                                    id="notificationsDropdown" role="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
                                     Notifications
 
                                     <span id="notificationBadge"
-                                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger @(unreadNotificationsCount > 0 ? "" : "d-none")">
+                                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger @(unreadNotificationsCount > 0 ? "" : "d-none")">
                                         @unreadNotificationsCount
                                     </span>
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end sb-notification-dropdown"
-                                     aria-labelledby="notificationsDropdown">
+                                    aria-labelledby="notificationsDropdown">
 
                                     <div class="sb-notification-header">
                                         <span class="sb-notification-title">Notifications</span>
 
-                                        <a class="sb-notification-view-all"
-                                           asp-controller="Notifications"
-                                           asp-action="Index">
+                                        <a class="sb-notification-view-all" asp-controller="Notifications"
+                                            asp-action="Index">
                                             View all
                                         </a>
                                     </div>
@@ -199,36 +190,36 @@
 
                 if (!items || items.length === 0) {
                     notificationDropdownItems.innerHTML = `
-                        <div class="sb-notification-empty">
-                            No notifications yet.
-                        </div>
-                    `;
+                                <div class="sb-notification-empty">
+                                    No notifications yet.
+                                </div>
+                            `;
                     return;
                 }
 
                 notificationDropdownItems.innerHTML = items.map(item => `
-                    <a href="${escapeHtml(item.link || "/Notifications")}"
-                       class="sb-notification-item">
+                            <a href="${escapeHtml(item.link || "/Notifications")}"
+                               class="sb-notification-item">
 
-                        <div class="d-flex justify-content-between gap-2 align-items-start">
-                            <div class="sb-notification-item-title">
-                                ${escapeHtml(item.title)}
-                            </div>
+                                <div class="d-flex justify-content-between gap-2 align-items-start">
+                                    <div class="sb-notification-item-title">
+                                        ${escapeHtml(item.title)}
+                                    </div>
 
-                            ${item.count > 0
-                                ? `<span class="badge bg-danger rounded-pill">${item.count}</span>`
-                                : ""}
-                        </div>
+                                    ${item.count > 0
+                        ? `<span class="badge bg-danger rounded-pill">${item.count}</span>`
+                        : ""}
+                                </div>
 
-                        <div class="sb-notification-item-message text-truncate">
-                            ${escapeHtml(item.message)}
-                        </div>
+                                <div class="sb-notification-item-message text-truncate">
+                                    ${escapeHtml(item.message)}
+                                </div>
 
-                        <div class="sb-notification-item-time">
-                            ${escapeHtml(item.createdAt)}
-                        </div>
-                    </a>
-                `).join("");
+                                <div class="sb-notification-item-time">
+                                    ${escapeHtml(item.createdAt)}
+                                </div>
+                            </a>
+                        `).join("");
             }
 
             async function loadNotificationDropdown() {
@@ -246,8 +237,23 @@
                 }
             }
 
-            notificationsDropdown?.addEventListener("click", () => {
-                loadNotificationDropdown();
+            notificationsDropdown?.addEventListener("click", async () => {
+                await loadNotificationDropdown();
+
+                try {
+                    await fetch("/Notifications/MarkAsRead", {
+                        method: "POST"
+                    });
+
+                    setNotificationBadge(0);
+
+                    setTimeout(() => {
+                        renderNotificationItems([]);
+                    }, 800);
+
+                } catch (err) {
+                    console.error(err);
+                }
             });
 
             loadNotificationDropdown();
