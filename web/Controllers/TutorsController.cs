@@ -218,6 +218,17 @@ public class TutorsController : Controller
         _context.TutorRequests.Add(req);
         await _context.SaveChangesAsync();
 
+        _context.Notifications.Add(new Notification
+        {
+            UserId = vm.TutorUserId,
+            Message = "You received a new tutoring request.",
+            Link = $"/Tutors/RequestDetails/{req.Id}",
+            IsRead = false,
+            CreatedAt = DateTime.UtcNow
+        });
+
+        await _context.SaveChangesAsync();
+
         _context.TutorRequestMessages.Add(new TutorRequestMessage
         {
             TutorRequestId = req.Id,
