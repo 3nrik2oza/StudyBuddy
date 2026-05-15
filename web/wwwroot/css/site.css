@@ -1,7 +1,4 @@
-.home-hero {
-    background: linear-gradient(135deg, #f1f5f9, #e0f2fe);
-    border: 1px solid #e2e8f0;
-}
+
 
 .home-hero-image-wrapper {
     max-width: 260px;
@@ -13,113 +10,17 @@
 }
 
 /* Quick action cards */
-.home-card {
-    background-color: #f9fafb;
-    border: 1px solid #e5e7eb;
-    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
-}
-
-.home-card:hover {
-    background-color: #ffffff;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
-}
-
-.home-card-icon {
-    font-size: 1.6rem;
-}
 
 /* Latest news styling */
-.home-news-item {
-    border-radius: 0.75rem;
-    border: 1px solid #e5e7eb;
-    margin-bottom: 0.5rem;
-}
-/* Base card */
-.home-card {
-    background-color: #f9fafb;
-    border: 1px solid #e5e7eb;
-    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease, border-color 0.12s ease;
-}
 
-.home-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
-}
+/* Base card */
 
 /* Variant colors */
-.home-card-materials {
-    background-color: #dbeafe;      /* blue-100 */
-    border-color: #bfdbfe;
-}
-
-.home-card-materials:hover {
-    background-color: #bfdbfe;
-}
-
-.home-card-post {
-    background-color: #fef3c7;      /* amber-100 */
-    border-color: #fcd34d;
-}
-
-.home-card-post:hover {
-    background-color: #fde68a;
-}
-
-.home-card-tutors {
-    background-color: #ede9fe;      /* violet-100 */
-    border-color: #ddd6fe;
-}
-
-.home-card-tutors:hover {
-    background-color: #ddd6fe;
-}
-
-.home-card-news {
-    background-color: #dcfce7;      /* green-100 */
-    border-color: #bbf7d0;
-}
-
-.home-card-news:hover {
-    background-color: #bbf7d0;
-}
-.page-header {
-    border: 1px solid transparent;
-}
 
 /* match home card colors, but softer */
-.page-header-materials {
-    background-color: #eff6ff;   /* blue-50 */
-    border-color: #bfdbfe;
-}
-
-.page-header-post {
-    background-color: #fffbeb;   /* amber-50 */
-    border-color: #fcd34d;
-}
-
-.page-header-tutors {
-    background-color: #f5f3ff;   /* violet-50 */
-    border-color: #ddd6fe;
-}
-
-.page-header-news {
-    background-color: #ecfdf3;   /* green-50 */
-    border-color: #bbf7d0;
-}
-.tutor-pill {
-    background-color: #ede9fe;
-    border: 1px solid #ddd6fe;
-    font-size: 0.9rem;
-}
 
 .tutor-pill span.badge {
     font-size: 0.8rem;
-}
-.session-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
 }
 
 .session-card {
@@ -256,21 +157,6 @@
     color: #1f2933;
 }
 /* boje vrha kartica prema predmetu */
-.tutor-card-blue {
-    border-top-color: #7aa8ff;
-}
-
-.tutor-card-yellow {
-    border-top-color: #ffd27a;
-}
-
-.tutor-card-red {
-    border-top-color: #ff8a8a;
-}
-
-.tutor-card-green {
-    border-top-color: #8ed6aa;
-}
 
 /* badge za help points */
 .tutor-help-badge {
@@ -280,133 +166,10 @@
     font-size: 0.8rem;
     font-weight: 500;
 }
-.news-section {
-    padding: 0 40px 40px;
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-.news-title {
-    font-size: 28px;
-    font-weight: 600;
-    margin: 40px 0 20px;
-}
-
-.news-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.news-card {
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 18px 20px 16px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
-    border: 1px solid #eef0f4;
-}
 
 /* unutrašnji layout */
-.news-card-inner {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.news-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-}
-
-.news-tag {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.news-tag-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 999px;
-}
-
-.news-tag-text {
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #6a7a99;
-    font-weight: 500;
-}
-
-.news-date {
-    color: #888;
-}
-
-.news-card h3 {
-    margin: 4px 0 2px;
-    font-size: 18px;
-}
-
-.news-card p {
-    margin: 0 0 4px;
-    font-size: 14px;
-    color: #444;
-}
-
-.news-link {
-    font-size: 14px;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.news-link:hover {
-    text-decoration: underline;
-}
 
 /* varijante boja po kategoriji */
-
-.news-blue {
-    border-left: 5px solid #6aa7ff;
-}
-.news-blue .news-tag-dot {
-    background: #6aa7ff;
-}
-.news-blue .news-link {
-    color: #3a6ea5;
-}
-
-.news-green {
-    border-left: 5px solid #8ed081;
-}
-.news-green .news-tag-dot {
-    background: #8ed081;
-}
-.news-green .news-link {
-    color: #3c8b4d;
-}
-
-.news-amber {
-    border-left: 5px solid #f5b971;
-}
-.news-amber .news-tag-dot {
-    background: #f5b971;
-}
-.news-amber .news-link {
-    color: #d07a22;
-}
-
-.news-red {
-    border-left: 5px solid #ff7c7c;
-}
-.news-red .news-tag-dot {
-    background: #ff7c7c;
-}
-.news-red .news-link {
-    color: #e45757;
-}
 
 .forum-list {
     max-width: 900px;
@@ -462,7 +225,6 @@
     font-size: 13px;
     color: #666;
 }
-
 
 .forum-border-blue {
     border-left: 5px solid #3a6ea5;
@@ -679,13 +441,6 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
-.register-title {
-    margin-bottom: 0.4rem;
-}
-
-.register-subtitle {
-    margin-bottom: 1.4rem;
-}
 /* ===== Profile UI (sb-*) ===== */
 :root{
     --sb-primary:#2563eb;
@@ -1692,37 +1447,6 @@ select.login-input.form-control{
   color: rgba(255,255,255,.9) !important;
 }
 /* ===== Chat (TutorRequest Details) ===== */
-
-.sb-msg{
-  max-width: 760px;
-  width: 100%;
-  padding: 14px 16px;
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,.12);
-  box-shadow: 0 12px 40px rgba(0,0,0,.35);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-
-.sb-msg-mine{
-  background: rgba(37, 99, 235, .18);       /* plava */
-  border-color: rgba(59, 130, 246, .35);
-}
-
-.sb-msg-other{
-  background: rgba(255,255,255,.06);       /* dark glass */
-}
-
-.sb-msg-meta{
-  font-size: 12px;
-  color: rgba(255,255,255,.70);
-  margin-bottom: 6px;
-}
-
-.sb-msg-body{
-  color: rgba(255,255,255,.92);
-  white-space: pre-wrap; /* zadrži enter/newline */
-}
 
 /* inputi u dark temi */
 .form-control.sb-input,
