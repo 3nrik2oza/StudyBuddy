@@ -14,6 +14,7 @@ public class NotificationGroupVM
     public string? Link { get; set; }
     public int Count { get; set; }
     public DateTime LastCreatedAt { get; set; }
+    public int Id { get; set; }
 }
 
 [Authorize]
@@ -43,16 +44,6 @@ public class NotificationsController : Controller
 
         var grouped = GroupNotifications(notifications);
 
-        var unread = notifications.Where(n => !n.IsRead).ToList();
-
-        if (unread.Any())
-        {
-            foreach (var n in unread)
-                n.IsRead = true;
-
-            await _context.SaveChangesAsync();
-        }
-
         return View(grouped);
     }
 
@@ -73,6 +64,7 @@ public class NotificationsController : Controller
             .Take(5)
             .Select(n => new
             {
+                id = n.Id,
                 title = n.Title,
                 message = n.LastMessage,
                 link = n.Link,
@@ -101,6 +93,7 @@ public class NotificationsController : Controller
 
                 return new NotificationGroupVM
                 {
+                    Id = latest.Id,
                     Title = latest.Title,
                     LastMessage = latest.Message,
                     Link = latest.Link,
@@ -113,24 +106,22 @@ public class NotificationsController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> MarkAsRead()
+    public async Task<IActionResult> MarkAsRead(int id)
     {
         var meId = _userManager.GetUserId(User);
 
         if (string.IsNullOrWhiteSpace(meId))
             return Unauthorized();
 
-        var unread = await _context.Notifications
-            .Where(n => n.UserId == meId && !n.IsRead)
-            .ToListAsync();
+        var notification = await _context.Notifications
+            .FirstOrDefaultAsync(n => n.Id == id && n.UserId == meId);
 
-        foreach (var notification in unread)
-        {
-            notification.IsRead = true;
-        }
+        if (notification == null)
+            return NotFound();
 
+        notification.IsRead = true;
         await _context.SaveChangesAsync();
 
-        return Ok();
+        return Redirect(notification.Link ?? "/Notifications");
     }
 }
